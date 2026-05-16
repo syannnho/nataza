@@ -150,13 +150,13 @@ tr:hover td{background:var(--bg2)}
 </div>
 
 <nav>
-  <a href="index.html" class="nav-logo">
+  <div class="nav-logo">
     <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
     lapakID
-  </a>
+  </div>
   <div class="nav-right">
     <div class="admin-badge">ADMIN</div>
-    <div class="theme-btn" id="themeBtn"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+    <div class="theme-btn" id="themeBtn"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
     <button class="btn-logout" onclick="doLogout()">Logout</button>
   </div>
 </nav>
@@ -296,8 +296,8 @@ tr:hover td{background:var(--bg2)}
       <div class="table-wrap">
         <table>
           <thead><tr><th>IP Address</th><th>Alasan</th><th>Tanggal</th><th>Aksi</th></tr></thead>
-          <tbody id="banTableBody"><tr><td colspan="4" class="no-data">Memuat data...</td></tr></tbody>
-        </table>
+          <tbody id="banTableBody"><tr><td colspan="4" class="no-data">Memuat data......</td></tr></tbody>
+        ~</table>
       </div>
     </div>
   </div>
@@ -321,8 +321,30 @@ let adminToken = localStorage.getItem('lapakid_admin_token') || '';
 let allIdsData = [];
 let filteredIds = [];
 let settingsCache = {};
+let currentConfirmCallback = null;
+
 const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');
 const dateStr = d => d ? new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+// Helper function untuk fetch dengan admin token
+async function apiFetch(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-admin-token': adminToken,
+    ...options.headers
+  };
+  
+  const response = await fetch(`${API}${path}`, {
+    ...options,
+    headers
+  });
+  
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.message || 'Request failed');
+  }
+  return data;
+}
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 async function doLogin() {
@@ -334,19 +356,19 @@ async function doLogin() {
   btn.disabled = true;
 
   try {
-    const r = await fetch(`${API}/admin/login`, {
+    const response = await fetch(`${API}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
     });
-    const d = await r.json();
-    if (r.ok && d.success) {
+    const data = await response.json();
+    if (response.ok && data.success) {
       adminToken = token;
       localStorage.setItem('lapakid_admin_token', token);
       document.getElementById('loginScreen').style.display = 'none';
       initDashboard();
     } else {
-      showLoginErr(d.message || 'Token tidak valid');
+      showLoginErr(data.message || 'Token tidak valid');
     }
   } catch (err) {
     showLoginErr('Gagal terhubung ke server. Cek koneksi internet.');
@@ -369,65 +391,72 @@ function doLogout() {
   location.reload();
 }
 
-function headers() {
-  return { 'Content-Type': 'application/json', 'x-admin-token': adminToken };
-}
-
 // ── INIT ──────────────────────────────────────────────────────────────────────
 async function initDashboard() {
   initTheme();
   await Promise.all([loadStats(), loadIds(), loadSettings()]);
-  loadPayments();
-  loadPromos();
-  loadBans();
+  await loadPayments();
+  await loadPromos();
+  await loadBans();
 }
 
 async function loadStats() {
-  const r = await fetch(`${API}/ids/stats`).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data: s } = await r.json();
-  document.getElementById('as-total').textContent = s.total.toLocaleString('id-ID');
-  document.getElementById('as-avail').textContent = s.available.toLocaleString('id-ID');
-  document.getElementById('as-sold').textContent = s.sold.toLocaleString('id-ID');
-  document.getElementById('as-likes').textContent = s.totalLikes.toLocaleString('id-ID');
+  try {
+    const data = await apiFetch('/ids/stats');
+    document.getElementById('as-total').textContent = data.data.total.toLocaleString('id-ID');
+    document.getElementById('as-avail').textContent = data.data.available.toLocaleString('id-ID');
+    document.getElementById('as-sold').textContent = data.data.sold.toLocaleString('id-ID');
+    document.getElementById('as-likes').textContent = data.data.totalLikes.toLocaleString('id-ID');
+  } catch (err) {
+    console.error('Load stats error:', err);
+  }
 }
 
 async function loadSettings() {
-  const r = await fetch(`${API}/settings`).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data } = await r.json();
-  settingsCache = data;
-  const p = data.prices || {};
-  ['low','medium','high','legend'].forEach(t => {
-    const el = document.getElementById(`sPrice-${t}`);
-    if (el && p[t]) el.value = p[t];
-  });
-  const f = data.adminFee || {};
-  ['google','file'].forEach(t => {
-    const el = document.getElementById(`sFee-${t}`);
-    if (el && f[t] !== undefined) el.value = f[t];
-  });
+  try {
+    const data = await apiFetch('/settings');
+    settingsCache = data.data;
+    const p = data.data.prices || {};
+    ['low','medium','high','legend'].forEach(t => {
+      const el = document.getElementById(`sPrice-${t}`);
+      if (el && p[t]) el.value = p[t];
+    });
+    const f = data.data.adminFee || {};
+    ['google','file'].forEach(t => {
+      const el = document.getElementById(`sFee-${t}`);
+      if (el && f[t] !== undefined) el.value = f[t];
+    });
+  } catch (err) {
+    console.error('Load settings error:', err);
+  }
 }
 
 // ── IDS ──────────────────────────────────────────────────────────────────────
 async function loadIds() {
-  const { ok, data } = await apiFetch('/ids');
-  if (!ok) return;
-  allIdsData = data.data || [];
-  filteredIds = allIdsData;
-  document.getElementById('idListCount').textContent = `(${allIdsData.length} ID)`;
-  renderIdTable(filteredIds);
+  try {
+    const data = await apiFetch('/ids');
+    allIdsData = data.data || [];
+    filteredIds = [...allIdsData];
+    document.getElementById('idListCount').textContent = `(${allIdsData.length} ID)`;
+    renderIdTable(filteredIds);
+  } catch (err) {
+    console.error('Load IDs error:', err);
+    document.getElementById('idTableBody').innerHTML = '<tr><td colspan="6" class="no-data">Gagal memuat data</td></tr>';
+  }
 }
 
 function filterIdTable() {
   const q = document.getElementById('searchId').value.trim().toLowerCase();
-  filteredIds = q ? allIdsData.filter(i => i.number.includes(q)) : allIdsData;
+  filteredIds = q ? allIdsData.filter(i => i.number.includes(q)) : [...allIdsData];
   renderIdTable(filteredIds);
 }
 
 function renderIdTable(ids) {
   const tbody = document.getElementById('idTableBody');
-  if (!ids.length) { tbody.innerHTML = '<tr><td colspan="6" class="no-data">Tidak ada ID ditemukan</td></tr>'; return; }
+  if (!ids.length) { 
+    tbody.innerHTML = '<tr><td colspan="6" class="no-data">Tidak ada ID ditemukan</td></tr>'; 
+    return; 
+  }
   tbody.innerHTML = ids.map(id => `
     <tr>
       <td class="td-mono">${id.number}</td>
@@ -437,155 +466,165 @@ function renderIdTable(ids) {
       <td>${dateStr(id.addedAt)}</td>
       <td>
         <div class="td-actions">
-          <button class="btn btn-sm ${id.sold?'btn-success':'badge-sold'}" style="${id.sold?'':'background:rgba(239,68,68,.1);color:var(--sold);border:1px solid rgba(239,68,68,.2)'}" onclick="toggleSold('${id.number}',${!id.sold})">${id.sold?'Batalkan':'Tandai Terjual'}</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteId('${id.number}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          <button class="btn btn-sm ${id.sold?'btn-success':'btn-danger'}" style="${id.sold?'':'background:rgba(239,68,68,.1);color:var(--sold);border:1px solid rgba(239,68,68,.2)'}" onclick="toggleSold('${id.number}',${!id.sold})">${id.sold?'Batalkan':'Tandai Terjual'}</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteId('${id.number}')"><svg viewBox="0 0 24 24" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
       </td>
     </tr>
   `).join('');
 }
 
-// ── ROBUST API HELPER ─────────────────────────────────────────────────────────
-async function apiFetch(path, opts = {}) {
-  const token = adminToken || localStorage.getItem('lapakid_admin_token') || '';
-  const config = {
-    method:  opts.method || 'GET',
-    headers: {
-      'Content-Type':  'application/json',
-      'x-admin-token': token,
-      ...(opts.headers || {}),
-    },
-  };
-  if (opts.body) config.body = typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body);
-
-  try {
-    const r = await fetch(API + path, config);
-    let data;
-    try { data = await r.json(); } catch { data = { success: false, message: 'Response bukan JSON (status ' + r.status + ')' }; }
-    if (!data.success) console.warn('[API]', config.method, path, data.message);
-    return { ok: r.ok, status: r.status, data };
-  } catch (err) {
-    console.error('[apiFetch]', path, err);
-    return { ok: false, status: 0, data: { success: false, message: 'Gagal terhubung: ' + err.message } };
-  }
-}
-
 async function addId() {
   const number = document.getElementById('newIdNum').value.trim();
-  const tier   = document.getElementById('newIdTier').value;
-  const note   = document.getElementById('newIdNote').value.trim();
+  const tier = document.getElementById('newIdTier').value;
+  const note = document.getElementById('newIdNote').value.trim();
   if (!number) { showToast('Nomor ID wajib diisi'); return; }
-  const { data } = await apiFetch('/ids', { method:'POST', body:{number,tier,note} });
-  if (data.success) {
+  
+  try {
+    await apiFetch('/ids', { method: 'POST', body: JSON.stringify({ number, tier, note }) });
     showToast('ID berhasil ditambahkan');
     document.getElementById('newIdNum').value = '';
     document.getElementById('newIdNote').value = '';
-    loadIds(); loadStats();
-  } else showToast(data.message || 'Gagal menambahkan ID');
+    await loadIds();
+    await loadStats();
+  } catch (err) {
+    showToast(err.message || 'Gagal menambahkan ID');
+  }
 }
 
 async function addBulk() {
-  const raw  = document.getElementById('bulkIds').value.trim();
+  const raw = document.getElementById('bulkIds').value.trim();
   const tier = document.getElementById('bulkTier').value;
   const note = document.getElementById('bulkNote').value.trim();
   if (!raw) { showToast('Masukkan daftar ID'); return; }
   const ids = raw.split('\n').map(s=>s.trim()).filter(Boolean);
-  const { data } = await apiFetch('/ids/bulk', { method:'POST', body:{ids,tier,note} });
-  if (data.success) {
+  
+  try {
+    const data = await apiFetch('/ids/bulk', { method: 'POST', body: JSON.stringify({ ids, tier, note }) });
     showToast(`Berhasil: ${data.inserted} ditambahkan, ${data.skipped} dilewati`);
     document.getElementById('bulkIds').value = '';
-    loadIds(); loadStats();
-  } else showToast(data.message || 'Gagal upload massal');
+    await loadIds();
+    await loadStats();
+  } catch (err) {
+    showToast(err.message || 'Gagal upload massal');
+  }
 }
 
 async function toggleSold(number, sold) {
-  const { data } = await apiFetch(`/ids/${encodeURIComponent(number)}`, { method:'PUT', body:{sold} });
-  if (data.success) { showToast(sold ? 'ID ditandai terjual' : 'Status dikembalikan'); loadIds(); loadStats(); }
-  else showToast(data.message || 'Gagal update status');
+  try {
+    await apiFetch(`/ids/${encodeURIComponent(number)}`, { method: 'PUT', body: JSON.stringify({ sold }) });
+    showToast(sold ? 'ID ditandai terjual' : 'Status dikembalikan');
+    await loadIds();
+    await loadStats();
+  } catch (err) {
+    showToast(err.message || 'Gagal update status');
+  }
 }
 
 function deleteId(number) {
   showConfirm('Hapus ID', `Hapus ID ${number}? Tindakan ini tidak bisa dibatalkan.`, async () => {
-    const { data } = await apiFetch(`/ids/${encodeURIComponent(number)}`, { method:'DELETE' });
-    if (data.success) { showToast('ID berhasil dihapus'); loadIds(); loadStats(); }
-    else showToast(data.message || 'Gagal menghapus ID');
+    try {
+      await apiFetch(`/ids/${encodeURIComponent(number)}`, { method: 'DELETE' });
+      showToast('ID berhasil dihapus');
+      await loadIds();
+      await loadStats();
+    } catch (err) {
+      showToast(err.message || 'Gagal menghapus ID');
+    }
   });
 }
 
 // ── PAYMENTS ──────────────────────────────────────────────────────────────────
-// Ekstrak MongoDB _id ke string (handle {$oid:'...'} atau string biasa)
-function extractId(v) {
-  if (!v) return '';
-  if (typeof v === 'string') return v;
-  if (v.$oid) return v.$oid;
-  return String(v);
+function extractId(obj) {
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  if (obj.$oid) return obj.$oid;
+  return String(obj);
 }
 
 function methodLabel(m) {
   if (m === 'google') return 'Google Pay';
-  if (m === 'qris')   return 'QRIS';
+  if (m === 'qris') return 'QRIS';
   return 'Transfer File';
 }
 
 async function loadPayments() {
-  const { ok, data } = await apiFetch('/payments');
-  const tbody = document.getElementById('paymentTableBody');
-  if (!ok || !data.data || !data.data.length) {
-    tbody.innerHTML = '<tr><td colspan="9" class="no-data">Belum ada pembayaran</td></tr>';
-    return;
+  try {
+    const data = await apiFetch('/payments');
+    const tbody = document.getElementById('paymentTableBody');
+    if (!data.data || !data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="no-data">Belum ada pembayaran</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.data.map(p => {
+      const pid = extractId(p._id);
+      return `
+        <tr>
+          <td class="td-mono">${p.idNumber}</td>
+          <td><span class="badge badge-${p.tier||'low'}">${(p.tier||'').toUpperCase()}</span></td>
+          <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.email}</span></td>
+          <td>${methodLabel(p.method)}</td>
+          <td class="td-mono">${fmt(p.finalPrice)}</td>
+          <td>${p.promoCode ? `<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>` : '—'}</td>
+          <td><span class="badge badge-${p.status==='confirmed'?'confirmed':'pending'}">${p.status==='confirmed'?'CONFIRMED':'PENDING'}</span></td>
+          <td>${dateStr(p.createdAt)}</td>
+          <td>${p.status==='pending'
+            ? `<button class="btn btn-sm btn-success" onclick="confirmPayment('${pid}')">Konfirmasi</button>`
+            : '<span style="color:var(--muted);font-size:.6rem">Selesai</span>'}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Load payments error:', err);
   }
-  tbody.innerHTML = data.data.map(p => {
-    const pid = extractId(p._id);
-    return `<tr>
-      <td class="td-mono">${p.idNumber}</td>
-      <td><span class="badge badge-${p.tier||'low'}">${(p.tier||'').toUpperCase()}</span></td>
-      <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.email}</span></td>
-      <td>${methodLabel(p.method)}</td>
-      <td class="td-mono">${fmt(p.finalPrice)}</td>
-      <td>${p.promoCode ? `<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>` : '—'}</td>
-      <td><span class="badge badge-${p.status==='confirmed'?'confirmed':'pending'}">${p.status==='confirmed'?'CONFIRMED':'PENDING'}</span></td>
-      <td>${dateStr(p.createdAt)}</td>
-      <td>${p.status==='pending'
-        ? `<button class="btn btn-sm btn-success" onclick="confirmPayment('${pid}')">Konfirmasi</button>`
-        : '<span style="color:var(--muted);font-size:.6rem">Selesai</span>'}</td>
-    </tr>`;
-  }).join('');
 }
 
-async function confirmPayment(id) {
-  if (!id) { showToast('ID pembayaran tidak valid'); return; }
+async function confirmPayment(paymentId) {
+  if (!paymentId) { showToast('ID pembayaran tidak valid'); return; }
   showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
-    const { data } = await apiFetch(`/payments/${id}/confirm`, { method:'PUT' });
-    if (data.success) { showToast('Pembayaran berhasil dikonfirmasi'); loadPayments(); loadIds(); loadStats(); }
-    else showToast(data.message || 'Gagal mengkonfirmasi');
+    try {
+      await apiFetch(`/payment/${paymentId}/confirm`, { method: 'PUT' });
+      showToast('Pembayaran berhasil dikonfirmasi');
+      await loadPayments();
+      await loadIds();
+      await loadStats();
+    } catch (err) {
+      showToast(err.message || 'Gagal mengkonfirmasi');
+    }
   });
 }
 
 // ── PROMOS ────────────────────────────────────────────────────────────────────
 async function loadPromos() {
-  const { ok, data } = await apiFetch('/promos');
-  const tbody = document.getElementById('promoTableBody');
-  if (!ok || !data.data || !data.data.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="no-data">Belum ada promo</td></tr>';
-    return;
+  try {
+    const data = await apiFetch('/promos');
+    const tbody = document.getElementById('promoTableBody');
+    if (!data.data || !data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="no-data">Belum ada promo</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.data.map(p => {
+      const pid = extractId(p._id);
+      return `
+        <tr>
+          <td class="td-mono" style="font-weight:700">${p.code}</td>
+          <td style="color:var(--success);font-weight:800">${p.discount}%</td>
+          <td class="td-mono">${p.uses||0}</td>
+          <td class="td-mono">${p.maxUses!=null?p.maxUses:'∞'}</td>
+          <td>${p.expiresAt?dateStr(p.expiresAt):'Tidak ada'}</td>
+          <td><span class="badge ${p.active?'badge-avail':'badge-sold'}">${p.active?'AKTIF':'NONAKTIF'}</span></td>
+          <td>
+            <div class="td-actions">
+              <button class="btn btn-sm ${p.active?'btn-danger':'btn-success'}" onclick="togglePromo('${pid}',${!p.active})">${p.active?'Nonaktifkan':'Aktifkan'}</button>
+              <button class="btn btn-sm btn-danger" onclick="deletePromo('${pid}')"><svg viewBox="0 0 24 24" width="11" height="11"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    console.error('Load promos error:', err);
   }
-  tbody.innerHTML = data.data.map(p => {
-    const pid = extractId(p._id);
-    return `<tr>
-      <td class="td-mono" style="font-weight:700">${p.code}</td>
-      <td style="color:var(--success);font-weight:800">${p.discount}%</td>
-      <td class="td-mono">${p.uses||0}</td>
-      <td class="td-mono">${p.maxUses!=null?p.maxUses:'∞'}</td>
-      <td>${p.expiresAt?dateStr(p.expiresAt):'Tidak ada'}</td>
-      <td><span class="badge ${p.active?'badge-avail':'badge-sold'}">${p.active?'AKTIF':'NONAKTIF'}</span></td>
-      <td>
-        <div class="td-actions">
-          <button class="btn btn-sm ${p.active?'btn-danger':'btn-success'}" onclick="togglePromo('${pid}',${!p.active})">${p.active?'Nonaktifkan':'Aktifkan'}</button>
-          <button class="btn btn-sm btn-danger" onclick="deletePromo('${pid}')"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
 }
 
 function updateDiscountPreview() {
@@ -602,35 +641,54 @@ function updateDiscountPreview() {
 }
 
 async function createPromo() {
-  const code        = document.getElementById('promoCode').value.trim();
-  const discount    = document.getElementById('promoDiscount').value;
-  const maxUses     = document.getElementById('promoMaxUses').value;
-  const expiresAt   = document.getElementById('promoExpiry').value;
+  const code = document.getElementById('promoCode').value.trim();
+  const discount = document.getElementById('promoDiscount').value;
+  const maxUses = document.getElementById('promoMaxUses').value;
+  const expiresAt = document.getElementById('promoExpiry').value;
   const description = document.getElementById('promoDesc').value.trim();
   if (!code || !discount) { showToast('Kode dan diskon wajib diisi'); return; }
-  const { data } = await apiFetch('/promos', {
-    method: 'POST',
-    body: { code, discount: Number(discount), maxUses: maxUses ? Number(maxUses) : null, expiresAt: expiresAt || null, description },
-  });
-  if (data.success) {
+  
+  try {
+    await apiFetch('/promos', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        code, 
+        discount: Number(discount), 
+        maxUses: maxUses ? Number(maxUses) : null, 
+        expiresAt: expiresAt || null, 
+        description 
+      })
+    });
     showToast('Promo berhasil dibuat');
-    ['promoCode','promoDiscount','promoMaxUses','promoExpiry','promoDesc'].forEach(id => { document.getElementById(id).value = ''; });
+    ['promoCode','promoDiscount','promoMaxUses','promoExpiry','promoDesc'].forEach(id => { 
+      document.getElementById(id).value = ''; 
+    });
     document.getElementById('discountPreview').style.display = 'none';
-    loadPromos();
-  } else showToast(data.message || 'Gagal membuat promo');
+    await loadPromos();
+  } catch (err) {
+    showToast(err.message || 'Gagal membuat promo');
+  }
 }
 
-async function togglePromo(id, active) {
-  const { data } = await apiFetch(`/promos/${id}`, { method:'PUT', body:{ active } });
-  if (data.success) { showToast(active ? 'Promo diaktifkan' : 'Promo dinonaktifkan'); loadPromos(); }
-  else showToast(data.message || 'Gagal update promo');
+async function togglePromo(promoId, active) {
+  try {
+    await apiFetch(`/promos/${promoId}`, { method: 'PUT', body: JSON.stringify({ active }) });
+    showToast(active ? 'Promo diaktifkan' : 'Promo dinonaktifkan');
+    await loadPromos();
+  } catch (err) {
+    showToast(err.message || 'Gagal update promo');
+  }
 }
 
-function deletePromo(id) {
+function deletePromo(promoId) {
   showConfirm('Hapus Promo', 'Hapus promo ini?', async () => {
-    const { data } = await apiFetch(`/promos/${id}`, { method:'DELETE' });
-    if (data.success) { showToast('Promo berhasil dihapus'); loadPromos(); }
-    else showToast(data.message || 'Gagal menghapus promo');
+    try {
+      await apiFetch(`/promos/${promoId}`, { method: 'DELETE' });
+      showToast('Promo berhasil dihapus');
+      await loadPromos();
+    } catch (err) {
+      showToast(err.message || 'Gagal menghapus promo');
+    }
   });
 }
 
@@ -641,44 +699,59 @@ async function savePrices() {
     const v = document.getElementById(`sPrice-${t}`).value;
     if (v) prices[t] = Number(v);
   });
-  const { data } = await apiFetch('/settings/prices', { method:'PUT', body:{ value: prices } });
-  if (data.success) { showToast('Harga berhasil disimpan'); settingsCache.prices = prices; }
-  else showToast(data.message || 'Gagal menyimpan harga');
+  try {
+    await apiFetch('/settings/prices', { method: 'PUT', body: JSON.stringify({ value: prices }) });
+    showToast('Harga berhasil disimpan');
+    settingsCache.prices = prices;
+  } catch (err) {
+    showToast(err.message || 'Gagal menyimpan harga');
+  }
 }
 
 async function saveFees() {
   const adminFee = {};
-  ['google','file','qris'].forEach(t => {
+  ['google','file'].forEach(t => {
     const el = document.getElementById(`sFee-${t}`);
     if (el) adminFee[t] = Number(el.value) || 0;
   });
-  const { data } = await apiFetch('/settings/adminFee', { method:'PUT', body:{ value: adminFee } });
-  if (data.success) showToast('Biaya admin berhasil disimpan');
-  else showToast(data.message || 'Gagal menyimpan biaya admin');
+  try {
+    await apiFetch('/settings/adminFee', { method: 'PUT', body: JSON.stringify({ value: adminFee }) });
+    showToast('Biaya admin berhasil disimpan');
+  } catch (err) {
+    showToast(err.message || 'Gagal menyimpan biaya admin');
+  }
 }
 
 // ── BANS ─────────────────────────────────────────────────────────────────────
 async function loadBans() {
-  const { ok, data } = await apiFetch('/bans');
-  const tbody = document.getElementById('banTableBody');
-  if (!ok || !data.data || !data.data.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="no-data">Tidak ada IP yang diblokir</td></tr>';
-    return;
+  try {
+    const data = await apiFetch('/bans');
+    const tbody = document.getElementById('banTableBody');
+    if (!data.data || !data.data.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="no-data">Tidak ada IP yang diblokir</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.data.map(b => `
+      <tr>
+        <td class="td-mono">${b.ip}</td>
+        <td>${b.reason||'spam_like'}</td>
+        <td>${dateStr(b.bannedAt)}</td>
+        <td><button class="btn btn-sm btn-success" onclick="unbanIp('${b.ip}')">Unban</button></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error('Load bans error:', err);
   }
-  tbody.innerHTML = data.data.map(b => `
-    <tr>
-      <td class="td-mono">${b.ip}</td>
-      <td>${b.reason||'spam_like'}</td>
-      <td>${dateStr(b.bannedAt)}</td>
-      <td><button class="btn btn-sm btn-success" onclick="unbanIp('${b.ip}')">Unban</button></td>
-    </tr>
-  `).join('');
 }
 
 async function unbanIp(ip) {
-  const { data } = await apiFetch(`/bans/${encodeURIComponent(ip)}`, { method:'DELETE' });
-  if (data.success) { showToast(`IP ${ip} berhasil di-unban`); loadBans(); }
-  else showToast(data.message || 'Gagal unban IP');
+  try {
+    await apiFetch(`/bans/${encodeURIComponent(ip)}`, { method: 'DELETE' });
+    showToast(`IP ${ip} berhasil di-unban`);
+    await loadBans();
+  } catch (err) {
+    showToast(err.message || 'Gagal unban IP');
+  }
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
@@ -690,57 +763,71 @@ function switchTab(tab) {
 }
 
 // ── CONFIRM MODAL ─────────────────────────────────────────────────────────────
-let confirmCb = null;
-function showConfirm(title, msg, cb) {
+function showConfirm(title, msg, callback) {
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmMsg').textContent = msg;
-  confirmCb = cb;
+  currentConfirmCallback = callback;
   document.getElementById('confirmOverlay').classList.add('open');
 }
-function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); confirmCb = null; }
-document.getElementById('confirmYes').addEventListener('click', () => { closeConfirm(); if(confirmCb) confirmCb(); });
-document.getElementById('confirmOverlay').addEventListener('click', e => { if(e.target===document.getElementById('confirmOverlay')) closeConfirm(); });
+
+function closeConfirm() { 
+  document.getElementById('confirmOverlay').classList.remove('open'); 
+  currentConfirmCallback = null; 
+}
+
+document.getElementById('confirmYes').addEventListener('click', () => { 
+  closeConfirm(); 
+  if (currentConfirmCallback) currentConfirmCallback(); 
+});
+
+document.getElementById('confirmOverlay').addEventListener('click', e => { 
+  if (e.target === document.getElementById('confirmOverlay')) closeConfirm(); 
+});
 
 // ── THEME ──────────────────────────────────────────────────────────────────────
 function initTheme() {
-  if (localStorage.getItem('lapakid_dark')==='1') document.body.classList.add('dark');
+  if (localStorage.getItem('lapakid_dark') === '1') document.body.classList.add('dark');
 }
+
 document.getElementById('themeBtn').addEventListener('click', () => {
   const d = document.body.classList.toggle('dark');
-  localStorage.setItem('lapakid_dark', d?'1':'0');
+  localStorage.setItem('lapakid_dark', d ? '1' : '0');
 });
 
 // ── TOAST ──────────────────────────────────────────────────────────────────────
 function showToast(msg) {
-  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
-  document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+  const t = document.createElement('div'); 
+  t.className = 'toast'; 
+  t.textContent = msg;
+  document.body.appendChild(t); 
+  setTimeout(() => t.remove(), 2500);
 }
 
-// ── AUTO-LOGIN (verifikasi token dulu) ────────────────────────────────────────
+// ── AUTO-LOGIN ────────────────────────────────────────────────────────────────
 async function tryAutoLogin() {
   initTheme();
-  if (!adminToken) return; // token tidak ada, tampilkan login screen
+  if (!adminToken) return;
   try {
-    const r = await fetch(`${API}/admin/login`, {
+    const response = await fetch(`${API}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: adminToken }),
     });
-    const d = await r.json();
-    if (r.ok && d.success) {
+    const data = await response.json();
+    if (response.ok && data.success) {
       document.getElementById('loginScreen').style.display = 'none';
       initDashboard();
     } else {
-      // Token tidak valid, hapus dari localStorage
       adminToken = '';
       localStorage.removeItem('lapakid_admin_token');
     }
-  } catch (_) {
-    // Server tidak bisa dijangkau, biarkan login screen tampil
+  } catch (err) {
+    console.error('Auto login error:', err);
     adminToken = '';
     localStorage.removeItem('lapakid_admin_token');
   }
 }
+
 tryAutoLogin();
 </script>
 </body>
