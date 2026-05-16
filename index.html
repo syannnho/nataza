@@ -27,6 +27,7 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .nav-logo{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.3px}
 .logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center}
 .logo-mark svg{width:14px;height:14px;stroke:#fff;fill:none}
+.logo-img{width:28px;height:28px;object-fit:contain;flex-shrink:0}
 .nav-links{display:flex;align-items:center;gap:6px}
 .nav-link{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;font-size:.7rem;font-weight:600;color:var(--muted2);text-decoration:none;transition:.15s}
 .nav-link:hover,.nav-link.active{background:var(--bg2);color:var(--text)}
@@ -70,7 +71,8 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .id-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 8px 24px rgba(70,95,255,.12)}
 .id-card.is-sold{opacity:.55;cursor:default;pointer-events:none}
 .sold-badge{position:absolute;top:8px;right:8px;background:var(--sold);color:#fff;font-size:.45rem;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.5px}
-.id-num{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--text);word-break:break-all;line-height:1.4}
+.id-num{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--text);word-break:break-all;line-height:1.4;display:flex;align-items:center;gap:5px}
+.id-icon{width:14px;height:14px;object-fit:contain;flex-shrink:0;opacity:.85}
 .id-card.is-sold .id-num{text-decoration:line-through;color:var(--muted)}
 .id-bottom{display:flex;align-items:center;justify-content:space-between}
 .id-tier{font-size:.5rem;font-weight:700;padding:2px 7px;border-radius:99px;letter-spacing:.3px;text-transform:uppercase}
@@ -157,7 +159,7 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
 
 <nav>
   <a href="index.html" class="nav-logo">
-    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <img id="logoImg" src="https://files.catbox.moe/j4ittw.png" alt="lapakID" class="logo-img"/>
     lapakID
   </a>
   <div class="nav-links">
@@ -319,7 +321,7 @@ function buildCard(id, mini) {
   const price = settings.prices ? fmt(settings.prices[id.tier] || 0) : '—';
   return `<div class="id-card${id.sold?' is-sold':''}" data-num="${id.number}" data-tier="${id.tier}">
     ${id.sold ? '<div class="sold-badge">SOLD</div>' : ''}
-    <div class="id-num">${highlight(id.number)}</div>
+    <div class="id-num"><img src="https://files.catbox.moe/em51di.png" class="id-icon" alt=""/>${highlight(id.number)}</div>
     <div class="id-bottom">
       <span class="id-tier ${TIER_BADGE_CLS[id.tier]}">${id.tier.toUpperCase()}</span>
       <button class="like-btn${liked?' liked':''}" data-num="${id.number}" onclick="event.stopPropagation()">
@@ -411,6 +413,13 @@ function initTheme() {
   const dark = localStorage.getItem('lapakid_dark') === '1';
   if (dark) document.body.classList.add('dark');
   updateThemeIcon(dark);
+  updateLogo(dark);
+}
+function updateLogo(dark) {
+  const logo = document.getElementById('logoImg');
+  if (logo) logo.src = dark
+    ? 'https://files.catbox.moe/6esihc.png'
+    : 'https://files.catbox.moe/j4ittw.png';
 }
 function updateThemeIcon(dark) {
   const icon = document.getElementById('themeIcon');
@@ -422,6 +431,7 @@ document.getElementById('themeBtn').addEventListener('click', () => {
   const dark = document.body.classList.toggle('dark');
   localStorage.setItem('lapakid_dark', dark ? '1' : '0');
   updateThemeIcon(dark);
+  updateLogo(dark);
 });
 
 // ── TOAST ────────────────────────────────────────────────────────────────────
