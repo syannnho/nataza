@@ -1,573 +1,373 @@
-// api/index.js - Fixed delete, confirm payment, dan delete promo
+// api/index.js — lapakID Backend
+// Fixed: MongoDB reconnect, URL parsing, admin login, CORS
+
 const { MongoClient, ObjectId } = require('mongodb');
 
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://n4taza_db:N44E8WEKlOJLZIHQ@cluster0.pdfnlfb.mongodb.net/?appName=Cluster0';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'lapakid_admin_secret_2026';
 const DB_NAME = 'lapakid';
 
+// ── MongoDB connection pool ───────────────────────────────────────────────────
 let cachedClient = null;
 let cachedDb = null;
 
-async function connectToDatabase() {
+async function getDB() {
   if (cachedDb && cachedClient && cachedClient.topology?.isConnected?.()) {
     return cachedDb;
   }
-  
   if (cachedClient) {
-    try { await cachedClient.close(); } catch (e) {}
+    try { await cachedClient.close(); } catch (_) {}
     cachedClient = null;
     cachedDb = null;
   }
-  
   const client = new MongoClient(MONGO_URI, {
     maxPoolSize: 10,
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 8000,
+    connectTimeoutMS: 8000,
+    socketTimeoutMS: 30000,
+    retryWrites: true,
+    retryReads: true,
   });
-  
   await client.connect();
   cachedClient = client;
   cachedDb = client.db(DB_NAME);
-  
-  await initCollections(cachedDb);
   return cachedDb;
 }
 
-async function initCollections(db) {
-  const collections = await db.listCollections().toArray();
-  const collectionNames = collections.map(c => c.name);
-  
-  if (!collectionNames.includes('settings')) {
-    await db.collection('settings').insertMany([
-      { key: 'prices', value: { low: 125000, medium: 450000, high: 850000, legend: 1350000 } },
-      { key: 'adminFee', value: { google: 5000, file: 0, qris: 0 } }
-    ]);
-  }
-  
-  if (!collectionNames.includes('ids')) {
-    await db.collection('ids').createIndex({ number: 1 }, { unique: true });
-  }
-  
-  if (!collectionNames.includes('promos')) {
-    await db.collection('promos').createIndex({ code: 1 }, { unique: true });
-  }
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setCORS(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,x-admin-token');
 }
+function ok(res, data)         { res.status(200).json({ success: true,  ...data }); }
+function created(res, data)    { res.status(201).json({ success: true,  ...data }); }
+function fail(res, code, msg)  { res.status(code).json({ success: false, message: msg }); }
 
-function parseBody(req) {
+function getIP(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  if (fwd) return fwd.split(',')[0].trim();
+  return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
+}
+function isAdmin(req) {
+  const tok = req.headers['x-admin-token'];
+  return tok === ADMIN_TOKEN;
+}
+function readBody(req) {
   return new Promise((resolve) => {
-    let body = '';
-    req.on('data', chunk => { body += chunk.toString(); });
-    req.on('end', () => {
-      try { resolve(body ? JSON.parse(body) : {}); } 
-      catch (e) { resolve({}); }
-    });
+    if (req.body && typeof req.body === 'object') return resolve(req.body);
+    let raw = '';
+    req.on('data', c => { raw += c; });
+    req.on('end', () => { try { resolve(raw ? JSON.parse(raw) : {}); } catch { resolve({}); } });
+    req.on('error', () => resolve({}));
   });
 }
-
-function sendJSON(res, status, data) {
-  res.statusCode = status;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(data));
+function qs(url) {
+  try {
+    const i = url.indexOf('?');
+    return i === -1 ? {} : Object.fromEntries(new URLSearchParams(url.slice(i + 1)));
+  } catch { return {}; }
+}
+function parts(url) {
+  return url.split('?')[0].replace(/^\/api\/?/, '').split('/').filter(Boolean);
 }
 
-module.exports = async (req, res) => {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-token');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+async function ensureSettings(db) {
+  const col = db.collection('settings');
+  if (!(await col.findOne({ key: 'prices' }))) {
+    await col.insertMany([
+      { key: 'prices',   value: { low: 125000, medium: 450000, high: 850000, legend: 1350000 } },
+      { key: 'adminFee', value: { google: 5000, file: 0 } },
+      { key: 'siteInfo', value: { name: 'lapakID' } },
+    ]);
   }
-  
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────────────
+module.exports = async function handler(req, res) {
+  setCORS(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  let db;
   try {
-    const db = await connectToDatabase();
-    const url = req.url.replace('/api', '');
-    const path = url.split('?')[0];
-    const parts = path.split('/').filter(Boolean);
-    const method = req.method;
-    
-    // Parse body for POST/PUT requests
-    let body = {};
-    if (method === 'POST' || method === 'PUT') {
-      body = await parseBody(req);
+    db = await getDB();
+    await ensureSettings(db);
+  } catch (err) {
+    console.error('[MongoDB]', err.message);
+    return fail(res, 503, 'Database tidak dapat terhubung: ' + err.message);
+  }
+
+  const [r0, r1, r2] = parts(req.url);
+  const M = req.method.toUpperCase();
+
+  try {
+    // ── admin/login ──────────────────────────────────────────────────────────
+    if (r0==='admin' && r1==='login' && M==='POST') {
+      const b = await readBody(req);
+      if (b.token === ADMIN_TOKEN) return ok(res, { token: ADMIN_TOKEN });
+      return fail(res, 401, 'Token admin salah');
     }
-    
-    console.log(`${method} /api/${parts.join('/')}`);
-    
-    // ============ ADMIN LOGIN ============
-    if (parts[0] === 'admin' && parts[1] === 'login' && method === 'POST') {
-      if (body.token === ADMIN_TOKEN) {
-        return sendJSON(res, 200, { success: true, token: ADMIN_TOKEN });
+
+    // ── ids ───────────────────────────────────────────────────────────────────
+    if (r0==='ids') {
+
+      if (r1==='popular' && M==='GET') {
+        const d = await db.collection('ids')
+          .find({ sold: { $ne: true }, likes: { $gt: 0 } })
+          .sort({ likes: -1 }).limit(12).toArray();
+        return ok(res, { data: d });
       }
-      return sendJSON(res, 401, { success: false, message: 'Token admin salah' });
-    }
-    
-    // Check admin auth untuk semua route yang memerlukan
-    const isAdminRoute = ['ids', 'payments', 'promos', 'settings', 'bans'].includes(parts[0]);
-    if (isAdminRoute && method !== 'GET') {
-      const token = req.headers['x-admin-token'];
-      if (token !== ADMIN_TOKEN) {
-        return sendJSON(res, 401, { success: false, message: 'Unauthorized' });
-      }
-    }
-    
-    // ============ IDS ROUTES ============
-    if (parts[0] === 'ids') {
-      const idsCollection = db.collection('ids');
-      
-      // GET /api/ids/stats
-      if (parts[1] === 'stats' && method === 'GET') {
-        const total = await idsCollection.countDocuments();
-        const sold = await idsCollection.countDocuments({ sold: true });
-        const likesAgg = await idsCollection.aggregate([
-          { $group: { _id: null, total: { $sum: '$likes' } } }
-        ]).toArray();
-        
-        return sendJSON(res, 200, {
-          success: true,
-          data: {
-            total,
-            available: total - sold,
-            sold,
-            totalLikes: likesAgg[0]?.total || 0
-          }
-        });
-      }
-      
-      // GET /api/ids
-      if (!parts[1] && method === 'GET') {
-        const ids = await idsCollection.find({}).sort({ addedAt: -1 }).toArray();
-        return sendJSON(res, 200, { success: true, data: ids });
-      }
-      
-      // POST /api/ids
-      if (!parts[1] && method === 'POST') {
-        if (!body.number || !body.tier) {
-          return sendJSON(res, 400, { success: false, message: 'Number dan tier wajib diisi' });
-        }
-        
-        const existing = await idsCollection.findOne({ number: body.number });
-        if (existing) {
-          return sendJSON(res, 409, { success: false, message: 'ID sudah ada' });
-        }
-        
-        const newId = {
-          number: String(body.number),
-          tier: body.tier,
-          sold: false,
-          likes: 0,
-          note: body.note || '',
-          addedAt: new Date()
-        };
-        
-        await idsCollection.insertOne(newId);
-        return sendJSON(res, 201, { success: true, data: newId });
-      }
-      
-      // POST /api/ids/bulk
-      if (parts[1] === 'bulk' && method === 'POST') {
-        if (!Array.isArray(body.ids) || !body.tier) {
-          return sendJSON(res, 400, { success: false, message: 'ids array dan tier wajib diisi' });
-        }
-        
-        let inserted = 0;
-        let skipped = 0;
-        
-        for (const num of body.ids) {
-          const existing = await idsCollection.findOne({ number: String(num).trim() });
-          if (!existing) {
-            await idsCollection.insertOne({
-              number: String(num).trim(),
-              tier: body.tier,
-              sold: false,
-              likes: 0,
-              note: body.note || '',
-              addedAt: new Date()
-            });
-            inserted++;
-          } else {
-            skipped++;
-          }
-        }
-        
-        return sendJSON(res, 201, { success: true, inserted, skipped });
-      }
-      
-      // PUT /api/ids/:number
-      if (parts[1] && method === 'PUT') {
-        const number = parts[1];
-        const update = {};
-        if (body.sold !== undefined) update.sold = body.sold;
-        if (body.tier !== undefined) update.tier = body.tier;
-        if (body.note !== undefined) update.note = body.note;
-        if (body.likes !== undefined) update.likes = body.likes;
-        
-        const result = await idsCollection.updateOne(
-          { number: number },
-          { $set: update }
-        );
-        
-        if (result.matchedCount === 0) {
-          return sendJSON(res, 404, { success: false, message: 'ID tidak ditemukan' });
-        }
-        
-        return sendJSON(res, 200, { success: true, message: 'ID berhasil diupdate' });
-      }
-      
-      // DELETE /api/ids/:number - FIXED
-      if (parts[1] && method === 'DELETE') {
-        const number = decodeURIComponent(parts[1]);
-        console.log('Deleting ID:', number);
-        
-        const result = await idsCollection.deleteOne({ number: number });
-        
-        if (result.deletedCount === 0) {
-          return sendJSON(res, 404, { success: false, message: 'ID tidak ditemukan' });
-        }
-        
-        // Also delete related likes
-        await db.collection('likes').deleteMany({ idNumber: number });
-        
-        return sendJSON(res, 200, { success: true, message: 'ID berhasil dihapus' });
-      }
-    }
-    
-    // ============ PAYMENTS ROUTES ============
-    if (parts[0] === 'payments' && method === 'GET') {
-      const payments = await db.collection('payments')
-        .find({})
-        .sort({ createdAt: -1 })
-        .limit(200)
-        .toArray();
-      
-      return sendJSON(res, 200, { success: true, data: payments });
-    }
-    
-    // ============ PAYMENT CONFIRM - FIXED ============
-    if (parts[0] === 'payment' && parts[2] === 'confirm' && method === 'PUT') {
-      const paymentId = parts[1];
-      console.log('Confirming payment:', paymentId);
-      
-      let oid;
-      try {
-        oid = new ObjectId(paymentId);
-      } catch (e) {
-        return sendJSON(res, 400, { success: false, message: 'ID pembayaran tidak valid: ' + paymentId });
-      }
-      
-      const payment = await db.collection('payments').findOne({ _id: oid });
-      if (!payment) {
-        return sendJSON(res, 404, { success: false, message: 'Pembayaran tidak ditemukan' });
-      }
-      
-      if (payment.status === 'confirmed') {
-        return sendJSON(res, 400, { success: false, message: 'Pembayaran sudah dikonfirmasi' });
-      }
-      
-      // Update payment status
-      await db.collection('payments').updateOne(
-        { _id: oid },
-        { $set: { status: 'confirmed', confirmedAt: new Date() } }
-      );
-      
-      // Mark ID as sold
-      await db.collection('ids').updateOne(
-        { number: payment.idNumber },
-        { $set: { sold: true, soldAt: new Date() } }
-      );
-      
-      return sendJSON(res, 200, { success: true, message: 'Pembayaran berhasil dikonfirmasi' });
-    }
-    
-    // ============ PROMOS ROUTES ============
-    if (parts[0] === 'promos') {
-      const promosCollection = db.collection('promos');
-      
-      // GET /api/promos
-      if (!parts[1] && method === 'GET') {
-        const promos = await promosCollection.find({}).sort({ createdAt: -1 }).toArray();
-        return sendJSON(res, 200, { success: true, data: promos });
-      }
-      
-      // POST /api/promos
-      if (!parts[1] && method === 'POST') {
-        if (!body.code || body.discount === undefined) {
-          return sendJSON(res, 400, { success: false, message: 'Code dan discount wajib diisi' });
-        }
-        
-        const newPromo = {
-          code: body.code.toUpperCase().trim(),
-          discount: Math.min(88, Math.max(1, Number(body.discount))),
-          maxUses: body.maxUses ? Number(body.maxUses) : null,
-          uses: 0,
-          active: true,
-          description: body.description || '',
-          expiresAt: body.expiresAt ? new Date(body.expiresAt) : null,
-          createdAt: new Date()
-        };
-        
-        await promosCollection.insertOne(newPromo);
-        return sendJSON(res, 201, { success: true, data: newPromo });
-      }
-      
-      // PUT /api/promos/:id - FIXED (untuk toggle aktif/nonaktif)
-      if (parts[1] && method === 'PUT') {
-        const promoId = parts[1];
-        console.log('Updating promo:', promoId);
-        
-        let oid;
-        try {
-          oid = new ObjectId(promoId);
-        } catch (e) {
-          return sendJSON(res, 400, { success: false, message: 'ID promo tidak valid: ' + promoId });
-        }
-        
-        const update = {};
-        if (body.active !== undefined) update.active = body.active;
-        if (body.discount !== undefined) update.discount = Number(body.discount);
-        if (body.maxUses !== undefined) update.maxUses = body.maxUses ? Number(body.maxUses) : null;
-        if (body.description !== undefined) update.description = body.description;
-        
-        const result = await promosCollection.updateOne(
-          { _id: oid },
-          { $set: update }
-        );
-        
-        if (result.matchedCount === 0) {
-          return sendJSON(res, 404, { success: false, message: 'Promo tidak ditemukan' });
-        }
-        
-        return sendJSON(res, 200, { success: true, message: 'Promo berhasil diupdate' });
-      }
-      
-      // DELETE /api/promos/:id - FIXED
-      if (parts[1] && method === 'DELETE') {
-        const promoId = parts[1];
-        console.log('Deleting promo:', promoId);
-        
-        let oid;
-        try {
-          oid = new ObjectId(promoId);
-        } catch (e) {
-          return sendJSON(res, 400, { success: false, message: 'ID promo tidak valid: ' + promoId });
-        }
-        
-        const result = await promosCollection.deleteOne({ _id: oid });
-        
-        if (result.deletedCount === 0) {
-          return sendJSON(res, 404, { success: false, message: 'Promo tidak ditemukan' });
-        }
-        
-        return sendJSON(res, 200, { success: true, message: 'Promo berhasil dihapus' });
-      }
-    }
-    
-    // ============ PROMO VALIDATION (public) ============
-    if (parts[0] === 'promo' && parts[1] === 'validate' && method === 'POST') {
-      if (!body.code) {
-        return sendJSON(res, 400, { success: false, message: 'Kode promo wajib diisi' });
-      }
-      
-      const promo = await db.collection('promos').findOne({ 
-        code: body.code.toUpperCase().trim(), 
-        active: true 
-      });
-      
-      if (!promo) {
-        return sendJSON(res, 404, { success: false, message: 'Kode promo tidak valid' });
-      }
-      
-      if (promo.expiresAt && new Date() > new Date(promo.expiresAt)) {
-        return sendJSON(res, 410, { success: false, message: 'Kode promo sudah kadaluarsa' });
-      }
-      
-      if (promo.maxUses !== null && promo.uses >= promo.maxUses) {
-        return sendJSON(res, 410, { success: false, message: 'Kode promo sudah mencapai batas penggunaan' });
-      }
-      
-      return sendJSON(res, 200, { 
-        success: true, 
-        discount: promo.discount, 
-        code: promo.code, 
-        description: promo.description || '' 
-      });
-    }
-    
-    // ============ SETTINGS ROUTES ============
-    if (parts[0] === 'settings') {
-      // GET /api/settings
-      if (!parts[1] && method === 'GET') {
-        const settings = await db.collection('settings').find({}).toArray();
-        const settingsMap = {};
-        settings.forEach(s => { settingsMap[s.key] = s.value; });
-        return sendJSON(res, 200, { success: true, data: settingsMap });
-      }
-      
-      // PUT /api/settings/prices
-      if (parts[1] === 'prices' && method === 'PUT') {
-        await db.collection('settings').updateOne(
-          { key: 'prices' },
-          { $set: { value: body.value } },
-          { upsert: true }
-        );
-        return sendJSON(res, 200, { success: true, message: 'Harga berhasil disimpan' });
-      }
-      
-      // PUT /api/settings/adminFee
-      if (parts[1] === 'adminFee' && method === 'PUT') {
-        await db.collection('settings').updateOne(
-          { key: 'adminFee' },
-          { $set: { value: body.value } },
-          { upsert: true }
-        );
-        return sendJSON(res, 200, { success: true, message: 'Biaya admin berhasil disimpan' });
-      }
-    }
-    
-    // ============ BANS ROUTES ============
-    if (parts[0] === 'bans') {
-      // GET /api/bans
-      if (!parts[1] && method === 'GET') {
-        const bans = await db.collection('bans')
-          .find({ active: true })
-          .sort({ bannedAt: -1 })
-          .toArray();
-        return sendJSON(res, 200, { success: true, data: bans });
-      }
-      
-      // DELETE /api/bans/:ip
-      if (parts[1] && method === 'DELETE') {
-        const ip = decodeURIComponent(parts[1]);
-        await db.collection('bans').updateOne(
-          { ip: ip },
-          { $set: { active: false, unbannedAt: new Date() } }
-        );
-        return sendJSON(res, 200, { success: true, message: `IP ${ip} berhasil di-unban` });
-      }
-    }
-    
-    // ============ LIKE ROUTES ============
-    if (parts[0] === 'like') {
-      // GET /api/like/check/:idNumber
-      if (parts[1] === 'check' && parts[2] && method === 'GET') {
-        const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || 'unknown';
-        const idNumber = parts[2];
-        
-        const [banned, liked] = await Promise.all([
-          db.collection('bans').findOne({ ip: ip, active: true }),
-          db.collection('likes').findOne({ ip: ip, idNumber: idNumber })
+
+      if (r1==='stats' && M==='GET') {
+        const col = db.collection('ids');
+        const [tot, sold, byT, likeT] = await Promise.all([
+          col.countDocuments(),
+          col.countDocuments({ sold: true }),
+          col.aggregate([{ $group: { _id:'$tier', count:{$sum:1},
+            sold:{ $sum:{ $cond:[{$eq:['$sold',true]},1,0] } },
+            likes:{ $sum:'$likes' } }}]).toArray(),
+          col.aggregate([{ $group: { _id:null, t:{$sum:'$likes'} }}]).toArray(),
         ]);
-        
-        return sendJSON(res, 200, { success: true, liked: !!liked, banned: !!banned });
+        const byTier = {};
+        byT.forEach(t => { byTier[t._id] = { count:t.count, sold:t.sold, likes:t.likes }; });
+        return ok(res, { data: { total:tot, sold, available:tot-sold, totalLikes:likeT[0]?.t||0, byTier } });
       }
-      
-      // POST /api/like/:idNumber
-      if (parts[1] && parts[1] !== 'check' && method === 'POST') {
-        const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || 'unknown';
-        const idNumber = parts[1];
-        
-        const banned = await db.collection('bans').findOne({ ip: ip, active: true });
-        if (banned) {
-          return sendJSON(res, 429, { success: false, message: 'IP kamu diblokir karena spam like' });
+
+      if (!r1 && M==='GET') {
+        const q = qs(req.url);
+        const f = {};
+        if (q.tier && q.tier!=='all') f.tier = q.tier;
+        if (q.sold==='true') f.sold = true;
+        else if (q.sold==='false') f.sold = { $ne: true };
+        if (q.search) f.number = { $regex: q.search.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), $options:'i' };
+        let sort = { addedAt:-1 };
+        if (q.sort==='likes') sort = { likes:-1 };
+        if (q.sort==='number') sort = { number:1 };
+        const d = await db.collection('ids').find(f).sort(sort).toArray();
+        return ok(res, { data: d });
+      }
+
+      if (!r1 && M==='POST') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const b = await readBody(req);
+        if (!b.number || !b.tier) return fail(res, 400, 'number dan tier wajib');
+        if (await db.collection('ids').findOne({ number: String(b.number) }))
+          return fail(res, 409, 'ID sudah ada');
+        const doc = { number:String(b.number), tier:b.tier, sold:false, likes:0, note:b.note||'', addedAt:new Date() };
+        await db.collection('ids').insertOne(doc);
+        return created(res, { data: doc });
+      }
+
+      if (r1==='bulk' && M==='POST') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const b = await readBody(req);
+        if (!Array.isArray(b.ids) || !b.tier) return fail(res, 400, 'ids[] dan tier wajib');
+        const docs = b.ids.map(n => ({ number:String(n).trim(), tier:b.tier, sold:false, likes:0, note:b.note||'', addedAt:new Date() }));
+        const ex = await db.collection('ids').find({ number:{$in:docs.map(d=>d.number)} }).toArray();
+        const exSet = new Set(ex.map(e=>e.number));
+        const ins = docs.filter(d => !exSet.has(d.number));
+        if (ins.length) await db.collection('ids').insertMany(ins);
+        return created(res, { inserted:ins.length, skipped:docs.length-ins.length });
+      }
+
+      if (r1 && !r2 && M==='GET') {
+        const doc = await db.collection('ids').findOne({ number: r1 });
+        if (!doc) return fail(res, 404, 'ID tidak ditemukan');
+        return ok(res, { data: doc });
+      }
+
+      if (r1 && !r2 && M==='PUT') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const b = await readBody(req);
+        const upd = {};
+        for (const k of ['tier','sold','note','likes']) if (b[k]!==undefined) upd[k]=b[k];
+        const r = await db.collection('ids').updateOne({ number:r1 }, { $set:upd });
+        if (!r.matchedCount) return fail(res, 404, 'ID tidak ditemukan');
+        return ok(res, { message: 'Diupdate' });
+      }
+
+      if (r1 && !r2 && M==='DELETE') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const r = await db.collection('ids').deleteOne({ number:r1 });
+        if (!r.deletedCount) return fail(res, 404, 'ID tidak ditemukan');
+        return ok(res, { message: 'Dihapus' });
+      }
+    }
+
+    // ── like ─────────────────────────────────────────────────────────────────
+    if (r0==='like') {
+
+      if (r1==='check' && r2 && M==='GET') {
+        const ip = getIP(req);
+        const [banned, liked] = await Promise.all([
+          db.collection('bans').findOne({ ip, active:true }),
+          db.collection('likes').findOne({ ip, idNumber:r2 }),
+        ]);
+        return ok(res, { liked:!!liked, banned:!!banned });
+      }
+
+      if (r1 && r1!=='check' && !r2 && M==='POST') {
+        const ip = getIP(req);
+        const number = r1;
+
+        if (await db.collection('bans').findOne({ ip, active:true }))
+          return fail(res, 429, 'IP kamu diblokir karena spam like. Hubungi admin.');
+
+        if (await db.collection('likes').findOne({ ip, idNumber:number }))
+          return fail(res, 409, 'Kamu sudah menyukai ID ini');
+
+        const since = new Date(Date.now() - 5*60*1000);
+        const cnt = await db.collection('likes').countDocuments({ ip, likedAt:{ $gte:since } });
+        if (cnt >= 10) {
+          await db.collection('bans').updateOne({ ip }, { $set:{ ip, bannedAt:new Date(), reason:'spam_like', active:true } }, { upsert:true });
+          return fail(res, 429, 'Spam terdeteksi. IP kamu diblokir.');
         }
-        
-        const existingLike = await db.collection('likes').findOne({ ip: ip, idNumber: idNumber });
-        if (existingLike) {
-          return sendJSON(res, 409, { success: false, message: 'Kamu sudah menyukai ID ini' });
-        }
-        
-        const since = new Date(Date.now() - 5 * 60 * 1000);
-        const recentLikes = await db.collection('likes').countDocuments({ ip: ip, likedAt: { $gte: since } });
-        
-        if (recentLikes >= 10) {
-          await db.collection('bans').updateOne(
-            { ip: ip },
-            { $set: { ip: ip, bannedAt: new Date(), reason: 'spam_like', active: true } },
-            { upsert: true }
-          );
-          return sendJSON(res, 429, { success: false, message: 'Spam terdeteksi. IP kamu diblokir' });
-        }
-        
-        const idDoc = await db.collection('ids').findOne({ number: idNumber });
-        if (!idDoc) {
-          return sendJSON(res, 404, { success: false, message: 'ID tidak ditemukan' });
-        }
-        
-        await db.collection('likes').insertOne({ ip: ip, idNumber: idNumber, likedAt: new Date() });
-        
-        const result = await db.collection('ids').findOneAndUpdate(
-          { number: idNumber },
-          { $inc: { likes: 1 } },
-          { returnDocument: 'after' }
+
+        if (!(await db.collection('ids').findOne({ number })))
+          return fail(res, 404, 'ID tidak ditemukan');
+
+        await db.collection('likes').insertOne({ ip, idNumber:number, likedAt:new Date() });
+        const upd = await db.collection('ids').findOneAndUpdate(
+          { number }, { $inc:{ likes:1 } }, { returnDocument:'after' }
         );
-        
-        return sendJSON(res, 200, { success: true, likes: result.likes });
+        return ok(res, { likes: upd.likes });
       }
     }
-    
-    // ============ CREATE PAYMENT (public) ============
-    if (parts[0] === 'payment' && !parts[1] && method === 'POST') {
-      const { idNumber, method: payMethod, buyer, email, promoCode } = body;
-      
-      if (!idNumber || !payMethod || !buyer || !email) {
-        return sendJSON(res, 400, { success: false, message: 'idNumber, method, buyer, email wajib diisi' });
+
+    // ── promo ─────────────────────────────────────────────────────────────────
+    if (r0==='promo' && r1==='validate' && M==='POST') {
+      const b = await readBody(req);
+      if (!b.code) return fail(res, 400, 'Kode promo wajib');
+      const p = await db.collection('promos').findOne({ code:b.code.toUpperCase().trim(), active:true });
+      if (!p) return fail(res, 404, 'Kode promo tidak valid atau tidak aktif');
+      if (p.expiresAt && new Date() > new Date(p.expiresAt)) return fail(res, 410, 'Kode promo kadaluarsa');
+      if (p.maxUses != null && p.uses >= p.maxUses) return fail(res, 410, 'Kode promo habis');
+      return ok(res, { discount:p.discount, code:p.code, description:p.description||'' });
+    }
+
+    if (r0==='promos') {
+      if (!r1 && M==='GET') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        return ok(res, { data: await db.collection('promos').find().sort({ createdAt:-1 }).toArray() });
       }
-      
-      const idDoc = await db.collection('ids').findOne({ number: String(idNumber) });
-      if (!idDoc) {
-        return sendJSON(res, 404, { success: false, message: 'ID tidak ditemukan' });
+      if (!r1 && M==='POST') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const b = await readBody(req);
+        if (!b.code || b.discount==null) return fail(res, 400, 'code dan discount wajib');
+        const doc = {
+          code: b.code.toUpperCase().trim(),
+          discount: Math.min(88, Math.max(1, Number(b.discount))),
+          maxUses: b.maxUses ? Number(b.maxUses) : null,
+          uses: 0, active: true,
+          description: b.description||'',
+          expiresAt: b.expiresAt ? new Date(b.expiresAt) : null,
+          createdAt: new Date(),
+        };
+        await db.collection('promos').insertOne(doc);
+        return created(res, { data: doc });
       }
-      
-      if (idDoc.sold) {
-        return sendJSON(res, 409, { success: false, message: 'ID sudah terjual' });
+      if (r1 && !r2 && M==='PUT') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const b = await readBody(req);
+        const upd = {};
+        if (b.discount!=null) upd.discount = Math.min(88,Math.max(1,Number(b.discount)));
+        if (b.active!=null)   upd.active = Boolean(b.active);
+        if (b.maxUses!=null)  upd.maxUses = Number(b.maxUses);
+        if (b.expiresAt!=null) upd.expiresAt = new Date(b.expiresAt);
+        if (b.description!=null) upd.description = b.description;
+        let oid; try { oid=new ObjectId(r1); } catch { return fail(res,400,'ID tidak valid'); }
+        await db.collection('promos').updateOne({ _id:oid }, { $set:upd });
+        return ok(res, { message:'Promo diupdate' });
       }
-      
-      const settings = await db.collection('settings').find({}).toArray();
-      const prices = settings.find(s => s.key === 'prices')?.value || {};
-      const fees = settings.find(s => s.key === 'adminFee')?.value || {};
-      
-      const basePrice = prices[idDoc.tier] || 0;
-      let discount = 0;
-      let promoUsed = null;
-      
+      if (r1 && !r2 && M==='DELETE') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        let oid; try { oid=new ObjectId(r1); } catch { return fail(res,400,'ID tidak valid'); }
+        await db.collection('promos').deleteOne({ _id:oid });
+        return ok(res, { message:'Promo dihapus' });
+      }
+    }
+
+    // ── settings ─────────────────────────────────────────────────────────────
+    if (r0==='settings') {
+      if (!r1 && M==='GET') {
+        const rows = await db.collection('settings').find().toArray();
+        const map = {};
+        rows.forEach(s => { map[s.key]=s.value; });
+        return ok(res, { data: map });
+      }
+      if (r1 && M==='PUT') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const b = await readBody(req);
+        if (b.value===undefined) return fail(res, 400, 'value wajib');
+        await db.collection('settings').updateOne({ key:r1 }, { $set:{ value:b.value } }, { upsert:true });
+        return ok(res, { message: `Setting '${r1}' disimpan` });
+      }
+    }
+
+    // ── payment ───────────────────────────────────────────────────────────────
+    if (r0==='payment' && !r1 && M==='POST') {
+      const b = await readBody(req);
+      const { idNumber, method:pMethod, buyer, email, promoCode } = b;
+      if (!idNumber||!pMethod||!buyer||!email) return fail(res, 400, 'idNumber, method, buyer, email wajib');
+      const idDoc = await db.collection('ids').findOne({ number:String(idNumber) });
+      if (!idDoc) return fail(res, 404, 'ID tidak ditemukan');
+      if (idDoc.sold) return fail(res, 409, 'ID sudah terjual');
+      const rows = await db.collection('settings').find({ key:{ $in:['prices','adminFee'] } }).toArray();
+      const prices = rows.find(s=>s.key==='prices')?.value || {};
+      const fees   = rows.find(s=>s.key==='adminFee')?.value || {};
+      const base = prices[idDoc.tier] || 0;
+      let disc=0, promoUsed=null;
       if (promoCode) {
-        const promo = await db.collection('promos').findOne({ code: promoCode.toUpperCase().trim(), active: true });
-        if (promo && (!promo.expiresAt || new Date() < new Date(promo.expiresAt))) {
-          if (!promo.maxUses || promo.uses < promo.maxUses) {
-            discount = promo.discount;
-            promoUsed = promo.code;
-            await db.collection('promos').updateOne({ code: promo.code }, { $inc: { uses: 1 } });
-          }
+        const pr = await db.collection('promos').findOne({ code:promoCode.toUpperCase().trim(), active:true });
+        if (pr && (pr.maxUses==null||pr.uses<pr.maxUses) && (!pr.expiresAt||new Date()<new Date(pr.expiresAt))) {
+          disc=pr.discount; promoUsed=pr.code;
+          await db.collection('promos').updateOne({ code:pr.code }, { $inc:{ uses:1 } });
         }
       }
-      
-      const adminFee = fees[payMethod] || 0;
-      const finalPrice = Math.round(basePrice * (1 - discount / 100)) + adminFee;
-      
-      const payment = {
-        idNumber: String(idNumber),
-        tier: idDoc.tier,
-        price: basePrice,
-        method: payMethod,
-        status: 'pending',
-        buyer: buyer,
-        email: email,
-        promoCode: promoUsed,
-        discount: discount,
-        adminFee: adminFee,
-        finalPrice: finalPrice,
-        createdAt: new Date()
-      };
-      
-      const result = await db.collection('payments').insertOne(payment);
-      return sendJSON(res, 201, { success: true, data: { ...payment, _id: result.insertedId } });
+      const adminFee  = fees[pMethod] || 0;
+      const finalPrice = Math.round(base*(1-disc/100)) + adminFee;
+      const payment = { idNumber:String(idNumber), tier:idDoc.tier, price:base, method:pMethod,
+        status:'pending', buyer, email, promoCode:promoUsed, discount:disc, adminFee, finalPrice, createdAt:new Date() };
+      const ins = await db.collection('payments').insertOne(payment);
+      return created(res, { data:{ ...payment, _id:ins.insertedId } });
     }
-    
-    // Route not found
-    return sendJSON(res, 404, { success: false, message: `Route tidak ditemukan: ${method} /api/${parts.join('/')}` });
-    
-  } catch (error) {
-    console.error('API Error:', error);
-    return sendJSON(res, 500, { success: false, message: error.message });
+
+    if (r0==='payments') {
+      if (!r1 && M==='GET') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        return ok(res, { data: await db.collection('payments').find().sort({ createdAt:-1 }).limit(200).toArray() });
+      }
+      if (r1 && r2==='confirm' && M==='PUT') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        let oid; try { oid=new ObjectId(r1); } catch { return fail(res,400,'ID tidak valid'); }
+        const p = await db.collection('payments').findOne({ _id:oid });
+        if (!p) return fail(res, 404, 'Pembayaran tidak ditemukan');
+        await db.collection('payments').updateOne({ _id:oid }, { $set:{ status:'confirmed', confirmedAt:new Date() } });
+        await db.collection('ids').updateOne({ number:p.idNumber }, { $set:{ sold:true, soldAt:new Date() } });
+        return ok(res, { message:'Pembayaran dikonfirmasi' });
+      }
+    }
+
+    // ── bans ─────────────────────────────────────────────────────────────────
+    if (r0==='bans') {
+      if (!r1 && M==='GET') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        return ok(res, { data: await db.collection('bans').find({ active:true }).sort({ bannedAt:-1 }).toArray() });
+      }
+      if (r1 && M==='DELETE') {
+        if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+        const ip = decodeURIComponent(r1);
+        await db.collection('bans').updateOne({ ip }, { $set:{ active:false, unbannedAt:new Date() } });
+        return ok(res, { message:`IP ${ip} di-unban` });
+      }
+    }
+
+    return fail(res, 404, `Route tidak ditemukan: ${M} /api/${[r0,r1,r2].filter(Boolean).join('/')}`);
+
+  } catch (err) {
+    console.error('[Error]', req.method, req.url, err.message);
+    cachedClient = null;
+    cachedDb = null;
+    return fail(res, 500, 'Server error: ' + err.message);
   }
 };
