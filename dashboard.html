@@ -297,7 +297,7 @@ tr:hover td{background:var(--bg2)}
         <table>
           <thead><tr><th>IP Address</th><th>Alasan</th><th>Tanggal</th><th>Aksi</th></tr></thead>
           <tbody id="banTableBody"><tr><td colspan="4" class="no-data">Memuat data......</td></tr></tbody>
-        ~</table>
+        </table>
       </div>
     </div>
   </div>
@@ -466,8 +466,8 @@ function renderIdTable(ids) {
       <td>${dateStr(id.addedAt)}</td>
       <td>
         <div class="td-actions">
-          <button class="btn btn-sm ${id.sold?'btn-success':'btn-danger'}" style="${id.sold?'':'background:rgba(239,68,68,.1);color:var(--sold);border:1px solid rgba(239,68,68,.2)'}" onclick="toggleSold('${id.number}',${!id.sold})">${id.sold?'Batalkan':'Tandai Terjual'}</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteId('${id.number}')"><svg viewBox="0 0 24 24" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          <button class="btn btn-sm ${id.sold?'btn-success':'btn-danger'}" style="${id.sold?'':'background:rgba(239,68,68,.1);color:var(--sold);border:1px solid rgba(239,68,68,.2)'}" onclick="toggleSold(this.dataset.num, this.dataset.sold==='true')" data-num="${id.number}" data-sold="${!id.sold}">${id.sold?'Batalkan':'Tandai Terjual'}</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteId(this.dataset.num)" data-num="${id.number}"><svg viewBox="0 0 24 24" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
       </td>
     </tr>
@@ -583,7 +583,7 @@ async function confirmPayment(paymentId) {
   if (!paymentId) { showToast('ID pembayaran tidak valid'); return; }
   showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
     try {
-      await apiFetch(`/payment/${paymentId}/confirm`, { method: 'PUT' });
+      await apiFetch(`/payments/${paymentId}/confirm`, { method: 'PUT' });
       showToast('Pembayaran berhasil dikonfirmasi');
       await loadPayments();
       await loadIds();
