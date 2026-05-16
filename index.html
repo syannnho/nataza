@@ -6,7 +6,7 @@
 <title>lapakID — Koleksi ID Premium</title>
 <link rel="icon" type="image/png" href="https://files.catbox.moe/em51di.png"/>
 <meta property="og:title" content="lapakID — Koleksi ID Premium"/>
-<meta property="og:description" content="Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend. Beli dengan aman, bergaransi, dan proses cepat."/>
+<meta property="og:description" content="Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend."/>
 <meta property="og:image" content="https://files.catbox.moe/em51di.png"/>
 <meta property="og:url" content="https://nataza.vercel.app/"/>
 <meta property="og:type" content="website"/>
@@ -95,7 +95,10 @@ body.dark nav{background:rgba(13,13,13,.95)}
 /* FILTER BAR */
 .filter-section{max-width:1400px;margin:0 auto;padding:0 16px 16px}
 @media(min-width:768px){.filter-section{padding:0 32px 20px}}
-.filter-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.filter-sticky{position:sticky;top:60px;z-index:100;background:var(--bg);padding:10px 16px 8px;margin:0 -16px;border-bottom:1px solid var(--border)}
+@media(min-width:768px){.filter-sticky{top:68px;padding:12px 32px 10px;margin:0 -32px}}
+body.dark .filter-sticky{background:var(--bg)}
+.filter-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px}
 .filter-bar{display:flex;gap:6px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg2);border-radius:10px;padding:6px}
 .filter-bar::-webkit-scrollbar{display:none}
 .fb{background:transparent;border:none;color:var(--muted2);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:.65rem;font-weight:600;white-space:nowrap;font-family:var(--font);transition:.15s}
@@ -113,7 +116,8 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .ids-section{max-width:1400px;margin:0 auto;padding:0 16px;padding-bottom:60px}
 @media(min-width:768px){.ids-section{padding:0 32px 60px}}
 .tier-block{margin-bottom:32px}
-.tier-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+.tier-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 0;border-bottom:2px solid var(--border);position:sticky;top:var(--filter-height,130px);z-index:90;background:var(--bg);transition:background .3s}
+body.dark .tier-head{background:var(--bg)}
 .tier-name{font-size:1.1rem;font-weight:800;color:var(--text)}
 .tier-badge{font-size:.5rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid;text-transform:uppercase;letter-spacing:.4px}
 .tier-count{font-size:.62rem;color:var(--muted);font-family:var(--mono);margin-left:auto}
@@ -123,6 +127,10 @@ body.dark nav{background:rgba(13,13,13,.95)}
 @media(min-width:900px){.id-grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:1100px){.id-grid{grid-template-columns:repeat(5,1fr)}}
 mark{background:rgba(70,95,255,.15);color:var(--purple);border-radius:2px;padding:0 1px}
+
+/* Card appear animation */
+@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.id-card{animation:cardIn .35s ease both}
 
 /* ID DETAIL MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
@@ -190,18 +198,20 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
 
 <!-- FILTER -->
 <div class="filter-section" id="semua">
-  <div class="filter-top">
-    <div class="filter-bar" id="filterBar">
-      <button class="fb act" data-f="all">Semua</button>
-      <button class="fb" data-f="low">Low</button>
-      <button class="fb" data-f="medium">Medium</button>
-      <button class="fb" data-f="high">High</button>
-      <button class="fb" data-f="legend">Legend</button>
-      <button class="fb" data-f="sold">Terjual</button>
+  <div class="filter-sticky" id="filterSticky">
+    <div class="filter-top">
+      <div class="filter-bar" id="filterBar">
+        <button class="fb act" data-f="all">Semua</button>
+        <button class="fb" data-f="low">Low</button>
+        <button class="fb" data-f="medium">Medium</button>
+        <button class="fb" data-f="high">High</button>
+        <button class="fb" data-f="legend">Legend</button>
+        <button class="fb" data-f="sold">Terjual</button>
+      </div>
+      <div class="search-wrap"><div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><input type="text" id="searchInput" placeholder="Cari nomor ID..."/></div>
     </div>
-    <div class="search-wrap"><div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><input type="text" id="searchInput" placeholder="Cari nomor ID..."/></div>
+    <div class="result-info" id="resultInfo">Memuat data...</div>
   </div>
-  <div class="result-info" id="resultInfo">Memuat data...</div>
 </div>
 
 <!-- ID LIST -->
@@ -300,6 +310,22 @@ function render() {
   }
   container.innerHTML = html;
   attachCardEvents(container);
+
+  // Stagger animation per card
+  container.querySelectorAll('.id-card').forEach((card, i) => {
+    card.style.animationDelay = `${Math.min(i * 0.04, 0.6)}s`;
+  });
+
+  // Update --filter-height agar tier-head sticky pas di bawah filter bar
+  updateFilterHeight();
+}
+
+function updateFilterHeight() {
+  const sticky = document.getElementById('filterSticky');
+  if (!sticky) return;
+  const h = sticky.getBoundingClientRect().height;
+  const navH = document.querySelector('nav')?.getBoundingClientRect().height || 60;
+  document.documentElement.style.setProperty('--filter-height', `${navH + h + 2}px`);
 }
 
 function filter() {
@@ -447,6 +473,7 @@ function showToast(msg) {
 }
 
 init();
+window.addEventListener('resize', updateFilterHeight);
 </script>
 </body>
 </html>
