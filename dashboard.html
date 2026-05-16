@@ -133,6 +133,14 @@ tr:hover td{background:var(--bg2)}
 
 .tab-content{display:none}
 .tab-content.active{display:block}
+
+/* DEBUG PANEL */
+#debugPanel{position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;color:#00ff88;font-family:monospace;font-size:11px;max-height:220px;overflow-y:auto;z-index:99999;border-top:2px solid #00ff88;padding:6px 10px;display:none}
+#debugPanel .d-row{padding:3px 0;border-bottom:1px solid #1a1a1a;line-height:1.4}
+#debugPanel .d-label{color:#ffcc00;font-weight:bold}
+#debugPanel .d-val{color:#00ff88;word-break:break-all}
+#debugPanel .d-time{color:#666;font-size:10px}
+#debugToggle{position:fixed;bottom:0;right:0;background:#ff3366;color:#fff;font-size:10px;font-weight:bold;padding:4px 10px;z-index:100000;cursor:pointer;border:none;font-family:monospace}
 </style>
 </head>
 <body>
@@ -522,13 +530,23 @@ async function toggleSold(number, sold) {
 }
 
 function deleteId(number) {
+  showDebug('deleteId dipanggil', `number="${number}" | token="${adminToken ? adminToken.slice(0,6)+'...' : 'KOSONG'}"`);
   showConfirm('Hapus ID', `Hapus ID ${number}? Tindakan ini tidak bisa dibatalkan.`, async () => {
     try {
-      await apiFetch(`/ids/${encodeURIComponent(number)}`, { method: 'DELETE' });
+      const url = `/ids/${encodeURIComponent(number)}`;
+      showDebug('Mengirim DELETE', `URL: ${API}${url}`);
+      const res = await fetch(`${API}${url}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }
+      });
+      const data = await res.json();
+      showDebug('Response DELETE', `status=${res.status} | body=${JSON.stringify(data)}`);
+      if (!data.success) throw new Error(data.message || 'Gagal');
       showToast('ID berhasil dihapus');
       await loadIds();
       await loadStats();
     } catch (err) {
+      showDebug('ERROR deleteId', err.message);
       showToast(err.message || 'Gagal menghapus ID');
     }
   });
@@ -580,15 +598,25 @@ async function loadPayments() {
 }
 
 async function confirmPayment(paymentId) {
+  showDebug('confirmPayment dipanggil', `paymentId="${paymentId}" | token="${adminToken ? adminToken.slice(0,6)+'...' : 'KOSONG'}"`);
   if (!paymentId) { showToast('ID pembayaran tidak valid'); return; }
   showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
     try {
-      await apiFetch(`/payments/${paymentId}/confirm`, { method: 'PUT' });
+      const url = `/payments/${paymentId}/confirm`;
+      showDebug('Mengirim PUT', `URL: ${API}${url}`);
+      const res = await fetch(`${API}${url}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken }
+      });
+      const data = await res.json();
+      showDebug('Response PUT', `status=${res.status} | body=${JSON.stringify(data)}`);
+      if (!data.success) throw new Error(data.message || 'Gagal');
       showToast('Pembayaran berhasil dikonfirmasi');
       await loadPayments();
       await loadIds();
       await loadStats();
     } catch (err) {
+      showDebug('ERROR confirmPayment', err.message);
       showToast(err.message || 'Gagal mengkonfirmasi');
     }
   });
@@ -828,7 +856,28 @@ async function tryAutoLogin() {
   }
 }
 
+
+function showDebug(label, val) {
+  const panel = document.getElementById('debugPanel');
+  if (!panel) return;
+  panel.style.display = 'block';
+  const row = document.createElement('div');
+  row.className = 'd-row';
+  const t = new Date().toLocaleTimeString('id-ID');
+  row.innerHTML = `<span class="d-time">[${t}]</span> <span class="d-label">${label}:</span> <span class="d-val">${val}</span>`;
+  panel.appendChild(row);
+  panel.scrollTop = panel.scrollHeight;
+}
+function toggleDebug() {
+  const p = document.getElementById('debugPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
 tryAutoLogin();
 </script>
+
+<button id="debugToggle" onclick="toggleDebug()">🐛 DEBUG</button>
+<div id="debugPanel"><div style="color:#ffcc00;padding:2px 0;font-weight:bold">── DEBUG LOG ──</div></div>
+
 </body>
 </html>
