@@ -486,32 +486,55 @@ function deleteId(number) {
 }
 
 // ── PAYMENTS ──────────────────────────────────────────────────────────────────
+// Extract MongoDB _id safely (handles both string and {$oid:"..."} forms)
+function extractId(obj) {
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  if (obj.$oid) return obj.$oid;
+  return String(obj);
+}
+
+function methodLabel(m) {
+  if (m === 'google') return 'Google Pay';
+  if (m === 'qris')   return 'QRIS';
+  return 'Transfer File';
+}
+
 async function loadPayments() {
   const r = await fetch(`${API}/payments`, { headers:headers() }).catch(()=>null);
   if (!r || !r.ok) return;
   const { data } = await r.json();
   const tbody = document.getElementById('paymentTableBody');
-  if (!data.length) { tbody.innerHTML='<tr><td colspan="9" class="no-data">Belum ada pembayaran</td></tr>'; return; }
-  tbody.innerHTML = data.map(p => `
-    <tr>
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="no-data">Belum ada pembayaran</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(p => {
+    const pid = extractId(p._id);
+    return `<tr>
       <td class="td-mono">${p.idNumber}</td>
-      <td><span class="badge badge-${p.tier}">${(p.tier||'').toUpperCase()}</span></td>
+      <td><span class="badge badge-${p.tier||'low'}">${(p.tier||'').toUpperCase()}</span></td>
       <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.email}</span></td>
-      <td>${p.method==='google'?'Google Pay':'Transfer File'}</td>
+      <td>${methodLabel(p.method)}</td>
       <td class="td-mono">${fmt(p.finalPrice)}</td>
       <td>${p.promoCode?`<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>`:'—'}</td>
       <td><span class="badge badge-${p.status==='confirmed'?'confirmed':'pending'}">${p.status==='confirmed'?'CONFIRMED':'PENDING'}</span></td>
       <td>${dateStr(p.createdAt)}</td>
-      <td>${p.status==='pending'?`<button class="btn btn-sm btn-success" onclick="confirmPayment('${p._id}')">Konfirmasi</button>`:'—'}</td>
-    </tr>
-  `).join('');
+      <td>${p.status==='pending'
+        ? `<button class="btn btn-sm btn-success" onclick="confirmPayment('${pid}')">Konfirmasi</button>`
+        : '<span style="color:var(--muted);font-size:.6rem">Selesai</span>'}</td>
+    </tr>`;
+  }).join('');
 }
 
 async function confirmPayment(id) {
-  showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran ini sebagai dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
+  if (!id) { showToast('ID pembayaran tidak valid'); return; }
+  showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran ini dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
     const r = await fetch(`${API}/payments/${id}/confirm`, { method:'PUT', headers:headers() }).catch(()=>null);
-    if (r && r.ok) { showToast('Pembayaran dikonfirmasi'); loadPayments(); loadIds(); loadStats(); }
-    else showToast('Gagal mengkonfirmasi');
+    if (!r) { showToast('Gagal terhubung ke server'); return; }
+    const d = await r.json().catch(()=>({success:false,message:'Response tidak valid'}));
+    if (d.success) { showToast('Pembayaran berhasil dikonfirmasi'); loadPayments(); loadIds(); loadStats(); }
+    else showToast(d.message || 'Gagal mengkonfirmasi');
   });
 }
 
@@ -521,23 +544,27 @@ async function loadPromos() {
   if (!r || !r.ok) return;
   const { data } = await r.json();
   const tbody = document.getElementById('promoTableBody');
-  if (!data.length) { tbody.innerHTML='<tr><td colspan="7" class="no-data">Belum ada promo</td></tr>'; return; }
-  tbody.innerHTML = data.map(p => `
-    <tr>
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="no-data">Belum ada promo</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(p => {
+    const pid = extractId(p._id);
+    return `<tr>
       <td class="td-mono" style="font-weight:700">${p.code}</td>
       <td style="color:var(--success);font-weight:800">${p.discount}%</td>
       <td class="td-mono">${p.uses||0}</td>
-      <td class="td-mono">${p.maxUses||'∞'}</td>
+      <td class="td-mono">${p.maxUses!=null?p.maxUses:'∞'}</td>
       <td>${p.expiresAt?dateStr(p.expiresAt):'Tidak ada'}</td>
       <td><span class="badge ${p.active?'badge-avail':'badge-sold'}">${p.active?'AKTIF':'NONAKTIF'}</span></td>
       <td>
         <div class="td-actions">
-          <button class="btn btn-sm ${p.active?'btn-danger':'btn-success'}" onclick="togglePromo('${p._id}',${!p.active})">${p.active?'Nonaktifkan':'Aktifkan'}</button>
-          <button class="btn btn-sm btn-danger" onclick="deletePromo('${p._id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+          <button class="btn btn-sm ${p.active?'btn-danger':'btn-success'}" onclick="togglePromo('${pid}',${!p.active})">${p.active?'Nonaktifkan':'Aktifkan'}</button>
+          <button class="btn btn-sm btn-danger" onclick="deletePromo('${pid}')"><svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 function updateDiscountPreview() {
@@ -572,15 +599,19 @@ async function createPromo() {
 
 async function togglePromo(id, active) {
   const r = await fetch(`${API}/promos/${id}`, { method:'PUT', headers:headers(), body:JSON.stringify({active}) }).catch(()=>null);
-  if (r && r.ok) { showToast(active?'Promo diaktifkan':'Promo dinonaktifkan'); loadPromos(); }
-  else showToast('Gagal mengupdate');
+  if (!r) { showToast('Gagal terhubung'); return; }
+  const d = await r.json().catch(()=>({success:false}));
+  if (d.success) { showToast(active?'Promo diaktifkan':'Promo dinonaktifkan'); loadPromos(); }
+  else showToast(d.message || 'Gagal mengupdate promo');
 }
 
 function deletePromo(id) {
   showConfirm('Hapus Promo', 'Apakah kamu yakin ingin menghapus promo ini?', async () => {
     const r = await fetch(`${API}/promos/${id}`, { method:'DELETE', headers:headers() }).catch(()=>null);
-    if (r && r.ok) { showToast('Promo dihapus'); loadPromos(); }
-    else showToast('Gagal');
+    if (!r) { showToast('Gagal terhubung'); return; }
+    const d = await r.json().catch(()=>({success:false}));
+    if (d.success) { showToast('Promo berhasil dihapus'); loadPromos(); }
+    else showToast(d.message || 'Gagal menghapus promo');
   });
 }
 
