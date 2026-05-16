@@ -411,10 +411,9 @@ async function loadSettings() {
 
 // ── IDS ──────────────────────────────────────────────────────────────────────
 async function loadIds() {
-  const r = await fetch(`${API}/ids`, { headers: headers() }).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data } = await r.json();
-  allIdsData = data || [];
+  const { ok, data } = await apiFetch('/ids');
+  if (!ok) return;
+  allIdsData = data.data || [];
   filteredIds = allIdsData;
   document.getElementById('idListCount').textContent = `(${allIdsData.length} ID)`;
   renderIdTable(filteredIds);
@@ -446,52 +445,80 @@ function renderIdTable(ids) {
   `).join('');
 }
 
+// ── ROBUST API HELPER ─────────────────────────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+  const token = adminToken || localStorage.getItem('lapakid_admin_token') || '';
+  const config = {
+    method:  opts.method || 'GET',
+    headers: {
+      'Content-Type':  'application/json',
+      'x-admin-token': token,
+      ...(opts.headers || {}),
+    },
+  };
+  if (opts.body) config.body = typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body);
+
+  try {
+    const r = await fetch(API + path, config);
+    let data;
+    try { data = await r.json(); } catch { data = { success: false, message: 'Response bukan JSON (status ' + r.status + ')' }; }
+    if (!data.success) console.warn('[API]', config.method, path, data.message);
+    return { ok: r.ok, status: r.status, data };
+  } catch (err) {
+    console.error('[apiFetch]', path, err);
+    return { ok: false, status: 0, data: { success: false, message: 'Gagal terhubung: ' + err.message } };
+  }
+}
+
 async function addId() {
   const number = document.getElementById('newIdNum').value.trim();
-  const tier = document.getElementById('newIdTier').value;
-  const note = document.getElementById('newIdNote').value.trim();
+  const tier   = document.getElementById('newIdTier').value;
+  const note   = document.getElementById('newIdNote').value.trim();
   if (!number) { showToast('Nomor ID wajib diisi'); return; }
-  const r = await fetch(`${API}/ids`, { method:'POST', headers:headers(), body:JSON.stringify({number,tier,note}) }).catch(()=>null);
-  if (!r) { showToast('Gagal terhubung'); return; }
-  const d = await r.json();
-  if (d.success) { showToast('ID berhasil ditambahkan'); document.getElementById('newIdNum').value=''; document.getElementById('newIdNote').value=''; loadIds(); loadStats(); }
-  else showToast(d.message || 'Gagal');
+  const { data } = await apiFetch('/ids', { method:'POST', body:{number,tier,note} });
+  if (data.success) {
+    showToast('ID berhasil ditambahkan');
+    document.getElementById('newIdNum').value = '';
+    document.getElementById('newIdNote').value = '';
+    loadIds(); loadStats();
+  } else showToast(data.message || 'Gagal menambahkan ID');
 }
 
 async function addBulk() {
-  const raw = document.getElementById('bulkIds').value.trim();
+  const raw  = document.getElementById('bulkIds').value.trim();
   const tier = document.getElementById('bulkTier').value;
   const note = document.getElementById('bulkNote').value.trim();
   if (!raw) { showToast('Masukkan daftar ID'); return; }
   const ids = raw.split('\n').map(s=>s.trim()).filter(Boolean);
-  const r = await fetch(`${API}/ids/bulk`, { method:'POST', headers:headers(), body:JSON.stringify({ids,tier,note}) }).catch(()=>null);
-  if (!r) { showToast('Gagal terhubung'); return; }
-  const d = await r.json();
-  if (d.success) { showToast(`Berhasil: ${d.inserted} ditambahkan, ${d.skipped} dilewati`); document.getElementById('bulkIds').value=''; loadIds(); loadStats(); }
-  else showToast(d.message || 'Gagal');
+  const { data } = await apiFetch('/ids/bulk', { method:'POST', body:{ids,tier,note} });
+  if (data.success) {
+    showToast(`Berhasil: ${data.inserted} ditambahkan, ${data.skipped} dilewati`);
+    document.getElementById('bulkIds').value = '';
+    loadIds(); loadStats();
+  } else showToast(data.message || 'Gagal upload massal');
 }
 
 async function toggleSold(number, sold) {
-  const r = await fetch(`${API}/ids/${number}`, { method:'PUT', headers:headers(), body:JSON.stringify({sold}) }).catch(()=>null);
-  if (r && r.ok) { showToast(sold?'ID ditandai terjual':'Status dikembalikan'); loadIds(); loadStats(); }
-  else showToast('Gagal mengupdate');
+  const { data } = await apiFetch(`/ids/${encodeURIComponent(number)}`, { method:'PUT', body:{sold} });
+  if (data.success) { showToast(sold ? 'ID ditandai terjual' : 'Status dikembalikan'); loadIds(); loadStats(); }
+  else showToast(data.message || 'Gagal update status');
 }
 
 function deleteId(number) {
-  showConfirm('Hapus ID', `Apakah kamu yakin ingin menghapus ID ${number}?`, async () => {
-    const r = await fetch(`${API}/ids/${number}`, { method:'DELETE', headers:headers() }).catch(()=>null);
-    if (r && r.ok) { showToast('ID berhasil dihapus'); loadIds(); loadStats(); }
-    else showToast('Gagal menghapus');
+  showConfirm('Hapus ID', `Hapus ID ${number}? Tindakan ini tidak bisa dibatalkan.`, async () => {
+    const { data } = await apiFetch(`/ids/${encodeURIComponent(number)}`, { method:'DELETE' });
+    if (data.success) { showToast('ID berhasil dihapus'); loadIds(); loadStats(); }
+    else showToast(data.message || 'Gagal menghapus ID');
   });
 }
 
 // ── PAYMENTS ──────────────────────────────────────────────────────────────────
-// Extract MongoDB _id safely (handles both string and {$oid:"..."} forms)
-function extractId(obj) {
-  if (!obj) return '';
-  if (typeof obj === 'string') return obj;
-  if (obj.$oid) return obj.$oid;
-  return String(obj);
+// Ekstrak MongoDB _id ke string (handle {$oid:'...'} atau string biasa)
+function extractId(v) {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (v.$oid) return v.$oid;
+  return String(v);
 }
 
 function methodLabel(m) {
@@ -501,15 +528,13 @@ function methodLabel(m) {
 }
 
 async function loadPayments() {
-  const r = await fetch(`${API}/payments`, { headers:headers() }).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data } = await r.json();
+  const { ok, data } = await apiFetch('/payments');
   const tbody = document.getElementById('paymentTableBody');
-  if (!data || !data.length) {
+  if (!ok || !data.data || !data.data.length) {
     tbody.innerHTML = '<tr><td colspan="9" class="no-data">Belum ada pembayaran</td></tr>';
     return;
   }
-  tbody.innerHTML = data.map(p => {
+  tbody.innerHTML = data.data.map(p => {
     const pid = extractId(p._id);
     return `<tr>
       <td class="td-mono">${p.idNumber}</td>
@@ -517,7 +542,7 @@ async function loadPayments() {
       <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.email}</span></td>
       <td>${methodLabel(p.method)}</td>
       <td class="td-mono">${fmt(p.finalPrice)}</td>
-      <td>${p.promoCode?`<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>`:'—'}</td>
+      <td>${p.promoCode ? `<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>` : '—'}</td>
       <td><span class="badge badge-${p.status==='confirmed'?'confirmed':'pending'}">${p.status==='confirmed'?'CONFIRMED':'PENDING'}</span></td>
       <td>${dateStr(p.createdAt)}</td>
       <td>${p.status==='pending'
@@ -529,26 +554,22 @@ async function loadPayments() {
 
 async function confirmPayment(id) {
   if (!id) { showToast('ID pembayaran tidak valid'); return; }
-  showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran ini dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
-    const r = await fetch(`${API}/payments/${id}/confirm`, { method:'PUT', headers:headers() }).catch(()=>null);
-    if (!r) { showToast('Gagal terhubung ke server'); return; }
-    const d = await r.json().catch(()=>({success:false,message:'Response tidak valid'}));
-    if (d.success) { showToast('Pembayaran berhasil dikonfirmasi'); loadPayments(); loadIds(); loadStats(); }
-    else showToast(d.message || 'Gagal mengkonfirmasi');
+  showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
+    const { data } = await apiFetch(`/payments/${id}/confirm`, { method:'PUT' });
+    if (data.success) { showToast('Pembayaran berhasil dikonfirmasi'); loadPayments(); loadIds(); loadStats(); }
+    else showToast(data.message || 'Gagal mengkonfirmasi');
   });
 }
 
 // ── PROMOS ────────────────────────────────────────────────────────────────────
 async function loadPromos() {
-  const r = await fetch(`${API}/promos`, { headers:headers() }).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data } = await r.json();
+  const { ok, data } = await apiFetch('/promos');
   const tbody = document.getElementById('promoTableBody');
-  if (!data || !data.length) {
+  if (!ok || !data.data || !data.data.length) {
     tbody.innerHTML = '<tr><td colspan="7" class="no-data">Belum ada promo</td></tr>';
     return;
   }
-  tbody.innerHTML = data.map(p => {
+  tbody.innerHTML = data.data.map(p => {
     const pid = extractId(p._id);
     return `<tr>
       <td class="td-mono" style="font-weight:700">${p.code}</td>
@@ -581,37 +602,35 @@ function updateDiscountPreview() {
 }
 
 async function createPromo() {
-  const code = document.getElementById('promoCode').value.trim();
-  const discount = document.getElementById('promoDiscount').value;
-  const maxUses = document.getElementById('promoMaxUses').value;
-  const expiresAt = document.getElementById('promoExpiry').value;
+  const code        = document.getElementById('promoCode').value.trim();
+  const discount    = document.getElementById('promoDiscount').value;
+  const maxUses     = document.getElementById('promoMaxUses').value;
+  const expiresAt   = document.getElementById('promoExpiry').value;
   const description = document.getElementById('promoDesc').value.trim();
   if (!code || !discount) { showToast('Kode dan diskon wajib diisi'); return; }
-  const r = await fetch(`${API}/promos`, {
-    method:'POST', headers:headers(),
-    body:JSON.stringify({ code, discount:Number(discount), maxUses:maxUses?Number(maxUses):null, expiresAt:expiresAt||null, description })
-  }).catch(()=>null);
-  if (!r) { showToast('Gagal terhubung'); return; }
-  const d = await r.json();
-  if (d.success) { showToast('Promo berhasil dibuat'); document.getElementById('promoCode').value=''; document.getElementById('promoDiscount').value=''; document.getElementById('promoMaxUses').value=''; document.getElementById('promoExpiry').value=''; document.getElementById('promoDesc').value=''; document.getElementById('discountPreview').style.display='none'; loadPromos(); }
-  else showToast(d.message || 'Gagal');
+  const { data } = await apiFetch('/promos', {
+    method: 'POST',
+    body: { code, discount: Number(discount), maxUses: maxUses ? Number(maxUses) : null, expiresAt: expiresAt || null, description },
+  });
+  if (data.success) {
+    showToast('Promo berhasil dibuat');
+    ['promoCode','promoDiscount','promoMaxUses','promoExpiry','promoDesc'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('discountPreview').style.display = 'none';
+    loadPromos();
+  } else showToast(data.message || 'Gagal membuat promo');
 }
 
 async function togglePromo(id, active) {
-  const r = await fetch(`${API}/promos/${id}`, { method:'PUT', headers:headers(), body:JSON.stringify({active}) }).catch(()=>null);
-  if (!r) { showToast('Gagal terhubung'); return; }
-  const d = await r.json().catch(()=>({success:false}));
-  if (d.success) { showToast(active?'Promo diaktifkan':'Promo dinonaktifkan'); loadPromos(); }
-  else showToast(d.message || 'Gagal mengupdate promo');
+  const { data } = await apiFetch(`/promos/${id}`, { method:'PUT', body:{ active } });
+  if (data.success) { showToast(active ? 'Promo diaktifkan' : 'Promo dinonaktifkan'); loadPromos(); }
+  else showToast(data.message || 'Gagal update promo');
 }
 
 function deletePromo(id) {
-  showConfirm('Hapus Promo', 'Apakah kamu yakin ingin menghapus promo ini?', async () => {
-    const r = await fetch(`${API}/promos/${id}`, { method:'DELETE', headers:headers() }).catch(()=>null);
-    if (!r) { showToast('Gagal terhubung'); return; }
-    const d = await r.json().catch(()=>({success:false}));
-    if (d.success) { showToast('Promo berhasil dihapus'); loadPromos(); }
-    else showToast(d.message || 'Gagal menghapus promo');
+  showConfirm('Hapus Promo', 'Hapus promo ini?', async () => {
+    const { data } = await apiFetch(`/promos/${id}`, { method:'DELETE' });
+    if (data.success) { showToast('Promo berhasil dihapus'); loadPromos(); }
+    else showToast(data.message || 'Gagal menghapus promo');
   });
 }
 
@@ -622,30 +641,31 @@ async function savePrices() {
     const v = document.getElementById(`sPrice-${t}`).value;
     if (v) prices[t] = Number(v);
   });
-  const r = await fetch(`${API}/settings/prices`, { method:'PUT', headers:headers(), body:JSON.stringify({value:prices}) }).catch(()=>null);
-  if (r && r.ok) { showToast('Harga berhasil disimpan'); settingsCache.prices = prices; }
-  else showToast('Gagal menyimpan');
+  const { data } = await apiFetch('/settings/prices', { method:'PUT', body:{ value: prices } });
+  if (data.success) { showToast('Harga berhasil disimpan'); settingsCache.prices = prices; }
+  else showToast(data.message || 'Gagal menyimpan harga');
 }
 
 async function saveFees() {
   const adminFee = {};
-  ['google','file'].forEach(t => {
-    const v = document.getElementById(`sFee-${t}`).value;
-    adminFee[t] = Number(v) || 0;
+  ['google','file','qris'].forEach(t => {
+    const el = document.getElementById(`sFee-${t}`);
+    if (el) adminFee[t] = Number(el.value) || 0;
   });
-  const r = await fetch(`${API}/settings/adminFee`, { method:'PUT', headers:headers(), body:JSON.stringify({value:adminFee}) }).catch(()=>null);
-  if (r && r.ok) { showToast('Biaya admin berhasil disimpan'); }
-  else showToast('Gagal menyimpan');
+  const { data } = await apiFetch('/settings/adminFee', { method:'PUT', body:{ value: adminFee } });
+  if (data.success) showToast('Biaya admin berhasil disimpan');
+  else showToast(data.message || 'Gagal menyimpan biaya admin');
 }
 
 // ── BANS ─────────────────────────────────────────────────────────────────────
 async function loadBans() {
-  const r = await fetch(`${API}/bans`, { headers:headers() }).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data } = await r.json();
+  const { ok, data } = await apiFetch('/bans');
   const tbody = document.getElementById('banTableBody');
-  if (!data.length) { tbody.innerHTML='<tr><td colspan="4" class="no-data">Tidak ada IP yang diblokir</td></tr>'; return; }
-  tbody.innerHTML = data.map(b => `
+  if (!ok || !data.data || !data.data.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="no-data">Tidak ada IP yang diblokir</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.data.map(b => `
     <tr>
       <td class="td-mono">${b.ip}</td>
       <td>${b.reason||'spam_like'}</td>
@@ -656,9 +676,9 @@ async function loadBans() {
 }
 
 async function unbanIp(ip) {
-  const r = await fetch(`${API}/bans/${encodeURIComponent(ip)}`, { method:'DELETE', headers:headers() }).catch(()=>null);
-  if (r && r.ok) { showToast(`IP ${ip} berhasil di-unban`); loadBans(); }
-  else showToast('Gagal');
+  const { data } = await apiFetch(`/bans/${encodeURIComponent(ip)}`, { method:'DELETE' });
+  if (data.success) { showToast(`IP ${ip} berhasil di-unban`); loadBans(); }
+  else showToast(data.message || 'Gagal unban IP');
 }
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
