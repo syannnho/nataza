@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Tentang Kami — lapakID</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9fafb;--bg2:#f2f4f7;--card:#fff;--border:#e4e7ec;--border2:#d0d5dd;
+  --text:#101828;--muted:#667085;--muted2:#475467;
+  --purple:#465fff;--purple2:#7c8eff;
+  --low:#6b7280;--medium:#3b82f6;--high:#f97316;--legend:#eab308;--sold:#ef4444;
+  --success:#12b76a;
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body.dark{--bg:#0d0d0d;--bg2:#151515;--card:#1a1a1a;--border:#252525;--border2:#2e2e2e;--text:#f5f5f5;--muted:#888;--muted2:#aaa}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;transition:background .3s,color .3s}
+
+nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(249,250,251,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+@media(min-width:768px){nav{height:68px;padding:0 32px}}
+body.dark nav{background:rgba(13,13,13,.95)}
+.nav-logo{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.3px}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:14px;height:14px;stroke:#fff;fill:none}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;font-size:.7rem;font-weight:600;color:var(--muted2);text-decoration:none;transition:.15s}
+.nav-link:hover,.nav-link.active{background:var(--bg2);color:var(--text)}
+.nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0}
+.theme-btn{background:var(--bg2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.theme-btn svg{width:14px;height:14px;stroke:var(--muted2);fill:none}
+
+.page-wrap{max-width:860px;margin:0 auto;padding:40px 16px 80px}
+@media(min-width:768px){.page-wrap{padding:56px 32px 80px}}
+
+/* HERO */
+.about-hero{text-align:center;margin-bottom:48px}
+.about-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(70,95,255,.08);border:1px solid rgba(70,95,255,.15);border-radius:99px;padding:4px 14px;font-size:.62rem;font-weight:700;color:var(--purple);letter-spacing:.3px;margin-bottom:16px}
+.about-badge svg{width:11px;height:11px;stroke:var(--purple);fill:none}
+.about-hero h1{font-size:2rem;font-weight:900;letter-spacing:-.5px;color:var(--text);margin-bottom:12px;line-height:1.1}
+@media(min-width:768px){.about-hero h1{font-size:2.8rem}}
+.about-hero h1 span{background:linear-gradient(135deg,var(--purple),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.about-hero p{color:var(--muted);font-size:.78rem;line-height:1.7;max-width:520px;margin:0 auto}
+
+/* STATS BAR */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:40px}
+@media(min-width:640px){.stats-row{grid-template-columns:repeat(4,1fr)}}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.stat-box-val{font-size:1.5rem;font-weight:900;color:var(--text);font-family:var(--mono);line-height:1}
+.stat-box-label{font-size:.58rem;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+
+/* SECTION */
+.about-section{margin-bottom:40px}
+.about-section h2{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.about-section h2 svg{width:16px;height:16px;stroke:var(--purple);fill:none}
+
+/* TIER INFO */
+.tier-list{display:flex;flex-direction:column;gap:10px}
+.tier-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px}
+.tier-dot{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tier-dot svg{width:18px;height:18px;fill:none;stroke:currentColor}
+.dot-low{background:rgba(107,114,128,.1);color:var(--low)}
+.dot-medium{background:rgba(59,130,246,.1);color:var(--medium)}
+.dot-high{background:rgba(249,115,22,.1);color:var(--high)}
+.dot-legend{background:rgba(234,179,8,.1);color:var(--legend)}
+.tier-item-name{font-size:.8rem;font-weight:800;color:var(--text);margin-bottom:2px}
+.tier-item-desc{font-size:.65rem;color:var(--muted);line-height:1.5}
+.tier-item-price{font-size:.8rem;font-weight:800;font-family:var(--mono);margin-left:auto;white-space:nowrap}
+
+/* GUARANTEE GRID */
+.guarantee-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:640px){.guarantee-grid{grid-template-columns:repeat(3,1fr)}}
+.guarantee-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.guarantee-icon{width:36px;height:36px;border-radius:10px;background:rgba(70,95,255,.08);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.guarantee-icon svg{width:16px;height:16px;stroke:var(--purple);fill:none}
+.guarantee-title{font-size:.75rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.guarantee-desc{font-size:.62rem;color:var(--muted);line-height:1.5}
+
+/* PAYMENT INFO */
+.payment-methods{display:flex;flex-direction:column;gap:8px}
+.pm-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px}
+.pm-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pm-icon svg{width:16px;height:16px;fill:none;stroke:currentColor}
+.pm-icon.google{background:rgba(234,67,53,.1);color:#ea4335}
+.pm-icon.file{background:rgba(18,183,106,.1);color:var(--success)}
+.pm-name{font-size:.78rem;font-weight:700;color:var(--text)}
+.pm-desc{font-size:.62rem;color:var(--muted);margin-top:2px}
+.pm-fee{margin-left:auto;font-size:.7rem;font-weight:700;font-family:var(--mono);color:var(--purple)}
+
+/* LOGIN INFO */
+.login-methods{display:flex;gap:10px;flex-wrap:wrap}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:10px;flex:1;min-width:120px}
+.login-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.login-icon svg{width:15px;height:15px;fill:none;stroke:currentColor}
+.login-google{background:rgba(234,67,53,.1);color:#ea4335}
+.login-file{background:rgba(18,183,106,.1);color:var(--success)}
+.login-name{font-size:.75rem;font-weight:700;color:var(--text)}
+.login-desc{font-size:.58rem;color:var(--muted)}
+
+/* FAQ */
+.faq-list{display:flex;flex-direction:column;gap:8px}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.faq-q{padding:14px 16px;font-size:.75rem;font-weight:700;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.faq-q svg{width:13px;height:13px;stroke:var(--muted);fill:none;transition:.2s;flex-shrink:0}
+.faq-item.open .faq-q svg{transform:rotate(180deg)}
+.faq-a{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s;font-size:.68rem;color:var(--muted);line-height:1.6}
+.faq-item.open .faq-a{max-height:200px;padding:0 16px 14px}
+
+footer{border-top:1px solid var(--border);padding:16px 32px;text-align:center;background:var(--card);color:var(--muted);font-size:.62rem}
+footer a{color:var(--purple);text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    lapakID
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</a>
+    <a href="about.html" class="nav-link active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>About</a>
+    <a href="payment.html" class="nav-link"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Beli ID</a>
+    <div class="theme-btn" id="themeBtn"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="about-hero">
+    <div class="about-badge"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>TERPERCAYA SEJAK 2024</div>
+    <h1>Marketplace ID<br/><span>Premium Terbaik</span></h1>
+    <p>lapakID adalah platform jual beli ID premium yang terpercaya. Semua ID telah diverifikasi dan bergaransi. Proses cepat, aman, dan transparan.</p>
+  </div>
+
+  <!-- LIVE STATS -->
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-box-val" id="aStatTotal">—</div><div class="stat-box-label">Total ID</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="aStatAvail">—</div><div class="stat-box-label">Tersedia</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="aStatSold">—</div><div class="stat-box-label">Terjual</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="aStatLikes">—</div><div class="stat-box-label">Total Suka</div></div>
+  </div>
+
+  <!-- TIER INFO -->
+  <div class="about-section">
+    <h2><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Sistem Tier ID</h2>
+    <div class="tier-list">
+      <div class="tier-item">
+        <div class="tier-dot dot-low"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+        <div><div class="tier-item-name">Low</div><div class="tier-item-desc">ID standar dengan nomor reguler. Cocok untuk penggunaan umum dan pemula.</div></div>
+        <div class="tier-item-price" id="price-low">—</div>
+      </div>
+      <div class="tier-item">
+        <div class="tier-dot dot-medium"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div><div class="tier-item-name">Medium</div><div class="tier-item-desc">ID dengan pola nomor yang lebih menarik dan mudah diingat.</div></div>
+        <div class="tier-item-price" id="price-medium">—</div>
+      </div>
+      <div class="tier-item">
+        <div class="tier-dot dot-high"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <div><div class="tier-item-name">High</div><div class="tier-item-desc">ID premium dengan pola nomor langka dan sangat diinginkan banyak orang.</div></div>
+        <div class="tier-item-price" id="price-high">—</div>
+      </div>
+      <div class="tier-item">
+        <div class="tier-dot dot-legend"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div><div class="tier-item-name">Legend</div><div class="tier-item-desc">ID ultra-langka dengan pola eksklusif. Koleksi terbatas untuk kolektor serius.</div></div>
+        <div class="tier-item-price" id="price-legend">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUARANTEE -->
+  <div class="about-section">
+    <h2><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Garansi &amp; Keamanan</h2>
+    <div class="guarantee-grid">
+      <div class="guarantee-card">
+        <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div class="guarantee-title">ID Terverifikasi</div>
+        <div class="guarantee-desc">Semua ID telah melalui proses verifikasi ketat sebelum dijual.</div>
+      </div>
+      <div class="guarantee-card">
+        <div class="guarantee-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="guarantee-title">Keamanan Data</div>
+        <div class="guarantee-desc">Data pembeli disimpan aman dan tidak disebarkan ke pihak ketiga.</div>
+      </div>
+      <div class="guarantee-card">
+        <div class="guarantee-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="guarantee-title">Proses Cepat</div>
+        <div class="guarantee-desc">Konfirmasi dan pengiriman ID dalam waktu maksimal 24 jam.</div>
+      </div>
+      <div class="guarantee-card">
+        <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="guarantee-title">Support 24/7</div>
+        <div class="guarantee-desc">Tim kami siap membantu kamu kapan saja melalui berbagai kanal.</div>
+      </div>
+      <div class="guarantee-card">
+        <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+        <div class="guarantee-title">Promo Menarik</div>
+        <div class="guarantee-desc">Diskon hingga 88% dengan kode promo eksklusif dari admin.</div>
+      </div>
+      <div class="guarantee-card">
+        <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="guarantee-title">Bergaransi</div>
+        <div class="guarantee-desc">ID yang sudah dibeli dijamin tidak dijual ulang kepada pembeli lain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT METHODS -->
+  <div class="about-section">
+    <h2><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Metode Pembayaran</h2>
+    <div class="payment-methods">
+      <div class="pm-card">
+        <div class="pm-icon google"><svg viewBox="0 0 24 24"><path d="M21.35 11.1H12.18v2.73h5.51c-.48 2.49-2.65 4.27-5.51 4.27a6.1 6.1 0 0 1 0-12.2c1.59 0 3.02.59 4.1 1.55l2.04-2.04A10.05 10.05 0 0 0 12.18 2C6.54 2 2 6.54 2 12.18c0 5.63 4.54 10.18 10.18 10.18 5.8 0 9.69-4.08 9.69-9.82 0-.65-.07-1.28-.17-1.9z"/></svg></div>
+        <div><div class="pm-name">Google Pay</div><div class="pm-desc">Pembayaran via Google Pay. Proses instan dan aman.</div></div>
+        <div class="pm-fee" id="pm-google-fee">+Rp 5.000</div>
+      </div>
+      <div class="pm-card">
+        <div class="pm-icon file"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div><div class="pm-name">Transfer File</div><div class="pm-desc">Pembayaran via transfer file/bukti transfer manual ke admin.</div></div>
+        <div class="pm-fee">Gratis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN METHODS -->
+  <div class="about-section">
+    <h2><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>Metode Login Admin</h2>
+    <div class="login-methods">
+      <div class="login-card">
+        <div class="login-icon login-google"><svg viewBox="0 0 24 24"><path d="M21.35 11.1H12.18v2.73h5.51c-.48 2.49-2.65 4.27-5.51 4.27a6.1 6.1 0 0 1 0-12.2c1.59 0 3.02.59 4.1 1.55l2.04-2.04A10.05 10.05 0 0 0 12.18 2C6.54 2 2 6.54 2 12.18c0 5.63 4.54 10.18 10.18 10.18 5.8 0 9.69-4.08 9.69-9.82 0-.65-.07-1.28-.17-1.9z"/></svg></div>
+        <div><div class="login-name">Google</div><div class="login-desc">Login dengan akun Google</div></div>
+      </div>
+      <div class="login-card">
+        <div class="login-icon login-file"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div><div class="login-name">File / Token</div><div class="login-desc">Login dengan admin token</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="about-section">
+    <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Pertanyaan Umum</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Apakah ID yang dibeli bergaransi tidak dijual ulang?<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="faq-a">Ya, setiap ID yang sudah dibeli akan langsung ditandai sebagai SOLD dan tidak akan dijual ke pembeli lain. Kami menjamin eksklusivitas kepemilikan ID kamu.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Berapa lama proses pengiriman setelah pembayaran?<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="faq-a">Setelah pembayaran dikonfirmasi admin, ID akan dikirimkan dalam waktu maksimal 24 jam. Biasanya proses ini hanya membutuhkan beberapa jam saja.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Bagaimana cara mendapatkan kode promo?<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="faq-a">Kode promo dibagikan melalui media sosial lapakID dan grup komunitas kami. Pantau terus update kami untuk mendapatkan diskon hingga 88%!</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Apa perbedaan tier Low, Medium, High, dan Legend?<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="faq-a">Tier menentukan kelangkaan dan keunikan pola nomor ID. Low adalah nomor reguler, Medium memiliki pola menarik, High memiliki pola langka, dan Legend adalah koleksi ultra-eksklusif dengan pola terlangka.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Apakah bisa refund jika ID tidak sesuai?<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="faq-a">Kami menjamin keaslian setiap ID yang dijual. Jika ada masalah teknis dari pihak kami, refund akan diproses dalam waktu 3x24 jam. Hubungi admin untuk detail lebih lanjut.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 <a href="index.html">lapakID</a> &mdash; Koleksi ID Premium Terpercaya &mdash; <a href="payment.html">Beli Sekarang</a>
+</footer>
+
+<script>
+const API = '/api';
+const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+
+async function init() {
+  initTheme();
+  const [statsR, settR] = await Promise.all([
+    fetch(`${API}/ids/stats`).catch(()=>null),
+    fetch(`${API}/settings`).catch(()=>null),
+  ]);
+  if (statsR && statsR.ok) {
+    const { data: s } = await statsR.json();
+    document.getElementById('aStatTotal').textContent = s.total.toLocaleString('id-ID');
+    document.getElementById('aStatAvail').textContent = s.available.toLocaleString('id-ID');
+    document.getElementById('aStatSold').textContent = s.sold.toLocaleString('id-ID');
+    document.getElementById('aStatLikes').textContent = s.totalLikes.toLocaleString('id-ID');
+  }
+  if (settR && settR.ok) {
+    const { data } = await settR.json();
+    const prices = data.prices || {};
+    const fees = data.adminFee || { google: 5000 };
+    ['low','medium','high','legend'].forEach(t => {
+      const el = document.getElementById(`price-${t}`);
+      if (el && prices[t]) el.textContent = fmt(prices[t]);
+    });
+    const gFee = document.getElementById('pm-google-fee');
+    if (gFee && fees.google) gFee.textContent = `+${fmt(fees.google)}`;
+  }
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+}
+
+function initTheme() {
+  if (localStorage.getItem('lapakid_dark')==='1') document.body.classList.add('dark');
+}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const d = document.body.classList.toggle('dark');
+  localStorage.setItem('lapakid_dark', d?'1':'0');
+});
+
+init();
+</script>
+</body>
+</html>

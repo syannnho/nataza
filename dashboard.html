@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Dashboard Admin — lapakID</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9fafb;--bg2:#f2f4f7;--card:#fff;--border:#e4e7ec;--border2:#d0d5dd;
+  --text:#101828;--muted:#667085;--muted2:#475467;
+  --purple:#465fff;--purple2:#7c8eff;
+  --low:#6b7280;--medium:#3b82f6;--high:#f97316;--legend:#eab308;--sold:#ef4444;
+  --success:#12b76a;--warning:#f79009;
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body.dark{--bg:#0d0d0d;--bg2:#151515;--card:#1a1a1a;--border:#252525;--border2:#2e2e2e;--text:#f5f5f5;--muted:#888;--muted2:#aaa}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;transition:background .3s,color .3s}
+
+/* LOGIN SCREEN */
+#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:360px;width:90%;text-align:center}
+.login-logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.login-logo svg{width:22px;height:22px;stroke:#fff;fill:none}
+.login-box h2{font-size:1.1rem;font-weight:800;margin-bottom:4px}
+.login-box p{font-size:.68rem;color:var(--muted);margin-bottom:20px}
+.login-input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:.75rem;color:var(--text);outline:none;margin-bottom:10px;text-align:center;letter-spacing:1px}
+.login-input:focus{border-color:var(--purple)}
+.btn-login{width:100%;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;padding:11px;border-radius:10px;font-size:.78rem;font-weight:800;cursor:pointer}
+.login-err{color:var(--sold);font-size:.65rem;margin-top:8px;display:none}
+
+/* LAYOUT */
+nav{position:sticky;top:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(249,250,251,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+@media(min-width:768px){nav{height:64px;padding:0 24px}}
+body.dark nav{background:rgba(13,13,13,.95)}
+.nav-logo{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:800;color:var(--text);text-decoration:none}
+.logo-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:12px;height:12px;stroke:#fff;fill:none}
+.nav-right{display:flex;align-items:center;gap:8px}
+.admin-badge{background:rgba(70,95,255,.1);border:1px solid rgba(70,95,255,.2);color:var(--purple);font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:99px}
+.btn-logout{background:var(--bg2);border:1px solid var(--border);padding:5px 12px;border-radius:99px;font-size:.65rem;font-weight:600;cursor:pointer;color:var(--muted2)}
+.theme-btn{background:var(--bg2);border:1px solid var(--border);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.theme-btn svg{width:13px;height:13px;stroke:var(--muted2);fill:none}
+
+.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 80px}
+@media(min-width:768px){.wrap{padding:28px 24px 80px}}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:var(--bg2);border-radius:12px;padding:5px;margin-bottom:24px;overflow-x:auto;scrollbar-width:none}
+.tab{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9px;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--muted2);border:none;background:transparent;font-family:var(--font)}
+.tab svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.tab.act{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:640px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.stat-card-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.stat-card-icon svg{width:15px;height:15px;fill:none;stroke:currentColor}
+.sc-purple{background:rgba(70,95,255,.1);color:var(--purple)}
+.sc-green{background:rgba(18,183,106,.1);color:var(--success)}
+.sc-red{background:rgba(239,68,68,.1);color:var(--sold)}
+.sc-yellow{background:rgba(234,179,8,.1);color:var(--legend)}
+.stat-card-val{font-size:1.4rem;font-weight:900;color:var(--text);font-family:var(--mono);line-height:1}
+.stat-card-label{font-size:.58rem;color:var(--muted);margin-top:3px}
+
+/* SECTIONS */
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.section-card h3{font-size:.85rem;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-card h3 svg{width:15px;height:15px;stroke:var(--purple);fill:none}
+
+/* FORMS */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.62rem;font-weight:700;color:var(--muted2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:.76rem;outline:none;transition:.15s;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple);background:var(--card)}
+.field textarea{min-height:80px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.field-row{grid-template-columns:1fr}}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:640px){.field-row3{grid-template-columns:1fr 1fr}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:10px;font-size:.7rem;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:.15s}
+.btn svg{width:12px;height:12px;stroke:currentColor;fill:none}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--sold);border:1px solid rgba(239,68,68,.2)}
+.btn-danger:hover{background:var(--sold);color:#fff}
+.btn-success{background:rgba(18,183,106,.1);color:var(--success);border:1px solid rgba(18,183,106,.2)}
+.btn-success:hover{background:var(--success);color:#fff}
+.btn-sm{padding:5px 10px;font-size:.62rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* TABLES */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.68rem}
+th{font-size:.58rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:hover td{background:var(--bg2)}
+.td-mono{font-family:var(--mono);font-size:.65rem}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:.55rem;font-weight:700;border:1px solid}
+.badge-low{background:rgba(107,114,128,.1);color:var(--low);border-color:rgba(107,114,128,.2)}
+.badge-medium{background:rgba(59,130,246,.1);color:var(--medium);border-color:rgba(59,130,246,.2)}
+.badge-high{background:rgba(249,115,22,.1);color:var(--high);border-color:rgba(249,115,22,.2)}
+.badge-legend{background:rgba(234,179,8,.1);color:var(--legend);border-color:rgba(234,179,8,.2)}
+.badge-sold{background:rgba(239,68,68,.1);color:var(--sold);border-color:rgba(239,68,68,.2)}
+.badge-avail{background:rgba(18,183,106,.1);color:var(--success);border-color:rgba(18,183,106,.2)}
+.badge-pending{background:rgba(247,144,9,.1);color:var(--warning);border-color:rgba(247,144,9,.2)}
+.badge-confirmed{background:rgba(18,183,106,.1);color:var(--success);border-color:rgba(18,183,106,.2)}
+.td-actions{display:flex;gap:5px;align-items:center}
+.no-data{text-align:center;padding:32px;color:var(--muted);font-size:.72rem}
+
+/* PROMO DISCOUNT PREVIEW */
+.discount-preview{background:rgba(70,95,255,.06);border:1px solid rgba(70,95,255,.15);border-radius:10px;padding:10px 14px;font-size:.68rem;color:var(--muted2);margin-top:8px;display:none}
+.discount-preview b{color:var(--purple)}
+
+/* SETTINGS PRICE */
+.price-settings{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:640px){.price-settings{grid-template-columns:repeat(4,1fr)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:99px;font-size:.68rem;font-weight:600;z-index:9999;white-space:nowrap;animation:fadeUp .25s}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* CONFIRM MODAL */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.confirm-overlay.open{opacity:1;pointer-events:all}
+.confirm-box{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:320px;width:88%;padding:20px;text-align:center}
+.confirm-box h4{font-size:.88rem;font-weight:800;margin-bottom:6px}
+.confirm-box p{font-size:.68rem;color:var(--muted);margin-bottom:16px}
+.confirm-actions{display:flex;gap:8px;justify-content:center}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <h2>Admin lapakID</h2>
+    <p>Masukkan token admin untuk melanjutkan</p>
+    <input type="password" class="login-input" id="tokenInput" placeholder="Token rahasia admin..." onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-login" onclick="doLogin()">Masuk</button>
+    <div class="login-err" id="loginErr">Token tidak valid</div>
+  </div>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    lapakID
+  </a>
+  <div class="nav-right">
+    <div class="admin-badge">ADMIN</div>
+    <div class="theme-btn" id="themeBtn"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+    <button class="btn-logout" onclick="doLogout()">Logout</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <!-- STATS -->
+  <div class="stats-grid" id="adminStats">
+    <div class="stat-card"><div class="stat-card-icon sc-purple"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/></svg></div><div class="stat-card-val" id="as-total">—</div><div class="stat-card-label">Total ID</div></div>
+    <div class="stat-card"><div class="stat-card-icon sc-green"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="stat-card-val" id="as-avail">—</div><div class="stat-card-label">Tersedia</div></div>
+    <div class="stat-card"><div class="stat-card-icon sc-red"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div><div class="stat-card-val" id="as-sold">—</div><div class="stat-card-label">Terjual</div></div>
+    <div class="stat-card"><div class="stat-card-icon sc-yellow"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="stat-card-val" id="as-likes">—</div><div class="stat-card-label">Total Suka</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab act" data-tab="ids" onclick="switchTab('ids')"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/></svg>Kelola ID</button>
+    <button class="tab" data-tab="payments" onclick="switchTab('payments')"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Pembayaran</button>
+    <button class="tab" data-tab="promos" onclick="switchTab('promos')"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Promo</button>
+    <button class="tab" data-tab="settings" onclick="switchTab('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2.83 0 1.65 1.65 0 0 0-1.51-1 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.68 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan</button>
+    <button class="tab" data-tab="bans" onclick="switchTab('bans')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>IP Banned</button>
+  </div>
+
+  <!-- TAB: IDS -->
+  <div class="tab-content active" id="tab-ids">
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Tambah ID Tunggal</h3>
+      <div class="field-row">
+        <div class="field"><label>Nomor ID</label><input type="text" id="newIdNum" placeholder="Contoh: 15699999999" style="font-family:var(--mono)"/></div>
+        <div class="field"><label>Tier</label>
+          <select id="newIdTier">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="legend">Legend</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Catatan (opsional)</label><input type="text" id="newIdNote" placeholder="Catatan tambahan..."/></div>
+      <button class="btn btn-primary" onclick="addId()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Tambah ID</button>
+    </div>
+
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Tambah ID Massal</h3>
+      <div class="field"><label>Daftar Nomor ID (satu per baris)</label><textarea id="bulkIds" placeholder="15699990001&#10;15699990002&#10;15699990003&#10;..."></textarea></div>
+      <div class="field-row">
+        <div class="field"><label>Tier untuk semua</label>
+          <select id="bulkTier">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="legend">Legend</option>
+          </select>
+        </div>
+        <div class="field"><label>Catatan (opsional)</label><input type="text" id="bulkNote" placeholder="Catatan..."/></div>
+      </div>
+      <button class="btn btn-primary" onclick="addBulk()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Massal</button>
+    </div>
+
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Daftar ID <span style="font-size:.62rem;font-weight:400;color:var(--muted);margin-left:4px" id="idListCount"></span></h3>
+      <div class="field" style="margin-bottom:12px"><input type="text" id="searchId" placeholder="Cari nomor ID..." oninput="filterIdTable()" style="font-family:var(--mono)"/></div>
+      <div class="table-wrap">
+        <table id="idTable">
+          <thead><tr><th>Nomor ID</th><th>Tier</th><th>Status</th><th>Suka</th><th>Ditambahkan</th><th>Aksi</th></tr></thead>
+          <tbody id="idTableBody"><tr><td colspan="6" class="no-data">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PAYMENTS -->
+  <div class="tab-content" id="tab-payments">
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Daftar Pembayaran</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Tier</th><th>Pembeli</th><th>Metode</th><th>Harga</th><th>Promo</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+          <tbody id="paymentTableBody"><tr><td colspan="9" class="no-data">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PROMOS -->
+  <div class="tab-content" id="tab-promos">
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Buat Kode Promo</h3>
+      <div class="field-row">
+        <div class="field"><label>Kode Promo</label><input type="text" id="promoCode" placeholder="SALE88" style="text-transform:uppercase;font-family:var(--mono)"/></div>
+        <div class="field"><label>Diskon (%)</label><input type="number" id="promoDiscount" min="1" max="88" placeholder="mis: 50" oninput="updateDiscountPreview()"/></div>
+      </div>
+      <div class="discount-preview" id="discountPreview">Diskon <b id="previewPct">0</b>% — Harga Low: <b id="previewLow">—</b>, Medium: <b id="previewMedium">—</b>, High: <b id="previewHigh">—</b>, Legend: <b id="previewLegend">—</b></div>
+      <div class="field-row">
+        <div class="field"><label>Maks. Penggunaan</label><input type="number" id="promoMaxUses" placeholder="Kosongkan = unlimited"/></div>
+        <div class="field"><label>Berlaku hingga</label><input type="datetime-local" id="promoExpiry"/></div>
+      </div>
+      <div class="field"><label>Deskripsi</label><input type="text" id="promoDesc" placeholder="Promo akhir tahun..."/></div>
+      <button class="btn btn-primary" onclick="createPromo()"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Buat Promo</button>
+    </div>
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>Daftar Promo</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kode</th><th>Diskon</th><th>Digunakan</th><th>Maks</th><th>Berlaku</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody id="promoTableBody"><tr><td colspan="7" class="no-data">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SETTINGS -->
+  <div class="tab-content" id="tab-settings">
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Harga per Tier (Rp)</h3>
+      <div class="price-settings">
+        <div class="field"><label style="color:var(--low)">Low</label><input type="number" id="sPrice-low" placeholder="125000"/></div>
+        <div class="field"><label style="color:var(--medium)">Medium</label><input type="number" id="sPrice-medium" placeholder="450000"/></div>
+        <div class="field"><label style="color:var(--high)">High</label><input type="number" id="sPrice-high" placeholder="850000"/></div>
+        <div class="field"><label style="color:var(--legend)">Legend</label><input type="number" id="sPrice-legend" placeholder="1350000"/></div>
+      </div>
+      <button class="btn btn-primary" onclick="savePrices()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Simpan Harga</button>
+    </div>
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0 0 6"/><path d="M19 9v2a7 7 0 0 1-14 0V9"/></svg>Biaya Admin (Rp)</h3>
+      <div class="field-row">
+        <div class="field"><label>Google Pay</label><input type="number" id="sFee-google" placeholder="5000"/></div>
+        <div class="field"><label>Transfer File</label><input type="number" id="sFee-file" placeholder="0"/></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveFees()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>Simpan Biaya</button>
+    </div>
+  </div>
+
+  <!-- TAB: BANS -->
+  <div class="tab-content" id="tab-bans">
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>IP Terblokir</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>IP Address</th><th>Alasan</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+          <tbody id="banTableBody"><tr><td colspan="4" class="no-data">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h4 id="confirmTitle">Konfirmasi</h4>
+    <p id="confirmMsg">Apakah kamu yakin?</p>
+    <div class="confirm-actions">
+      <button class="btn btn-danger" id="confirmYes">Ya, lanjutkan</button>
+      <button class="btn" style="background:var(--bg2);border:1px solid var(--border)" onclick="closeConfirm()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let adminToken = localStorage.getItem('lapakid_admin_token') || '';
+let allIdsData = [];
+let filteredIds = [];
+let settingsCache = {};
+const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+const dateStr = d => d ? new Date(d).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const token = document.getElementById('tokenInput').value.trim();
+  if (!token) { showLoginErr('Token tidak boleh kosong'); return; }
+
+  const btn = document.querySelector('.btn-login');
+  btn.textContent = 'Memverifikasi...';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch(`${API}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    const d = await r.json();
+    if (r.ok && d.success) {
+      adminToken = token;
+      localStorage.setItem('lapakid_admin_token', token);
+      document.getElementById('loginScreen').style.display = 'none';
+      initDashboard();
+    } else {
+      showLoginErr(d.message || 'Token tidak valid');
+    }
+  } catch (err) {
+    showLoginErr('Gagal terhubung ke server. Cek koneksi internet.');
+  } finally {
+    btn.textContent = 'Masuk';
+    btn.disabled = false;
+  }
+}
+
+function showLoginErr(msg) {
+  const e = document.getElementById('loginErr');
+  e.textContent = msg || 'Token tidak valid';
+  e.style.display = 'block';
+  setTimeout(() => { e.style.display = 'none'; }, 4000);
+}
+
+function doLogout() {
+  adminToken = '';
+  localStorage.removeItem('lapakid_admin_token');
+  location.reload();
+}
+
+function headers() {
+  return { 'Content-Type': 'application/json', 'x-admin-token': adminToken };
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function initDashboard() {
+  initTheme();
+  await Promise.all([loadStats(), loadIds(), loadSettings()]);
+  loadPayments();
+  loadPromos();
+  loadBans();
+}
+
+async function loadStats() {
+  const r = await fetch(`${API}/ids/stats`).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data: s } = await r.json();
+  document.getElementById('as-total').textContent = s.total.toLocaleString('id-ID');
+  document.getElementById('as-avail').textContent = s.available.toLocaleString('id-ID');
+  document.getElementById('as-sold').textContent = s.sold.toLocaleString('id-ID');
+  document.getElementById('as-likes').textContent = s.totalLikes.toLocaleString('id-ID');
+}
+
+async function loadSettings() {
+  const r = await fetch(`${API}/settings`).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data } = await r.json();
+  settingsCache = data;
+  const p = data.prices || {};
+  ['low','medium','high','legend'].forEach(t => {
+    const el = document.getElementById(`sPrice-${t}`);
+    if (el && p[t]) el.value = p[t];
+  });
+  const f = data.adminFee || {};
+  ['google','file'].forEach(t => {
+    const el = document.getElementById(`sFee-${t}`);
+    if (el && f[t] !== undefined) el.value = f[t];
+  });
+}
+
+// ── IDS ──────────────────────────────────────────────────────────────────────
+async function loadIds() {
+  const r = await fetch(`${API}/ids`, { headers: headers() }).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data } = await r.json();
+  allIdsData = data || [];
+  filteredIds = allIdsData;
+  document.getElementById('idListCount').textContent = `(${allIdsData.length} ID)`;
+  renderIdTable(filteredIds);
+}
+
+function filterIdTable() {
+  const q = document.getElementById('searchId').value.trim().toLowerCase();
+  filteredIds = q ? allIdsData.filter(i => i.number.includes(q)) : allIdsData;
+  renderIdTable(filteredIds);
+}
+
+function renderIdTable(ids) {
+  const tbody = document.getElementById('idTableBody');
+  if (!ids.length) { tbody.innerHTML = '<tr><td colspan="6" class="no-data">Tidak ada ID ditemukan</td></tr>'; return; }
+  tbody.innerHTML = ids.map(id => `
+    <tr>
+      <td class="td-mono">${id.number}</td>
+      <td><span class="badge badge-${id.tier}">${id.tier.toUpperCase()}</span></td>
+      <td><span class="badge ${id.sold?'badge-sold':'badge-avail'}">${id.sold?'TERJUAL':'TERSEDIA'}</span></td>
+      <td class="td-mono">${id.likes||0}</td>
+      <td>${dateStr(id.addedAt)}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm ${id.sold?'btn-success':'badge-sold'}" style="${id.sold?'':'background:rgba(239,68,68,.1);color:var(--sold);border:1px solid rgba(239,68,68,.2)'}" onclick="toggleSold('${id.number}',${!id.sold})">${id.sold?'Batalkan':'Tandai Terjual'}</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteId('${id.number}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function addId() {
+  const number = document.getElementById('newIdNum').value.trim();
+  const tier = document.getElementById('newIdTier').value;
+  const note = document.getElementById('newIdNote').value.trim();
+  if (!number) { showToast('Nomor ID wajib diisi'); return; }
+  const r = await fetch(`${API}/ids`, { method:'POST', headers:headers(), body:JSON.stringify({number,tier,note}) }).catch(()=>null);
+  if (!r) { showToast('Gagal terhubung'); return; }
+  const d = await r.json();
+  if (d.success) { showToast('ID berhasil ditambahkan'); document.getElementById('newIdNum').value=''; document.getElementById('newIdNote').value=''; loadIds(); loadStats(); }
+  else showToast(d.message || 'Gagal');
+}
+
+async function addBulk() {
+  const raw = document.getElementById('bulkIds').value.trim();
+  const tier = document.getElementById('bulkTier').value;
+  const note = document.getElementById('bulkNote').value.trim();
+  if (!raw) { showToast('Masukkan daftar ID'); return; }
+  const ids = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  const r = await fetch(`${API}/ids/bulk`, { method:'POST', headers:headers(), body:JSON.stringify({ids,tier,note}) }).catch(()=>null);
+  if (!r) { showToast('Gagal terhubung'); return; }
+  const d = await r.json();
+  if (d.success) { showToast(`Berhasil: ${d.inserted} ditambahkan, ${d.skipped} dilewati`); document.getElementById('bulkIds').value=''; loadIds(); loadStats(); }
+  else showToast(d.message || 'Gagal');
+}
+
+async function toggleSold(number, sold) {
+  const r = await fetch(`${API}/ids/${number}`, { method:'PUT', headers:headers(), body:JSON.stringify({sold}) }).catch(()=>null);
+  if (r && r.ok) { showToast(sold?'ID ditandai terjual':'Status dikembalikan'); loadIds(); loadStats(); }
+  else showToast('Gagal mengupdate');
+}
+
+function deleteId(number) {
+  showConfirm('Hapus ID', `Apakah kamu yakin ingin menghapus ID ${number}?`, async () => {
+    const r = await fetch(`${API}/ids/${number}`, { method:'DELETE', headers:headers() }).catch(()=>null);
+    if (r && r.ok) { showToast('ID berhasil dihapus'); loadIds(); loadStats(); }
+    else showToast('Gagal menghapus');
+  });
+}
+
+// ── PAYMENTS ──────────────────────────────────────────────────────────────────
+async function loadPayments() {
+  const r = await fetch(`${API}/payments`, { headers:headers() }).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data } = await r.json();
+  const tbody = document.getElementById('paymentTableBody');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="9" class="no-data">Belum ada pembayaran</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td class="td-mono">${p.idNumber}</td>
+      <td><span class="badge badge-${p.tier}">${(p.tier||'').toUpperCase()}</span></td>
+      <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.email}</span></td>
+      <td>${p.method==='google'?'Google Pay':'Transfer File'}</td>
+      <td class="td-mono">${fmt(p.finalPrice)}</td>
+      <td>${p.promoCode?`<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>`:'—'}</td>
+      <td><span class="badge badge-${p.status==='confirmed'?'confirmed':'pending'}">${p.status==='confirmed'?'CONFIRMED':'PENDING'}</span></td>
+      <td>${dateStr(p.createdAt)}</td>
+      <td>${p.status==='pending'?`<button class="btn btn-sm btn-success" onclick="confirmPayment('${p._id}')">Konfirmasi</button>`:'—'}</td>
+    </tr>
+  `).join('');
+}
+
+async function confirmPayment(id) {
+  showConfirm('Konfirmasi Pembayaran', 'Tandai pembayaran ini sebagai dikonfirmasi? ID akan otomatis ditandai terjual.', async () => {
+    const r = await fetch(`${API}/payments/${id}/confirm`, { method:'PUT', headers:headers() }).catch(()=>null);
+    if (r && r.ok) { showToast('Pembayaran dikonfirmasi'); loadPayments(); loadIds(); loadStats(); }
+    else showToast('Gagal mengkonfirmasi');
+  });
+}
+
+// ── PROMOS ────────────────────────────────────────────────────────────────────
+async function loadPromos() {
+  const r = await fetch(`${API}/promos`, { headers:headers() }).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data } = await r.json();
+  const tbody = document.getElementById('promoTableBody');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="7" class="no-data">Belum ada promo</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td class="td-mono" style="font-weight:700">${p.code}</td>
+      <td style="color:var(--success);font-weight:800">${p.discount}%</td>
+      <td class="td-mono">${p.uses||0}</td>
+      <td class="td-mono">${p.maxUses||'∞'}</td>
+      <td>${p.expiresAt?dateStr(p.expiresAt):'Tidak ada'}</td>
+      <td><span class="badge ${p.active?'badge-avail':'badge-sold'}">${p.active?'AKTIF':'NONAKTIF'}</span></td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm ${p.active?'btn-danger':'btn-success'}" onclick="togglePromo('${p._id}',${!p.active})">${p.active?'Nonaktifkan':'Aktifkan'}</button>
+          <button class="btn btn-sm btn-danger" onclick="deletePromo('${p._id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateDiscountPreview() {
+  const pct = parseInt(document.getElementById('promoDiscount').value) || 0;
+  const preview = document.getElementById('discountPreview');
+  if (pct <= 0 || pct > 88) { preview.style.display='none'; return; }
+  preview.style.display = 'block';
+  document.getElementById('previewPct').textContent = pct;
+  const p = settingsCache.prices || { low:125000, medium:450000, high:850000, legend:1350000 };
+  ['low','medium','high','legend'].forEach(t => {
+    const discounted = Math.round(p[t] * (1-pct/100));
+    document.getElementById(`preview${t.charAt(0).toUpperCase()+t.slice(1)}`).textContent = fmt(discounted);
+  });
+}
+
+async function createPromo() {
+  const code = document.getElementById('promoCode').value.trim();
+  const discount = document.getElementById('promoDiscount').value;
+  const maxUses = document.getElementById('promoMaxUses').value;
+  const expiresAt = document.getElementById('promoExpiry').value;
+  const description = document.getElementById('promoDesc').value.trim();
+  if (!code || !discount) { showToast('Kode dan diskon wajib diisi'); return; }
+  const r = await fetch(`${API}/promos`, {
+    method:'POST', headers:headers(),
+    body:JSON.stringify({ code, discount:Number(discount), maxUses:maxUses?Number(maxUses):null, expiresAt:expiresAt||null, description })
+  }).catch(()=>null);
+  if (!r) { showToast('Gagal terhubung'); return; }
+  const d = await r.json();
+  if (d.success) { showToast('Promo berhasil dibuat'); document.getElementById('promoCode').value=''; document.getElementById('promoDiscount').value=''; document.getElementById('promoMaxUses').value=''; document.getElementById('promoExpiry').value=''; document.getElementById('promoDesc').value=''; document.getElementById('discountPreview').style.display='none'; loadPromos(); }
+  else showToast(d.message || 'Gagal');
+}
+
+async function togglePromo(id, active) {
+  const r = await fetch(`${API}/promos/${id}`, { method:'PUT', headers:headers(), body:JSON.stringify({active}) }).catch(()=>null);
+  if (r && r.ok) { showToast(active?'Promo diaktifkan':'Promo dinonaktifkan'); loadPromos(); }
+  else showToast('Gagal mengupdate');
+}
+
+function deletePromo(id) {
+  showConfirm('Hapus Promo', 'Apakah kamu yakin ingin menghapus promo ini?', async () => {
+    const r = await fetch(`${API}/promos/${id}`, { method:'DELETE', headers:headers() }).catch(()=>null);
+    if (r && r.ok) { showToast('Promo dihapus'); loadPromos(); }
+    else showToast('Gagal');
+  });
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+async function savePrices() {
+  const prices = {};
+  ['low','medium','high','legend'].forEach(t => {
+    const v = document.getElementById(`sPrice-${t}`).value;
+    if (v) prices[t] = Number(v);
+  });
+  const r = await fetch(`${API}/settings/prices`, { method:'PUT', headers:headers(), body:JSON.stringify({value:prices}) }).catch(()=>null);
+  if (r && r.ok) { showToast('Harga berhasil disimpan'); settingsCache.prices = prices; }
+  else showToast('Gagal menyimpan');
+}
+
+async function saveFees() {
+  const adminFee = {};
+  ['google','file'].forEach(t => {
+    const v = document.getElementById(`sFee-${t}`).value;
+    adminFee[t] = Number(v) || 0;
+  });
+  const r = await fetch(`${API}/settings/adminFee`, { method:'PUT', headers:headers(), body:JSON.stringify({value:adminFee}) }).catch(()=>null);
+  if (r && r.ok) { showToast('Biaya admin berhasil disimpan'); }
+  else showToast('Gagal menyimpan');
+}
+
+// ── BANS ─────────────────────────────────────────────────────────────────────
+async function loadBans() {
+  const r = await fetch(`${API}/bans`, { headers:headers() }).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data } = await r.json();
+  const tbody = document.getElementById('banTableBody');
+  if (!data.length) { tbody.innerHTML='<tr><td colspan="4" class="no-data">Tidak ada IP yang diblokir</td></tr>'; return; }
+  tbody.innerHTML = data.map(b => `
+    <tr>
+      <td class="td-mono">${b.ip}</td>
+      <td>${b.reason||'spam_like'}</td>
+      <td>${dateStr(b.bannedAt)}</td>
+      <td><button class="btn btn-sm btn-success" onclick="unbanIp('${b.ip}')">Unban</button></td>
+    </tr>
+  `).join('');
+}
+
+async function unbanIp(ip) {
+  const r = await fetch(`${API}/bans/${encodeURIComponent(ip)}`, { method:'DELETE', headers:headers() }).catch(()=>null);
+  if (r && r.ok) { showToast(`IP ${ip} berhasil di-unban`); loadBans(); }
+  else showToast('Gagal');
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('act'));
+  document.getElementById(`tab-${tab}`)?.classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('act');
+}
+
+// ── CONFIRM MODAL ─────────────────────────────────────────────────────────────
+let confirmCb = null;
+function showConfirm(title, msg, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  confirmCb = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); confirmCb = null; }
+document.getElementById('confirmYes').addEventListener('click', () => { closeConfirm(); if(confirmCb) confirmCb(); });
+document.getElementById('confirmOverlay').addEventListener('click', e => { if(e.target===document.getElementById('confirmOverlay')) closeConfirm(); });
+
+// ── THEME ──────────────────────────────────────────────────────────────────────
+function initTheme() {
+  if (localStorage.getItem('lapakid_dark')==='1') document.body.classList.add('dark');
+}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const d = document.body.classList.toggle('dark');
+  localStorage.setItem('lapakid_dark', d?'1':'0');
+});
+
+// ── TOAST ──────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+}
+
+// ── AUTO-LOGIN (verifikasi token dulu) ────────────────────────────────────────
+async function tryAutoLogin() {
+  initTheme();
+  if (!adminToken) return; // token tidak ada, tampilkan login screen
+  try {
+    const r = await fetch(`${API}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: adminToken }),
+    });
+    const d = await r.json();
+    if (r.ok && d.success) {
+      document.getElementById('loginScreen').style.display = 'none';
+      initDashboard();
+    } else {
+      // Token tidak valid, hapus dari localStorage
+      adminToken = '';
+      localStorage.removeItem('lapakid_admin_token');
+    }
+  } catch (_) {
+    // Server tidak bisa dijangkau, biarkan login screen tampil
+    adminToken = '';
+    localStorage.removeItem('lapakid_admin_token');
+  }
+}
+tryAutoLogin();
+</script>
+</body>
+</html>

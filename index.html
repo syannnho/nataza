@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>lapakID — Koleksi ID Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9fafb;--bg2:#f2f4f7;--card:#fff;--border:#e4e7ec;--border2:#d0d5dd;
+  --text:#101828;--muted:#667085;--muted2:#475467;
+  --purple:#465fff;--purple2:#7c8eff;
+  --low:#6b7280;--medium:#3b82f6;--high:#f97316;--legend:#eab308;--sold:#ef4444;
+  --success:#12b76a;--warning:#f79009;
+  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
+  --radius:14px;--shadow:0 4px 20px rgba(70,95,255,.08);
+}
+body.dark{--bg:#0d0d0d;--bg2:#151515;--card:#1a1a1a;--border:#252525;--border2:#2e2e2e;--text:#f5f5f5;--muted:#888;--muted2:#aaa}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;transition:background .3s,color .3s}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(249,250,251,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+@media(min-width:768px){nav{height:68px;padding:0 32px}}
+body.dark nav{background:rgba(13,13,13,.95)}
+.nav-logo{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.3px}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:14px;height:14px;stroke:#fff;fill:none}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;font-size:.7rem;font-weight:600;color:var(--muted2);text-decoration:none;transition:.15s}
+.nav-link:hover,.nav-link.active{background:var(--bg2);color:var(--text)}
+.nav-link svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;padding:7px 16px;border-radius:99px;font-size:.7rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.btn-primary svg{width:13px;height:13px;stroke:#fff;fill:none}
+.theme-btn{background:var(--bg2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.theme-btn svg{width:14px;height:14px;stroke:var(--muted2);fill:none}
+
+/* HERO */
+.hero{padding:40px 16px 24px;max-width:1400px;margin:0 auto}
+@media(min-width:768px){.hero{padding:56px 32px 32px}}
+.hero-label{display:inline-flex;align-items:center;gap:6px;background:rgba(70,95,255,.08);border:1px solid rgba(70,95,255,.15);border-radius:99px;padding:4px 12px;font-size:.65rem;font-weight:700;color:var(--purple);letter-spacing:.3px;margin-bottom:16px}
+.hero-label svg{width:11px;height:11px;stroke:var(--purple);fill:none}
+.hero h1{font-size:2rem;font-weight:900;color:var(--text);letter-spacing:-.5px;line-height:1.1;margin-bottom:10px}
+@media(min-width:768px){.hero h1{font-size:3rem}}
+.hero h1 span{background:linear-gradient(135deg,var(--purple),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--muted);font-size:.8rem;margin-bottom:24px;max-width:500px;line-height:1.6}
+.hero-stats{display:flex;gap:20px;flex-wrap:wrap}
+.hero-stat{display:flex;flex-direction:column}
+.hero-stat-val{font-size:1.3rem;font-weight:800;color:var(--text);line-height:1}
+.hero-stat-label{font-size:.6rem;color:var(--muted);font-family:var(--mono);margin-top:2px}
+
+/* POPULAR SECTION */
+.section{max-width:1400px;margin:0 auto;padding:0 16px 32px}
+@media(min-width:768px){.section{padding:0 32px 40px}}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:800;color:var(--text)}
+.section-title svg{width:16px;height:16px;stroke:var(--legend);fill:none}
+.section-link{font-size:.65rem;color:var(--purple);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px}
+.section-link svg{width:11px;height:11px;stroke:var(--purple);fill:none}
+
+/* POPULAR GRID */
+.popular-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){.popular-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.popular-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.popular-grid{grid-template-columns:repeat(6,1fr)}}
+
+/* ID CARD */
+.id-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.id-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 8px 24px rgba(70,95,255,.12)}
+.id-card.is-sold{opacity:.55;cursor:default;pointer-events:none}
+.sold-badge{position:absolute;top:8px;right:8px;background:var(--sold);color:#fff;font-size:.45rem;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.5px}
+.id-num{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--text);word-break:break-all;line-height:1.4}
+.id-card.is-sold .id-num{text-decoration:line-through;color:var(--muted)}
+.id-bottom{display:flex;align-items:center;justify-content:space-between}
+.id-tier{font-size:.5rem;font-weight:700;padding:2px 7px;border-radius:99px;letter-spacing:.3px;text-transform:uppercase}
+.tier-low{background:rgba(107,114,128,.1);color:var(--low);border:1px solid rgba(107,114,128,.2)}
+.tier-medium{background:rgba(59,130,246,.1);color:var(--medium);border:1px solid rgba(59,130,246,.2)}
+.tier-high{background:rgba(249,115,22,.1);color:var(--high);border:1px solid rgba(249,115,22,.2)}
+.tier-legend{background:rgba(234,179,8,.1);color:var(--legend);border:1px solid rgba(234,179,8,.2)}
+.like-btn{display:flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-size:.6rem;color:var(--muted);font-family:var(--mono);transition:.15s;padding:2px 4px;border-radius:6px}
+.like-btn:hover{color:var(--sold)}
+.like-btn.liked{color:var(--sold)}
+.like-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;transition:.15s}
+.like-btn.liked svg{fill:var(--sold);stroke:var(--sold)}
+
+/* FILTER BAR */
+.filter-section{max-width:1400px;margin:0 auto;padding:0 16px 16px}
+@media(min-width:768px){.filter-section{padding:0 32px 20px}}
+.filter-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.filter-bar{display:flex;gap:6px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:var(--bg2);border-radius:10px;padding:6px}
+.filter-bar::-webkit-scrollbar{display:none}
+.fb{background:transparent;border:none;color:var(--muted2);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:.65rem;font-weight:600;white-space:nowrap;font-family:var(--font);transition:.15s}
+.fb.act{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.search-wrap{position:relative;flex:1;min-width:180px}
+.search-wrap input{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:8px 12px 8px 36px;color:var(--text);font-family:var(--mono);font-size:.72rem;outline:none;transition:.15s}
+.search-wrap input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(70,95,255,.1)}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none}
+.search-icon svg{width:14px;height:14px;stroke:var(--muted);fill:none}
+.result-info{font-size:.65rem;color:var(--muted);font-family:var(--mono)}
+.result-info span{color:var(--text);font-weight:700}
+
+/* TIER SECTION */
+.ids-section{max-width:1400px;margin:0 auto;padding:0 16px;padding-bottom:60px}
+@media(min-width:768px){.ids-section{padding:0 32px 60px}}
+.tier-block{margin-bottom:32px}
+.tier-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+.tier-name{font-size:1.1rem;font-weight:800;color:var(--text)}
+.tier-badge{font-size:.5rem;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid;text-transform:uppercase;letter-spacing:.4px}
+.tier-count{font-size:.62rem;color:var(--muted);font-family:var(--mono);margin-left:auto}
+.id-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(min-width:480px){.id-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:640px){.id-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.id-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1100px){.id-grid{grid-template-columns:repeat(5,1fr)}}
+mark{background:rgba(70,95,255,.15);color:var(--purple);border-radius:2px;padding:0 1px}
+
+/* ID DETAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:420px;width:90%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.2);transform:scale(.95);transition:.2s}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:1rem;font-weight:800;color:var(--text)}
+.modal-close{background:var(--bg2);border:1px solid var(--border);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal-close svg{width:12px;height:12px;stroke:var(--muted);fill:none}
+.modal-id{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:16px;letter-spacing:1px}
+.modal-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.72rem}
+.modal-row:last-child{border:none}
+.modal-row-label{color:var(--muted);display:flex;align-items:center;gap:5px}
+.modal-row-label svg{width:12px;height:12px;stroke:var(--muted);fill:none}
+.modal-row-val{font-weight:700;color:var(--text)}
+.modal-actions{display:flex;gap:8px;margin-top:20px}
+.btn-buy{flex:1;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;padding:10px;border-radius:10px;font-weight:700;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-buy svg{width:13px;height:13px;stroke:#fff;fill:none}
+.btn-like-modal{background:var(--bg2);border:1px solid var(--border);padding:10px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:.7rem;font-weight:600;color:var(--text)}
+.btn-like-modal svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.btn-like-modal.liked{color:var(--sold);border-color:rgba(239,68,68,.3)}
+.btn-like-modal.liked svg{fill:var(--sold);stroke:var(--sold)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:99px;font-size:.68rem;font-weight:600;z-index:9999;white-space:nowrap;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 16px;color:var(--muted)}
+.empty-state svg{width:40px;height:40px;margin:0 auto 12px;display:block;stroke:var(--muted);fill:none;opacity:.4}
+.empty-state p{font-size:.75rem}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;background:var(--card);color:var(--muted);font-size:.62rem}
+footer a{color:var(--purple);text-decoration:none;font-weight:600}
+
+/* PAYMENT STATS STRIP */
+.stats-strip{background:linear-gradient(135deg,var(--purple),var(--purple2));padding:14px 16px}
+.stats-inner{max-width:1400px;margin:0 auto;display:flex;gap:20px;overflow-x:auto;scrollbar-width:none}
+@media(min-width:768px){.stats-inner{padding:0 16px}}
+.stat-item{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.stat-icon{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
+.stat-icon svg{width:14px;height:14px;stroke:#fff;fill:none}
+.stat-info-label{font-size:.5rem;color:rgba(255,255,255,.7);font-family:var(--mono)}
+.stat-info-val{font-size:.8rem;font-weight:800;color:#fff}
+.stat-sep{width:1px;height:30px;background:rgba(255,255,255,.2);flex-shrink:0}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    lapakID
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</a>
+    <a href="about.html" class="nav-link"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>About</a>
+    <a href="payment.html" class="nav-link"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Beli ID</a>
+    <div class="theme-btn" id="themeBtn"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+  </div>
+</nav>
+
+<div class="stats-strip">
+  <div class="stats-inner" id="statsStrip">
+    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M16 8l-8 0M8 12l8 0M8 16l5 0"/></svg></div><div><div class="stat-info-label">TOTAL ID</div><div class="stat-info-val" id="statTotal">—</div></div></div>
+    <div class="stat-sep"></div>
+    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 12h.01"/></svg></div><div><div class="stat-info-label">TERSEDIA</div><div class="stat-info-val" id="statAvail">—</div></div></div>
+    <div class="stat-sep"></div>
+    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div><div class="stat-info-label">TOTAL LIKES</div><div class="stat-info-val" id="statLikes">—</div></div></div>
+    <div class="stat-sep"></div>
+    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="stat-info-label">TERJUAL</div><div class="stat-info-val" id="statSold">—</div></div></div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-label"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>ID PREMIUM TERPERCAYA</div>
+  <h1>Temukan ID <span>Impianmu</span></h1>
+  <p class="hero-sub">Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend. Beli dengan aman, bergaransi, dan proses cepat.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-val" id="hStatTotal">—</div><div class="hero-stat-label">Total ID</div></div>
+    <div class="hero-stat"><div class="hero-stat-val" id="hStatSold">—</div><div class="hero-stat-label">Terjual</div></div>
+    <div class="hero-stat"><div class="hero-stat-val" id="hStatLikes">—</div><div class="hero-stat-label">Total Suka</div></div>
+  </div>
+</div>
+
+<!-- POPULAR -->
+<div class="section">
+  <div class="section-head">
+    <div class="section-title"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Banyak Disukai</div>
+    <a href="#semua" class="section-link">Lihat semua <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
+  </div>
+  <div class="popular-grid" id="popularGrid"><div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Memuat...</p></div></div>
+</div>
+
+<!-- FILTER -->
+<div class="filter-section" id="semua">
+  <div class="filter-top">
+    <div class="filter-bar" id="filterBar">
+      <button class="fb act" data-f="all">Semua</button>
+      <button class="fb" data-f="low">Low</button>
+      <button class="fb" data-f="medium">Medium</button>
+      <button class="fb" data-f="high">High</button>
+      <button class="fb" data-f="legend">Legend</button>
+      <button class="fb" data-f="sold">Terjual</button>
+    </div>
+    <div class="search-wrap"><div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><input type="text" id="searchInput" placeholder="Cari nomor ID..."/></div>
+  </div>
+  <div class="result-info" id="resultInfo">Memuat data...</div>
+</div>
+
+<!-- ID LIST -->
+<div class="ids-section" id="gridContainer"></div>
+
+<!-- ID DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Detail ID</div>
+      <div class="modal-close" id="modalClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div class="modal-id" id="modalIdNum"></div>
+    <div id="modalRows"></div>
+    <div class="modal-actions">
+      <button class="btn-buy" id="modalBuyBtn"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Beli ID Ini</button>
+      <button class="btn-like-modal" id="modalLikeBtn"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="modalLikeCount">0</span></button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  &copy; 2026 <a href="index.html">lapakID</a> &mdash; Koleksi ID Premium Terpercaya &mdash; <a href="about.html">Tentang Kami</a> &mdash; <a href="dashboard.html">Admin</a>
+</footer>
+
+<script>
+const API = '/api';
+let allIds = [];
+let activeFilter = 'all';
+let searchQ = '';
+let settings = {};
+let likedSet = new Set(JSON.parse(localStorage.getItem('lapakid_liked') || '[]'));
+let currentModal = null;
+
+const PRICE_LABELS = { low:'Low', medium:'Medium', high:'High', legend:'Legend' };
+const TIER_BADGE_CLS = { low:'tier-low', medium:'tier-medium', high:'tier-high', legend:'tier-legend' };
+const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+
+// ── INIT ────────────────────────────────────────────────────────────────────
+async function init() {
+  initTheme();
+  await Promise.all([loadSettings(), loadStats(), loadPopular(), loadIds()]);
+}
+
+async function loadSettings() {
+  const r = await fetch(`${API}/settings`).catch(()=>null);
+  if (!r || !r.ok) return;
+  const d = await r.json();
+  settings = d.data || {};
+}
+
+async function loadStats() {
+  const r = await fetch(`${API}/ids/stats`).catch(()=>null);
+  if (!r || !r.ok) return;
+  const { data: s } = await r.json();
+  ['statTotal','hStatTotal'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.total.toLocaleString('id-ID'); });
+  ['statAvail'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.available.toLocaleString('id-ID'); });
+  ['statSold','hStatSold'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.sold.toLocaleString('id-ID'); });
+  ['statLikes','hStatLikes'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.totalLikes.toLocaleString('id-ID'); });
+}
+
+async function loadPopular() {
+  const r = await fetch(`${API}/ids/popular`).catch(()=>null);
+  const grid = document.getElementById('popularGrid');
+  if (!r || !r.ok) { grid.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Gagal memuat</p></div>'; return; }
+  const { data } = await r.json();
+  if (!data.length) { grid.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Belum ada data</p></div>'; return; }
+  grid.innerHTML = data.map(id => buildCard(id, true)).join('');
+  attachCardEvents(grid);
+}
+
+async function loadIds() {
+  const r = await fetch(`${API}/ids`).catch(()=>null);
+  if (!r || !r.ok) { document.getElementById('gridContainer').innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Gagal memuat ID</p></div>'; return; }
+  const { data } = await r.json();
+  allIds = data || [];
+  render();
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const filtered = filter();
+  let total = 0;
+  Object.values(filtered).forEach(v => total += v.length);
+  document.getElementById('resultInfo').innerHTML = `Menampilkan <span>${total.toLocaleString('id-ID')}</span> ID`;
+
+  const container = document.getElementById('gridContainer');
+  if (total === 0) {
+    container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>Tidak ada ID ditemukan</p></div>';
+    return;
+  }
+
+  const tiers = ['low','medium','high','legend'];
+  let html = '';
+  for (const tier of tiers) {
+    const ids = filtered[tier];
+    if (!ids || !ids.length) continue;
+    html += `<div class="tier-block">
+      <div class="tier-head">
+        <span class="tier-name">${PRICE_LABELS[tier]}</span>
+        <span class="id-tier ${TIER_BADGE_CLS[tier]}">${tier.toUpperCase()}</span>
+        <span class="tier-count"><b>${ids.length}</b> ID</span>
+      </div>
+      <div class="id-grid">${ids.map(id => buildCard(id, false)).join('')}</div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  attachCardEvents(container);
+}
+
+function filter() {
+  const tiers = activeFilter === 'all' ? ['low','medium','high','legend'] : activeFilter === 'sold' ? ['low','medium','high','legend'] : [activeFilter];
+  const result = {};
+  for (const tier of tiers) {
+    let ids = allIds.filter(id => id.tier === tier);
+    if (activeFilter === 'sold') ids = ids.filter(id => id.sold);
+    else if (activeFilter !== 'all') ids = ids.filter(id => !id.sold);
+    if (searchQ) ids = ids.filter(id => id.number.includes(searchQ));
+    result[tier] = ids;
+  }
+  return result;
+}
+
+function highlight(text) {
+  if (!searchQ) return text;
+  const regex = new RegExp(`(${searchQ.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(regex, '<mark>$1</mark>');
+}
+
+function buildCard(id, mini) {
+  const liked = likedSet.has(id.number);
+  const price = settings.prices ? fmt(settings.prices[id.tier] || 0) : '—';
+  return `<div class="id-card${id.sold?' is-sold':''}" data-num="${id.number}" data-tier="${id.tier}">
+    ${id.sold ? '<div class="sold-badge">SOLD</div>' : ''}
+    <div class="id-num">${highlight(id.number)}</div>
+    <div class="id-bottom">
+      <span class="id-tier ${TIER_BADGE_CLS[id.tier]}">${id.tier.toUpperCase()}</span>
+      <button class="like-btn${liked?' liked':''}" data-num="${id.number}" onclick="event.stopPropagation()">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>${id.likes || 0}</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+function attachCardEvents(container) {
+  container.querySelectorAll('.id-card:not(.is-sold)').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.num));
+  });
+  container.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); doLike(btn.dataset.num, btn); });
+  });
+}
+
+// ── LIKE ─────────────────────────────────────────────────────────────────────
+async function doLike(number, btn) {
+  if (likedSet.has(number)) { showToast('Kamu sudah menyukai ID ini'); return; }
+  btn.disabled = true;
+  const r = await fetch(`${API}/like/${number}`, { method: 'POST' }).catch(() => null);
+  if (!r) { btn.disabled = false; showToast('Gagal, coba lagi'); return; }
+  const d = await r.json();
+  if (d.success) {
+    likedSet.add(number);
+    localStorage.setItem('lapakid_liked', JSON.stringify([...likedSet]));
+    const idx = allIds.findIndex(i => i.number === number);
+    if (idx !== -1) allIds[idx].likes = d.likes;
+    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b => {
+      b.classList.add('liked');
+      b.querySelector('span').textContent = d.likes;
+      b.disabled = false;
+    });
+    if (currentModal?.number === number) {
+      document.getElementById('modalLikeCount').textContent = d.likes;
+      document.getElementById('modalLikeBtn').classList.add('liked');
+    }
+    showToast('Berhasil menyukai ID ini!');
+  } else {
+    btn.disabled = false;
+    showToast(d.message || 'Gagal like');
+  }
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+async function openModal(number) {
+  const id = allIds.find(i => i.number === number);
+  if (!id) return;
+  currentModal = id;
+  const price = settings.prices ? fmt(settings.prices[id.tier] || 0) : '—';
+  const liked = likedSet.has(number);
+  document.getElementById('modalIdNum').textContent = number;
+  document.getElementById('modalRows').innerHTML = `
+    <div class="modal-row"><div class="modal-row-label"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Tier</div><div class="modal-row-val"><span class="id-tier ${TIER_BADGE_CLS[id.tier]}">${id.tier.toUpperCase()}</span></div></div>
+    <div class="modal-row"><div class="modal-row-label"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Harga</div><div class="modal-row-val">${price}</div></div>
+    <div class="modal-row"><div class="modal-row-label"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Suka</div><div class="modal-row-val">${id.likes || 0}</div></div>
+    <div class="modal-row"><div class="modal-row-label"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ditambahkan</div><div class="modal-row-val">${id.addedAt ? new Date(id.addedAt).toLocaleDateString('id-ID') : '—'}</div></div>
+    ${id.note ? `<div class="modal-row"><div class="modal-row-label"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Catatan</div><div class="modal-row-val">${id.note}</div></div>` : ''}
+  `;
+  document.getElementById('modalLikeCount').textContent = id.likes || 0;
+  const likeBtn = document.getElementById('modalLikeBtn');
+  likeBtn.className = 'btn-like-modal' + (liked ? ' liked' : '');
+  likeBtn.onclick = () => doLike(number, likeBtn);
+  document.getElementById('modalBuyBtn').onclick = () => {
+    window.location.href = `payment.html?id=${encodeURIComponent(number)}`;
+  };
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+document.getElementById('modalClose').addEventListener('click', () => { document.getElementById('modalOverlay').classList.remove('open'); currentModal = null; });
+document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target === document.getElementById('modalOverlay')) { document.getElementById('modalOverlay').classList.remove('open'); currentModal=null; } });
+
+// ── FILTER BAR ───────────────────────────────────────────────────────────────
+document.getElementById('filterBar').querySelectorAll('.fb').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.f;
+    document.querySelectorAll('.fb').forEach(b => b.classList.remove('act'));
+    btn.classList.add('act');
+    render();
+  });
+});
+document.getElementById('searchInput').addEventListener('input', e => { searchQ = e.target.value.trim(); render(); });
+
+// ── THEME ────────────────────────────────────────────────────────────────────
+function initTheme() {
+  const dark = localStorage.getItem('lapakid_dark') === '1';
+  if (dark) document.body.classList.add('dark');
+  updateThemeIcon(dark);
+}
+function updateThemeIcon(dark) {
+  const icon = document.getElementById('themeIcon');
+  icon.innerHTML = dark
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const dark = document.body.classList.toggle('dark');
+  localStorage.setItem('lapakid_dark', dark ? '1' : '0');
+  updateThemeIcon(dark);
+});
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
