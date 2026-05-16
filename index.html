@@ -151,17 +151,6 @@ mark{background:rgba(70,95,255,.15);color:var(--purple);border-radius:2px;paddin
 /* FOOTER */
 footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;background:var(--card);color:var(--muted);font-size:.62rem}
 footer a{color:var(--purple);text-decoration:none;font-weight:600}
-
-/* PAYMENT STATS STRIP */
-.stats-strip{background:linear-gradient(135deg,var(--purple),var(--purple2));padding:14px 16px}
-.stats-inner{max-width:1400px;margin:0 auto;display:flex;gap:20px;overflow-x:auto;scrollbar-width:none}
-@media(min-width:768px){.stats-inner{padding:0 16px}}
-.stat-item{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.stat-icon{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
-.stat-icon svg{width:14px;height:14px;stroke:#fff;fill:none}
-.stat-info-label{font-size:.5rem;color:rgba(255,255,255,.7);font-family:var(--mono)}
-.stat-info-val{font-size:.8rem;font-weight:800;color:#fff}
-.stat-sep{width:1px;height:30px;background:rgba(255,255,255,.2);flex-shrink:0}
 </style>
 </head>
 <body>
@@ -172,34 +161,15 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
     lapakID
   </a>
   <div class="nav-links">
-    <a href="index.html" class="nav-link active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</a>
-    <a href="about.html" class="nav-link"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>About</a>
-    <a href="payment.html" class="nav-link"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Beli ID</a>
     <div class="theme-btn" id="themeBtn"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
   </div>
 </nav>
 
-<div class="stats-strip">
-  <div class="stats-inner" id="statsStrip">
-    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M16 8l-8 0M8 12l8 0M8 16l5 0"/></svg></div><div><div class="stat-info-label">TOTAL ID</div><div class="stat-info-val" id="statTotal">—</div></div></div>
-    <div class="stat-sep"></div>
-    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 12h.01"/></svg></div><div><div class="stat-info-label">TERSEDIA</div><div class="stat-info-val" id="statAvail">—</div></div></div>
-    <div class="stat-sep"></div>
-    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div><div class="stat-info-label">TOTAL LIKES</div><div class="stat-info-val" id="statLikes">—</div></div></div>
-    <div class="stat-sep"></div>
-    <div class="stat-item"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="stat-info-label">TERJUAL</div><div class="stat-info-val" id="statSold">—</div></div></div>
-  </div>
-</div>
 
 <div class="hero">
   <div class="hero-label"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>ID PREMIUM TERPERCAYA</div>
   <h1>Temukan ID <span>Impianmu</span></h1>
   <p class="hero-sub">Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend. Beli dengan aman, bergaransi, dan proses cepat.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="hero-stat-val" id="hStatTotal">—</div><div class="hero-stat-label">Total ID</div></div>
-    <div class="hero-stat"><div class="hero-stat-val" id="hStatSold">—</div><div class="hero-stat-label">Terjual</div></div>
-    <div class="hero-stat"><div class="hero-stat-val" id="hStatLikes">—</div><div class="hero-stat-label">Total Suka</div></div>
-  </div>
 </div>
 
 <!-- POPULAR -->
@@ -266,7 +236,7 @@ const fmt = n => 'Rp ' + Number(n).toLocaleString('id-ID');
 // ── INIT ────────────────────────────────────────────────────────────────────
 async function init() {
   initTheme();
-  await Promise.all([loadSettings(), loadStats(), loadPopular(), loadIds()]);
+  await Promise.all([loadSettings(), loadPopular(), loadIds()]);
 }
 
 async function loadSettings() {
@@ -274,16 +244,6 @@ async function loadSettings() {
   if (!r || !r.ok) return;
   const d = await r.json();
   settings = d.data || {};
-}
-
-async function loadStats() {
-  const r = await fetch(`${API}/ids/stats`).catch(()=>null);
-  if (!r || !r.ok) return;
-  const { data: s } = await r.json();
-  ['statTotal','hStatTotal'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.total.toLocaleString('id-ID'); });
-  ['statAvail'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.available.toLocaleString('id-ID'); });
-  ['statSold','hStatSold'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.sold.toLocaleString('id-ID'); });
-  ['statLikes','hStatLikes'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=s.totalLikes.toLocaleString('id-ID'); });
 }
 
 async function loadPopular() {
