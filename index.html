@@ -574,13 +574,8 @@ window.addEventListener('resize', () => { updateFilterHeight(); setupTierSticky(
   var bar     = document.getElementById('musicBar');
   var titleEl = document.getElementById('musicTitle');
   var subEl   = document.getElementById('musicSub');
-  var audio   = document.getElementById('musicAudio');
-
-  if (!audio) {
-    audio = document.createElement('audio');
-    audio.id = 'musicAudio';
-    document.body.appendChild(audio);
-  }
+  var audio = document.getElementById('musicAudio');
+  audio.volume = 0.7;
 
   function loadSong(index) {
     currentSong = index;
@@ -670,6 +665,8 @@ window.addEventListener('resize', () => { updateFilterHeight(); setupTierSticky(
 })();
 
 </script>
+
+<audio id="musicAudio" preload="none"></audio>
 
 <!-- MUSIC PLAYER -->
 <div class="music-player" id="musicPlayer">
