@@ -556,38 +556,51 @@ window.addEventListener('resize', () => { updateFilterHeight(); setupTierSticky(
 
 // ── MUSIC PLAYER ─────────────────────────────────────────────────────────────
 (function() {
-  const TRACKS = [
-    { title: 'Lofi Vibes', src: 'https://files.catbox.moe/3syoqj.mp3' },
+  var TRACKS = [
+    { title: 'Track 1', src: 'https://files.catbox.moe/3syoqj.mp3' },
+    { title: 'Track 2', src: 'https://files.catbox.moe/d0y6ho.mp3' },
   ];
 
-  let trackIdx = 0;
-  let hideTimer = null;
-  let isHidden = false;
-  let progressInterval = null;
+  var trackIdx = 0;
+  var hideTimer = null;
+  var progressInterval = null;
 
-  const player  = document.getElementById('musicPlayer');
-  const toggle  = document.getElementById('musicToggle');
-  const album   = document.getElementById('musicAlbum');
-  const btnPlay = document.getElementById('btnPlay');
-  const btnPrev = document.getElementById('btnPrev');
-  const btnNext = document.getElementById('btnNext');
-  const playIcon= document.getElementById('playIcon');
-  const bar     = document.getElementById('musicBar');
-  const titleEl = document.getElementById('musicTitle');
-  const subEl   = document.getElementById('musicSub');
+  var player  = document.getElementById('musicPlayer');
+  var toggle  = document.getElementById('musicToggle');
+  var album   = document.getElementById('musicAlbum');
+  var btnPlay = document.getElementById('btnPlay');
+  var btnPrev = document.getElementById('btnPrev');
+  var btnNext = document.getElementById('btnNext');
+  var playIcon= document.getElementById('playIcon');
+  var bar     = document.getElementById('musicBar');
+  var titleEl = document.getElementById('musicTitle');
+  var subEl   = document.getElementById('musicSub');
 
-  const audio = new Audio();
-  audio.loop = false;
-  audio.volume = 0.6;
+  // Pakai <audio> HTML tag supaya lebih stabil di mobile
+  var audio = document.getElementById('musicAudio');
+  if (!audio) {
+    audio = document.createElement('audio');
+    audio.id = 'musicAudio';
+    audio.preload = 'none';
+    audio.volume = 0.7;
+    document.body.appendChild(audio);
+  }
 
   function loadTrack(idx, autoplay) {
     trackIdx = ((idx % TRACKS.length) + TRACKS.length) % TRACKS.length;
-    const t = TRACKS[trackIdx];
+    var t = TRACKS[trackIdx];
+    audio.pause();
     audio.src = t.src;
+    audio.load();
     titleEl.textContent = t.title;
     subEl.textContent = 'Track ' + (trackIdx + 1) + ' / ' + TRACKS.length;
     bar.style.width = '0%';
-    if (autoplay) audio.play().catch(function(){});
+    if (autoplay) {
+      audio.addEventListener('canplay', function onReady() {
+        audio.removeEventListener('canplay', onReady);
+        audio.play().catch(function(){});
+      });
+    }
   }
 
   function updatePlayUI() {
@@ -607,14 +620,12 @@ window.addEventListener('resize', () => { updateFilterHeight(); setupTierSticky(
   }
 
   function showPlayer() {
-    isHidden = false;
     player.classList.remove('hidden');
     toggle.classList.remove('show');
     resetHideTimer();
   }
 
   function hidePlayer() {
-    isHidden = true;
     player.classList.add('hidden');
     toggle.classList.add('show');
     clearTimeout(hideTimer);
@@ -628,18 +639,26 @@ window.addEventListener('resize', () => { updateFilterHeight(); setupTierSticky(
     }, 20000);
   }
 
-  audio.addEventListener('play', function() { updatePlayUI(); startProgress(); });
+  audio.addEventListener('play',  function() { updatePlayUI(); startProgress(); });
   audio.addEventListener('pause', function() { updatePlayUI(); clearInterval(progressInterval); });
   audio.addEventListener('ended', function() { loadTrack(trackIdx + 1, true); });
+  audio.addEventListener('error', function() {
+    titleEl.textContent = 'Error - skip...';
+    setTimeout(function(){ loadTrack(trackIdx + 1, true); }, 1500);
+  });
 
   btnPlay.addEventListener('click', function() {
-    if (audio.paused) audio.play().catch(function(){});
-    else audio.pause();
+    if (audio.paused) {
+      if (!audio.src || audio.src === window.location.href) loadTrack(trackIdx, false);
+      audio.play().catch(function(){});
+    } else {
+      audio.pause();
+    }
     resetHideTimer();
   });
+
   btnPrev.addEventListener('click', function() { loadTrack(trackIdx - 1, !audio.paused); resetHideTimer(); });
   btnNext.addEventListener('click', function() { loadTrack(trackIdx + 1, !audio.paused); resetHideTimer(); });
-
   toggle.addEventListener('click', showPlayer);
 
   player.addEventListener('mouseenter', function() { clearTimeout(hideTimer); });
@@ -649,19 +668,8 @@ window.addEventListener('resize', () => { updateFilterHeight(); setupTierSticky(
     setTimeout(resetHideTimer, 3000);
   }, {passive:true});
 
+  // Load track pertama tapi tidak autoplay
   loadTrack(0, false);
-
-  var started = false;
-  function tryStart() {
-    if (started) return;
-    started = true;
-    audio.play().catch(function(){});
-    document.removeEventListener('click', tryStart);
-    document.removeEventListener('touchstart', tryStart);
-  }
-  document.addEventListener('click', tryStart);
-  document.addEventListener('touchstart', tryStart, {passive:true});
-
   resetHideTimer();
 })();
 
