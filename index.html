@@ -67,17 +67,17 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .section-link svg{width:11px;height:11px;stroke:var(--purple);fill:none}
 
 /* POPULAR GRID */
-.popular-scroll-wrap{position:relative}
-.popular-grid{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:6px;cursor:grab;user-select:none}
+.popular-scroll-wrap{position:relative;overflow:hidden}
+.popular-grid{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;user-select:none}
 .popular-grid::-webkit-scrollbar{display:none}
 .popular-grid:active{cursor:grabbing}
-.popular-grid .id-card{flex:0 0 150px;scroll-snap-align:start}
-@media(min-width:480px){.popular-grid .id-card{flex:0 0 170px}}
-@media(min-width:768px){.popular-grid .id-card{flex:0 0 190px}}
-/* Fade edges */
-.popular-scroll-wrap::before,.popular-scroll-wrap::after{content:'';position:absolute;top:0;bottom:6px;width:32px;z-index:2;pointer-events:none}
-.popular-scroll-wrap::before{left:0;background:linear-gradient(to right,var(--bg),transparent)}
-.popular-scroll-wrap::after{right:0;background:linear-gradient(to left,var(--bg),transparent)}
+/* Setiap slide = 2x2 grid */
+.popular-slide{flex:0 0 100%;scroll-snap-align:start;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px}
+.popular-slide .id-card{width:100%}
+/* Dots indicator */
+.popular-dots{display:flex;justify-content:center;gap:6px;margin-top:12px}
+.popular-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:.3s;cursor:pointer}
+.popular-dot.active{background:var(--purple);width:18px;border-radius:3px}
 
 /* ID CARD */
 .id-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
@@ -93,11 +93,9 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .tier-medium{background:rgba(59,130,246,.1);color:var(--medium);border:1px solid rgba(59,130,246,.2)}
 .tier-high{background:rgba(249,115,22,.1);color:var(--high);border:1px solid rgba(249,115,22,.2)}
 .tier-legend{background:rgba(234,179,8,.1);color:var(--legend);border:1px solid rgba(234,179,8,.2)}
-.like-btn{display:flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-size:.6rem;color:var(--muted);font-family:var(--mono);transition:.15s;padding:2px 4px;border-radius:6px}
-.like-btn:hover{color:var(--sold)}
-.like-btn.liked{color:var(--sold)}
-.like-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;transition:.15s}
-.like-btn.liked svg{fill:var(--sold);stroke:var(--sold)}
+.like-btn{display:flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-size:.58rem;color:var(--muted);font-family:var(--mono);transition:.15s;padding:2px 4px;border-radius:6px;white-space:nowrap}
+.like-btn:hover{color:var(--purple)}
+.like-btn.liked{color:var(--purple)}
 
 /* FILTER BAR */
 .filter-section{margin:0;padding:0}
@@ -230,6 +228,7 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
     <a href="#semua" class="section-link">Lihat semua <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>
   </div>
   <div class="popular-scroll-wrap"><div class="popular-scroll-wrap"><div class="popular-grid" id="popularGrid"><div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Memuat...</p></div></div></div>
+  <div class="popular-dots" id="popularDots"></div>
 </div>
 
 <!-- FILTER -->
@@ -305,54 +304,72 @@ async function loadPopular() {
   if (!r || !r.ok) { grid.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Gagal memuat</p></div>'; return; }
   const { data } = await r.json();
   if (!data.length) { grid.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><p>Belum ada data</p></div>'; return; }
-  grid.innerHTML = data.map(id => buildCard(id, true)).join('');
-  attachCardEvents(grid);
-  initPopularScroll(grid);
-}
+  // Bagi data ke slide 2x2 (4 card per slide)
+  const slides = [];
+  for (let i = 0; i < data.length; i += 4) {
+    slides.push(data.slice(i, i + 4));
+  }
+  grid.innerHTML = slides.map((group, si) =>
+    `<div class="popular-slide" data-slide="${si}">${group.map(id => buildCard(id, true)).join('')}</div>`
+  ).join('');
 
-function initPopularScroll(grid) {
-  // ── Drag to scroll ──────────────────────────────────────────────────────────
-  var isDown = false, startX, scrollLeft;
-  grid.addEventListener('mousedown', function(e) {
-    isDown = true; startX = e.pageX - grid.offsetLeft; scrollLeft = grid.scrollLeft;
-  });
-  grid.addEventListener('mouseleave', function() { isDown = false; });
-  grid.addEventListener('mouseup',    function() { isDown = false; });
-  grid.addEventListener('mousemove',  function(e) {
-    if (!isDown) return;
-    e.preventDefault();
-    grid.scrollLeft = scrollLeft - (e.pageX - grid.offsetLeft - startX);
-  });
-
-  // ── Auto scroll ─────────────────────────────────────────────────────────────
-  var autoTimer = null;
-  var paused = false;
-  var CARD_W = 160; // estimasi lebar card + gap
-
-  function autoScroll() {
-    if (paused) return;
-    var maxScroll = grid.scrollWidth - grid.clientWidth;
-    if (grid.scrollLeft >= maxScroll - 2) {
-      // Balik ke awal dengan smooth
-      grid.scrollTo({ left: 0, behavior: 'smooth' });
-    } else {
-      grid.scrollBy({ left: CARD_W, behavior: 'smooth' });
-    }
+  // Dots
+  const dotsEl = document.getElementById('popularDots');
+  if (dotsEl) {
+    dotsEl.innerHTML = slides.map((_, i) =>
+      `<div class="popular-dot${i===0?' active':''}" data-idx="${i}"></div>`
+    ).join('');
+    dotsEl.querySelectorAll('.popular-dot').forEach(dot => {
+      dot.addEventListener('click', () => scrollToSlide(grid, parseInt(dot.dataset.idx), dotsEl));
+    });
   }
 
-  autoTimer = setInterval(autoScroll, 2500);
+  attachCardEvents(grid);
+  initPopularScroll(grid, slides.length, dotsEl);
+}
 
-  // Pause saat user touch/hover
+function scrollToSlide(grid, idx, dotsEl) {
+  grid.scrollTo({ left: idx * grid.clientWidth, behavior: 'smooth' });
+  if (dotsEl) {
+    dotsEl.querySelectorAll('.popular-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+}
+
+function initPopularScroll(grid, totalSlides, dotsEl) {
+  var currentSlide = 0;
+  var paused = false;
+  var autoTimer = null;
+
+  function goNext() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    scrollToSlide(grid, currentSlide, dotsEl);
+  }
+
+  function startAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(function() { if (!paused) goNext(); }, 3000);
+  }
+
+  // Update dot saat scroll manual
+  grid.addEventListener('scroll', function() {
+    var idx = Math.round(grid.scrollLeft / grid.clientWidth);
+    if (idx !== currentSlide) {
+      currentSlide = idx;
+      if (dotsEl) {
+        dotsEl.querySelectorAll('.popular-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+      }
+    }
+  }, {passive:true});
+
+  // Pause saat disentuh
   grid.addEventListener('touchstart', function() { paused = true; clearInterval(autoTimer); }, {passive:true});
-  grid.addEventListener('touchend',   function() {
-    clearTimeout(autoTimer);
-    setTimeout(function() {
-      paused = false;
-      autoTimer = setInterval(autoScroll, 2500);
-    }, 3000);
+  grid.addEventListener('touchend', function() {
+    setTimeout(function() { paused = false; startAuto(); }, 3000);
   }, {passive:true});
   grid.addEventListener('mouseenter', function() { paused = true; });
   grid.addEventListener('mouseleave', function() { paused = false; });
+
+  startAuto();
 }
 
 async function loadIds() {
@@ -482,14 +499,15 @@ function highlight(text) {
 function buildCard(id, mini) {
   const liked = likedSet.has(id.number);
   const price = settings.prices ? fmt(settings.prices[id.tier] || 0) : '—';
+  const likeCount = id.likes || 0;
+  const likeText = likeCount === 0 ? 'Belum ada suka' : likeCount + ' orang suka';
   return `<div class="id-card${id.sold?' is-sold':''}" data-num="${id.number}" data-tier="${id.tier}">
     ${id.sold ? '<div class="sold-badge">SOLD</div>' : ''}
     <div class="id-num"><img src="https://files.catbox.moe/em51di.png" class="id-icon" alt=""/>${highlight(id.number)}</div>
     <div class="id-bottom">
       <span class="id-tier ${TIER_BADGE_CLS[id.tier]}">${id.tier.toUpperCase()}</span>
       <button class="like-btn${liked?' liked':''}" data-num="${id.number}" onclick="event.stopPropagation()">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        <span>${id.likes || 0}</span>
+        <span>${likeText}</span>
       </button>
     </div>
   </div>`;
@@ -518,7 +536,7 @@ async function doLike(number, btn) {
     if (idx !== -1) allIds[idx].likes = d.likes;
     document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b => {
       b.classList.add('liked');
-      b.querySelector('span').textContent = d.likes;
+      b.querySelector('span').textContent = d.likes + ' orang suka';
       b.disabled = false;
     });
     if (currentModal?.number === number) {
