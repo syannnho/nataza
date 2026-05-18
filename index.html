@@ -185,6 +185,44 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
 .music-toggle{position:fixed;left:16px;bottom:24px;z-index:9998;background:rgba(20,20,20,.85);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);transition:opacity .3s,transform .3s;opacity:0;transform:scale(.8);pointer-events:none}
 .music-toggle.show{opacity:1;transform:scale(1);pointer-events:all}
 .music-toggle svg{width:20px;height:20px;stroke:#fff;fill:none}
+
+/* ── BANNER SLIDER ── */
+.banner-section{max-width:1400px;margin:0 auto;padding:0 16px 24px}
+@media(min-width:768px){.banner-section{padding:0 32px 32px}}
+.banner-wrap{position:relative;border-radius:16px;overflow:hidden}
+.banner-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.banner-slide{flex:0 0 100%;position:relative}
+.banner-slide img{width:100%;height:auto;display:block;border-radius:16px;object-fit:cover;max-height:200px}
+@media(min-width:768px){.banner-slide img{max-height:280px}}
+.banner-dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.banner-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);border:none;cursor:pointer;padding:0;transition:.3s}
+.banner-dot.active{background:var(--purple);width:18px;border-radius:3px}
+.banner-prev,.banner-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(4px);transition:.2s}
+.banner-prev{left:8px}
+.banner-next{right:8px}
+.banner-prev:hover,.banner-next:hover{background:rgba(0,0,0,.7)}
+.banner-prev svg,.banner-next svg{width:14px;height:14px;stroke:#fff;fill:none}
+
+/* ── POPUP PROMO ── */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.3s}
+.popup-overlay.open{opacity:1;pointer-events:all}
+.popup-box{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:360px;width:90%;overflow:hidden;transform:scale(.9) translateY(20px);transition:.3s;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.popup-overlay.open .popup-box{transform:scale(1) translateY(0)}
+.popup-img{width:100%;display:block;max-height:220px;object-fit:cover}
+.popup-body{padding:20px}
+.popup-title{font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:6px}
+.popup-desc{font-size:.75rem;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.popup-code{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px dashed var(--purple);border-radius:10px;padding:8px 14px;margin-bottom:16px}
+.popup-code-text{font-family:var(--mono);font-size:.8rem;font-weight:700;color:var(--purple);letter-spacing:1px}
+.popup-copy{background:var(--purple);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.6rem;font-weight:700;cursor:pointer;transition:.15s}
+.popup-copy:hover{opacity:.85}
+.popup-footer{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.popup-check{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.65rem;color:var(--muted)}
+.popup-check input{width:14px;height:14px;accent-color:var(--purple);cursor:pointer;flex-shrink:0}
+.popup-ok{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;border-radius:99px;padding:8px 24px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s}
+.popup-ok:hover{opacity:.9}
+.popup-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1}
+.popup-close svg{width:12px;height:12px;stroke:#fff;fill:none}
 </style>
 </head>
 <body>
@@ -202,6 +240,23 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
   <div class="hero-label"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>ID PREMIUM TERPERCAYA</div>
   <h1>Temukan ID <span>Impianmu</span></h1>
   <p class="hero-sub">Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend. Beli dengan aman, bergaransi, dan proses cepat.</p>
+</div>
+
+
+<!-- BANNER SLIDER -->
+<div class="banner-section">
+  <div class="banner-wrap" id="bannerWrap">
+    <div class="banner-track" id="bannerTrack">
+      <div class="banner-slide"><img src="https://files.catbox.moe/kv3k51.png" alt="Banner 1" loading="lazy"/></div>
+      <div class="banner-slide"><img src="https://files.catbox.moe/l28ii6.png" alt="Banner 2" loading="lazy"/></div>
+    </div>
+    <button class="banner-prev" id="bannerPrev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button class="banner-next" id="bannerNext"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
+  </div>
+  <div class="banner-dots" id="bannerDots">
+    <button class="banner-dot active" data-idx="0"></button>
+    <button class="banner-dot" data-idx="1"></button>
+  </div>
 </div>
 
 <!-- POPULAR -->
@@ -256,6 +311,29 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
 <footer>
   &copy; 2026 <a href="index.html">lapakID</a> &mdash; Koleksi ID Premium Terpercaya &mdash; <a href="about.html">Tentang Kami</a> &mdash; <a href="dashboard.html">Admin</a>
 </footer>
+
+
+<!-- POPUP PROMO -->
+<div class="popup-overlay" id="promoPopup">
+  <div class="popup-box" style="position:relative">
+    <button class="popup-close" id="popupClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <img src="https://files.catbox.moe/p2lyhy.png" alt="Promo" class="popup-img"/>
+    <div class="popup-body">
+      <div class="popup-title">🎉 Diskon 10% Untuk Kamu!</div>
+      <div class="popup-desc">Gunakan kode promo berikut saat checkout dan dapatkan diskon 10% untuk semua tier ID. Berlaku terbatas!</div>
+      <div class="popup-code">
+        <span class="popup-code-text" id="promoCodeText">LAPAK10</span>
+        <button class="popup-copy" onclick="copyPromoCode()">Salin</button>
+      </div>
+      <div class="popup-footer">
+        <label class="popup-check">
+          <input type="checkbox" id="dontShowAgain"/> Jangan tampilkan lagi
+        </label>
+        <button class="popup-ok" id="popupOk">Oke, Mengerti!</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- MUSIC PLAYER -->
 <audio id="musicAudio" preload="none"></audio>
@@ -698,6 +776,83 @@ init();
   loadSong(0);
   resetHideTimer();
 })();
+
+// ── BANNER SLIDER ──────────────────────────────────────────────────────────
+(function() {
+  var track = document.getElementById('bannerTrack');
+  var dots  = document.querySelectorAll('.banner-dot');
+  var total = 2;
+  var cur   = 0;
+  var timer = null;
+
+  function goTo(idx) {
+    cur = (idx + total) % total;
+    track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === cur); });
+  }
+
+  function next() { goTo(cur + 1); }
+  function prev() { goTo(cur - 1); }
+
+  function startAuto() {
+    clearInterval(timer);
+    timer = setInterval(next, 4000);
+  }
+
+  document.getElementById('bannerNext').addEventListener('click', function() { next(); startAuto(); });
+  document.getElementById('bannerPrev').addEventListener('click', function() { prev(); startAuto(); });
+  dots.forEach(function(d) {
+    d.addEventListener('click', function() { goTo(parseInt(d.dataset.idx)); startAuto(); });
+  });
+
+  var wrap = document.getElementById('bannerWrap');
+  wrap.addEventListener('mouseenter', function() { clearInterval(timer); });
+  wrap.addEventListener('mouseleave', startAuto);
+
+  // Touch swipe
+  var tx = 0;
+  wrap.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; clearInterval(timer); }, {passive:true});
+  wrap.addEventListener('touchend', function(e) {
+    var diff = tx - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) diff > 0 ? next() : prev();
+    startAuto();
+  }, {passive:true});
+
+  startAuto();
+})();
+
+// ── POPUP PROMO ────────────────────────────────────────────────────────────
+(function() {
+  var STORAGE_KEY = 'lapakid_popup_hide';
+  if (localStorage.getItem(STORAGE_KEY) === '1') return;
+
+  var overlay = document.getElementById('promoPopup');
+  var closeBtn = document.getElementById('popupClose');
+  var okBtn    = document.getElementById('popupOk');
+  var check    = document.getElementById('dontShowAgain');
+
+  function closePopup() {
+    if (check.checked) localStorage.setItem(STORAGE_KEY, '1');
+    overlay.classList.remove('open');
+  }
+
+  closeBtn.addEventListener('click', closePopup);
+  okBtn.addEventListener('click', closePopup);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closePopup(); });
+
+  // Tampil setelah 1.5 detik
+  setTimeout(function() { overlay.classList.add('open'); }, 1500);
+})();
+
+function copyPromoCode() {
+  var code = document.getElementById('promoCodeText').textContent;
+  navigator.clipboard.writeText(code).then(function() {
+    showToast('Kode promo ' + code + ' disalin!');
+  }).catch(function() {
+    showToast('Kode: ' + code);
+  });
+}
+
 </script>
 </body>
 </html>
