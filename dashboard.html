@@ -529,7 +529,7 @@ async function loadPayments() {
       return `<tr>
         <td class="td-mono">${p.idNumber}</td>
         <td><span class="badge badge-${p.tier||'low'}">${(p.tier||'').toUpperCase()}</span></td>
-        <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.email}</span></td>
+        <td>${p.buyer}<br/><span style="font-size:.58rem;color:var(--muted)">${p.phone||p.email||'—'}</span></td>
         <td>${methodLabel(p.method)}</td>
         <td class="td-mono">${fmt(p.finalPrice)}</td>
         <td>${p.promoCode ? `<span class="badge" style="background:rgba(70,95,255,.1);color:var(--purple);border-color:rgba(70,95,255,.2)">${p.promoCode} -${p.discount}%</span>` : '—'}</td>
