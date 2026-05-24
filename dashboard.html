@@ -353,6 +353,13 @@ body:not(.dark) .editor-textarea{background:#1e1e1e;color:#d4d4d4}
   <!-- TAB: BANS -->
   <div class="tab-content" id="tab-bans">
     <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>Kirim Info ke Semua Pengguna</h3>
+      <p style="font-size:.65rem;color:var(--muted);margin-bottom:12px">Pesan ini akan muncul sebagai notifikasi di halaman utama untuk semua pengunjung.</p>
+      <div class="field"><label>Judul</label><input type="text" id="broadcastTitle" placeholder="Contoh: Promo Spesial!"/></div>
+      <div class="field"><label>Pesan</label><input type="text" id="broadcastMsg" placeholder="Contoh: Dapatkan diskon 20% hari ini pakai kode SALE20"/></div>
+      <button class="btn btn-primary" onclick="sendBroadcast()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Kirim Notifikasi</button>
+    </div>
+    <div class="section-card">
       <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>IP Terblokir</h3>
       <div class="table-wrap">
         <table>
@@ -817,6 +824,19 @@ document.getElementById('themeBtn').addEventListener('click', () => {
 
 // ── TOAST ──────────────────────────────────────────────────────────────────────
 function showToast(msg) { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+
+// ── BROADCAST ─────────────────────────────────────────────────────────────────
+async function sendBroadcast() {
+  const title = document.getElementById('broadcastTitle').value.trim();
+  const message = document.getElementById('broadcastMsg').value.trim();
+  if (!message) { showToast('Pesan tidak boleh kosong'); return; }
+  try {
+    await apiFetch('/notifications/broadcast', { method:'POST', body: JSON.stringify({ title, message }) });
+    showToast('Notifikasi berhasil dikirim ke semua pengguna!');
+    document.getElementById('broadcastTitle').value = '';
+    document.getElementById('broadcastMsg').value = '';
+  } catch(e) { showToast(e.message || 'Gagal mengirim notifikasi'); }
+}
 
 // ── AUTO-LOGIN ────────────────────────────────────────────────────────────────
 async function tryAutoLogin() {
