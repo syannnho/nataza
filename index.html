@@ -34,7 +34,6 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .nav-links{display:flex;align-items:center;gap:6px}
 .theme-btn{background:var(--bg2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .theme-btn svg{width:14px;height:14px;stroke:var(--muted2);fill:none}
-/* SERVICE BUTTON */
 .service-btn{background:var(--bg2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative}
 .service-btn img{width:18px;height:18px;object-fit:contain}
 
@@ -83,7 +82,8 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .notif-head-title{font-size:.75rem;font-weight:800;color:var(--text)}
 .notif-mark-read{font-size:.6rem;color:var(--purple);font-weight:600;cursor:pointer;background:none;border:none;font-family:var(--font)}
 .notif-list{overflow-y:auto;max-height:315px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-.notif-item{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.notif-item{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:background .15s}
+.notif-item:hover{background:rgba(70,95,255,.05)}
 .notif-item:last-child{border:none}
 .notif-item.unread{background:rgba(70,95,255,.04)}
 .notif-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -443,7 +443,7 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
 </div>
 
 <footer>
-  &copy; 2026 <a href="index.html">lapakID</a> &mdash; Koleksi ID Premium Terpercaya &mdash; <a href="about.html">Tentang Kami</a> &mdash; <a href="dashboard.html">Admin</a>
+  2026 — lapakID
 </footer>
 
 <!-- POPUP PROMO -->
@@ -548,7 +548,7 @@ async function loadNotifications() {
       else timeStr = t.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
       const tierColor = {low:'#6b7280',medium:'#3b82f6',high:'#f97316',legend:'#eab308'}[n.tier]||'#465fff';
       const isInfo = n.type === 'info';
-      return `<div class="notif-item${n.read?'':' unread'}">
+      return `<div class="notif-item${n.read?'':' unread'}" data-notif-id="${n._id}">
         <div class="notif-icon ${isInfo ? 'notif-icon-info' : 'notif-icon-ok'}">
           <svg viewBox="0 0 24 24">${isInfo
             ? '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
@@ -556,22 +556,63 @@ async function loadNotifications() {
           }</svg>
         </div>
         <div class="notif-body">
-          ${isInfo ? `<div class="notif-title">${n.title||'Info dari Admin'}</div>` : ''}
-          <div class="notif-msg">${n.message}</div>
+          ${isInfo ? `<div class="notif-title">${escapeHtml(n.title||'Info dari Admin')}</div>` : ''}
+          <div class="notif-msg">${escapeHtml(n.message)}</div>
           ${n.tier && !isInfo ? `<div class="notif-tier" style="margin-top:3px"><span style="font-size:.5rem;font-weight:700;padding:1px 6px;border-radius:99px;background:${tierColor}22;color:${tierColor};border:1px solid ${tierColor}44">${n.tier.toUpperCase()}</span></div>` : ''}
           <div class="notif-time">${timeStr}</div>
         </div>
       </div>`;
     }).join('');
+    // Tambahkan event listener untuk klik notifikasi
+    document.querySelectorAll('.notif-item').forEach(item => {
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const notifId = item.dataset.notifId;
+        if (notifId && item.classList.contains('unread')) {
+          await markAsRead(notifId);
+          item.classList.remove('unread');
+          // Update badge
+          const dotCount = document.querySelectorAll('.notif-item.unread').length;
+          const dot = document.getElementById('notifDot');
+          if (dotCount > 0) {
+            dot.textContent = dotCount > 99 ? '99+' : String(dotCount);
+            dot.classList.add('show');
+          } else {
+            dot.classList.remove('show');
+            dot.textContent = '';
+          }
+        }
+      });
+    });
+  } catch(e) { console.error('loadNotifications error:', e); }
+}
+
+async function markAsRead(notifId) {
+  try {
+    await fetch(`/api/notifications/${notifId}/read`, { method: 'PUT' });
   } catch(e) {}
 }
+
 async function markAllRead() {
-  await fetch('/api/notifications/read', {method:'PUT'}).catch(()=>{});
-  const dot = document.getElementById('notifDot');
-  dot.classList.remove('show');
-  dot.textContent = '';
-  document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
+  try {
+    await fetch('/api/notifications/read', {method:'PUT'});
+    const dot = document.getElementById('notifDot');
+    dot.classList.remove('show');
+    dot.textContent = '';
+    document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
+  } catch(e) {}
 }
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
 document.getElementById('notifBtn').addEventListener('click', (e) => {
   e.stopPropagation();
   notifOpen = !notifOpen;
@@ -584,9 +625,7 @@ document.addEventListener('click', (e) => {
     document.getElementById('notifPanel').classList.remove('open');
   }
 });
-// Poll notifikasi tiap 30 detik
 setInterval(loadNotifications, 30000);
-
 
 // ── SERVICE / REPORT CHAT ─────────────────────────────────────────────────────
 let chatOpen = false;
@@ -597,7 +636,6 @@ document.getElementById('serviceBtn').addEventListener('click', (e) => {
   if (chatOpen) {
     document.getElementById('chatForm').style.display = 'block';
     document.getElementById('chatSent').style.display = 'none';
-    // Sembunyikan music player saat chat dibuka
     document.getElementById('musicPlayer').classList.add('hidden');
     document.getElementById('musicToggle').classList.add('show');
   }
@@ -605,7 +643,6 @@ document.getElementById('serviceBtn').addEventListener('click', (e) => {
 function closeChat() {
   chatOpen = false;
   document.getElementById('chatOverlay').classList.remove('open');
-  // Tampilkan kembali music player setelah 5 detik
   setTimeout(() => {
     document.getElementById('musicPlayer').classList.remove('hidden');
     document.getElementById('musicToggle').classList.remove('show');
@@ -647,7 +684,6 @@ async function sendReport() {
   }
 }
 
-
 async function init() {
   initTheme();
   loadNotifications();
@@ -661,8 +697,7 @@ async function loadSettings() {
   if (!r || !r.ok) return;
   const d = await r.json();
   settings = d.data || {};
-  window._lapakSettings = settings; // expose untuk music player
-  // trigger musik player jika sudah siap
+  window._lapakSettings = settings;
   if (window._musicReadyCb) { window._musicReadyCb(settings); window._musicReadyCb = null; }
 }
 
@@ -780,7 +815,6 @@ function render() {
   container.querySelectorAll('.id-card').forEach((card, i) => {
     card.style.animationDelay = `${Math.min(i * 0.04, 0.6)}s`;
   });
-  // pagination click events
   container.querySelectorAll('.pg-btn[data-tier]').forEach(btn => {
     btn.addEventListener('click', () => {
       const t = btn.dataset.tier;
@@ -926,7 +960,7 @@ async function openModal(number) {
     </div>
     ${id.note ? `<div class="modal-row">
       <div class="modal-row-label"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Catatan</div>
-      <div class="modal-row-val">${id.note}</div>
+      <div class="modal-row-val">${escapeHtml(id.note)}</div>
     </div>` : ''}
   `;
   document.getElementById('modalLikeCount').textContent = id.likes || 0;
@@ -970,7 +1004,6 @@ function initTheme() {
   if (dark) document.body.classList.add('dark');
   updateThemeIcon(dark);
   updateLogo(dark);
-  // Set service icon sesuai mode
   const svcIcon = document.getElementById('serviceIcon');
   if (svcIcon) svcIcon.src = dark
     ? 'https://img.icons8.com/?size=100&id=hGGoQujQ1YcO&format=png&color=FFFFFF'
@@ -1046,7 +1079,7 @@ init();
 
 // ── MUSIC PLAYER ──
 (function() {
-  var songs = [];  // will be loaded from API
+  var songs = [];
   var songsLoaded = false;
   var currentSong = 0;
   var hideTimer = null;
@@ -1071,8 +1104,7 @@ init();
     currentSong = index;
     audio.src = songs[index].src;
     var title = songs[index].title;
-    // marquee if title too long
-    titleEl.innerHTML = '<span class="music-title-inner" id="musicTitleInner">' + title + '</span>';
+    titleEl.innerHTML = '<span class="music-title-inner" id="musicTitleInner">' + escapeHtml(title) + '</span>';
     subEl.textContent = 'Track ' + (index + 1) + ' / ' + songs.length;
     setProgress(0);
     setTimeout(function() {
@@ -1154,13 +1186,10 @@ init();
     }
   }
 
-  // Jika settings sudah tersedia (loadSettings selesai duluan)
   if (window._lapakSettings) {
     applyMusic(window._lapakSettings);
   } else {
-    // Daftarkan callback, dipanggil saat loadSettings selesai
     window._musicReadyCb = applyMusic;
-    // Timeout fallback 3 detik - fetch langsung jika loadSettings terlalu lama
     setTimeout(function() {
       if (songs.length === 0 && !window._lapakSettings) {
         fetch('/api/settings').then(function(r){ return r.json(); }).then(function(d) {
@@ -1210,26 +1239,38 @@ init();
   startAuto();
 })();
 
-// ── POPUP PROMO ──
+// ── POPUP PROMO ── (FIXED: menggunakan localStorage dengan benar)
 (function() {
-  var STORAGE_KEY = 'lapakid_popup_hide';
-  if (localStorage.getItem(STORAGE_KEY) === '1') return;
+  var STORAGE_KEY = 'lapakid_popup_hide_2026';
+  
+  // Cek apakah user sudah memilih untuk tidak menampilkan lagi
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    return;
+  }
 
   var overlay  = document.getElementById('promoPopup');
   var closeBtn = document.getElementById('popupClose');
   var okBtn    = document.getElementById('popupOk');
   var check    = document.getElementById('dontShowAgain');
 
-  function closePopup() {
-    if (check.checked) localStorage.setItem(STORAGE_KEY, '1');
+  function closePopupAndSave() {
+    // Jika checkbox dicentang, simpan ke localStorage
+    if (check && check.checked) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
     overlay.classList.remove('open');
   }
 
-  closeBtn.addEventListener('click', closePopup);
-  okBtn.addEventListener('click', closePopup);
-  overlay.addEventListener('click', function(e) { if (e.target === overlay) closePopup(); });
+  closeBtn.addEventListener('click', closePopupAndSave);
+  okBtn.addEventListener('click', closePopupAndSave);
+  overlay.addEventListener('click', function(e) { 
+    if (e.target === overlay) closePopupAndSave(); 
+  });
 
-  setTimeout(function() { overlay.classList.add('open'); }, 1500);
+  // Tampilkan popup setelah 2 detik
+  setTimeout(function() { 
+    overlay.classList.add('open'); 
+  }, 2000);
 })();
 
 function copyPromoCode() {
