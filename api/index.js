@@ -1,4 +1,4 @@
-// api/index.js — lapakID Backend v3
+// api/index.js — lapakID Backend v3 (FULL)
 const { MongoClient, ObjectId } = require('mongodb');
 
 const MONGO_URI    = process.env.MONGODB_URI   || 'mongodb+srv://n4taza_db:N44E8WEKlOJLZIHQ@cluster0.pdfnlfb.mongodb.net/?appName=Cluster0';
@@ -43,10 +43,9 @@ function readBody(req) {
     req.on('error',()=>resolve({}));
   });
 }
-function qs(url) { try{ const i=url.indexOf('?'); return i===-1?{}:Object.fromEntries(new URLSearchParams(url.slice(i+1))); }catch{return{};} }
+function qs(url) { try{ const i=url.indexOf('?'); return i===-1?{}:Object.fromEntries(new URLSearchParams(url.slice(i+1))); }catch{return {};} }
 function parts(url) {
   const path = url.split('?')[0];
-  // Strip /api prefix in various forms
   const clean = path.replace(/^\/api\//, '/').replace(/^\/api$/, '/');
   return clean.split('/').filter(Boolean);
 }
@@ -61,7 +60,6 @@ async function ensureSettings(db) {
       {key:'music',   value:[]},
     ]);
   }
-  // Pastikan semua key wajib ada (untuk DB lama)
   const required = [
     {key:'music',   value:[]},
     {key:'adminFee',value:{qris:0,google:5000,file:0}},
@@ -115,7 +113,6 @@ module.exports = async function handler(req, res) {
   const M = req.method.toUpperCase();
 
   // ── github/file — no DB needed ────────────────────────────────────────────
-  console.log('[DEBUG] r0='+r0+' r1='+r1+' url='+req.url);
   if (r0==='github' && r1==='file') {
     if (!isAdmin(req)) return fail(res,401,'Unauthorized');
     const ALLOWED = ['index.html','dashboard.html','payment.html','about.html'];
@@ -250,9 +247,8 @@ module.exports = async function handler(req, res) {
     // ── notifications ─────────────────────────────────────────────────────────
     if (r0==='notifications') {
       if (!r1 && M==='GET') {
-        const limit = parseInt(qs(req.url).limit)||20;
-        // Support multiple types: confirmed (purchases) + info (admin broadcast)
-        const typeFilter = {type:{$in:['confirmed','info']}};
+        const limit = parseInt(qs(req.url).limit)||30;
+        const typeFilter = {type:{$in:['confirmed','info','reply']}};
         const notifs = await db.collection('notifications')
           .find(typeFilter)
           .sort({createdAt:-1}).limit(limit).toArray();
@@ -260,8 +256,13 @@ module.exports = async function handler(req, res) {
         return ok(res,{data:notifs, unread});
       }
       if (r1==='read' && M==='PUT') {
-        await db.collection('notifications').updateMany({type:{$in:['confirmed','info']},read:false},{$set:{read:true}});
+        await db.collection('notifications').updateMany({type:{$in:['confirmed','info','reply']},read:false},{$set:{read:true}});
         return ok(res,{message:'Semua notifikasi ditandai dibaca'});
+      }
+      if (r1 && r2==='read' && M==='PUT') {
+        let oid; try{oid=new ObjectId(r1);}catch{return fail(res,400,'ID tidak valid');}
+        await db.collection('notifications').updateOne({_id:oid},{$set:{read:true}});
+        return ok(res,{message:'Notifikasi ditandai dibaca'});
       }
       if (r1==='broadcast' && M==='POST') {
         if (!isAdmin(req)) return fail(res,401,'Unauthorized');
@@ -337,6 +338,13 @@ module.exports = async function handler(req, res) {
         await db.collection('settings').updateOne({key:r1},{$set:{value:b.value}},{upsert:true});
         return ok(res,{message:`Setting '${r1}' disimpan`});
       }
+      if (r1==='music' && M==='PUT') {
+        if (!isAdmin(req)) return fail(res,401,'Unauthorized');
+        const b=await readBody(req);
+        if (!Array.isArray(b.value)) return fail(res,400,'value harus array');
+        await db.collection('settings').updateOne({key:'music'},{$set:{value:b.value}},{upsert:true});
+        return ok(res,{message:'Playlist musik disimpan'});
+      }
     }
 
     // ── payment ───────────────────────────────────────────────────────────
@@ -364,7 +372,6 @@ module.exports = async function handler(req, res) {
       const ip=getIP(req);
       const payment={idNumber:String(idNumber),tier:idDoc.tier,price:base,method:pMethod,status:'pending',buyer,phone,promoCode:promoUsed,discount:disc,adminFee,finalPrice,ip,createdAt:new Date()};
       const ins=await db.collection('payments').insertOne(payment);
-      // Tidak buat notifikasi di sini - notifikasi hanya saat dikonfirmasi
       return created(res,{data:{...payment,_id:ins.insertedId}});
     }
 
@@ -380,15 +387,14 @@ module.exports = async function handler(req, res) {
         if (!p) return fail(res,404,'Pembayaran tidak ditemukan');
         await db.collection('payments').updateOne({_id:oid},{$set:{status:'confirmed',confirmedAt:new Date()}});
         await db.collection('ids').updateOne({number:p.idNumber},{$set:{sold:true,soldAt:new Date()}});
-        // notifikasi konfirmasi — tampil di index.html untuk semua user
         const priceStr = (p.finalPrice||0).toLocaleString('id-ID');
         await db.collection('notifications').insertOne({
           type:'confirmed',
-          title:'Pembelian Berhasil',
-          message:`${p.buyer} baru saja membeli ID ${p.idNumber} dengan harga Rp ${priceStr}`,
+          title:'✅ Pembelian Berhasil',
+          message:`${p.buyer} membeli ID ${p.idNumber} (${p.tier.toUpperCase()}) seharga Rp ${priceStr}`,
           idNumber:p.idNumber,
           buyer:p.buyer,
-          phone:p.phone||p.email||'',
+          phone:p.phone||'',
           finalPrice:p.finalPrice,
           tier:p.tier,
           read:false,
@@ -436,8 +442,24 @@ module.exports = async function handler(req, res) {
         const b = await readBody(req);
         if (!b.reply) return fail(res,400,'reply wajib');
         let oid; try{oid=new ObjectId(r1);}catch{return fail(res,400,'ID tidak valid');}
+        const report = await db.collection('reports').findOne({_id:oid});
+        if (!report) return fail(res,404,'Laporan tidak ditemukan');
+        
         await db.collection('reports').updateOne({_id:oid},{$set:{reply:b.reply,status:'replied',repliedAt:new Date()}});
-        return ok(res,{message:'Balasan tersimpan'});
+        
+        // KIRIM NOTIFIKASI KE SEMUA USER (broadcast reply)
+        await db.collection('notifications').insertOne({
+          type:'reply',
+          title:'💬 Balasan dari Admin',
+          message:`Admin membalas pesan dari ${report.name}: "${b.reply.substring(0,100)}${b.reply.length>100?'...':''}"`,
+          originalMessage: report.message,
+          reply: b.reply,
+          replyTo: report.name,
+          read:false,
+          createdAt:new Date(),
+        });
+        
+        return ok(res,{message:'Balasan tersimpan dan notifikasi terkirim'});
       }
       if (r1 && r2==='read' && M==='PUT') {
         if (!isAdmin(req)) return fail(res,401,'Unauthorized');
