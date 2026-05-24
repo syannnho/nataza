@@ -39,7 +39,7 @@ body.dark nav{background:rgba(13,13,13,.95)}
 .service-btn img{width:18px;height:18px;object-fit:contain}
 
 /* CHAT MODAL */
-.chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
+.chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 @media(min-width:480px){.chat-overlay{align-items:center}}
 .chat-overlay.open{opacity:1;pointer-events:all}
 .chat-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:420px;padding:0;overflow:hidden;transform:translateY(40px);transition:.25s;box-shadow:0 -8px 40px rgba(0,0,0,.15)}
@@ -75,14 +75,14 @@ body.dark nav{background:rgba(13,13,13,.95)}
 /* NOTIF BELL */
 .notif-btn{position:relative;background:var(--bg2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;text-decoration:none}
 .notif-btn svg{width:14px;height:14px;stroke:var(--muted2);fill:none}
-.notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--sold);border-radius:50%;border:2px solid var(--bg);display:none}
-.notif-dot.show{display:block}
+.notif-dot{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:var(--sold);border-radius:99px;border:2px solid var(--bg);display:none;align-items:center;justify-content:center;font-size:.48rem;font-weight:800;color:#fff;padding:0 3px;font-family:var(--mono)}
+.notif-dot.show{display:flex}
 .notif-panel{position:fixed;top:62px;right:12px;width:300px;max-height:360px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:300;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-8px) scale(.97);transition:.2s}
 .notif-panel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
 .notif-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
 .notif-head-title{font-size:.75rem;font-weight:800;color:var(--text)}
 .notif-mark-read{font-size:.6rem;color:var(--purple);font-weight:600;cursor:pointer;background:none;border:none;font-family:var(--font)}
-.notif-list{overflow-y:auto;max-height:280px}
+.notif-list{overflow-y:auto;max-height:315px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .notif-item{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
 .notif-item:last-child{border:none}
 .notif-item.unread{background:rgba(70,95,255,.04)}
@@ -234,7 +234,7 @@ footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;ba
 footer a{color:var(--purple);text-decoration:none;font-weight:600}
 
 /* ── MUSIC PLAYER ── */
-.music-player{position:fixed;left:16px;bottom:24px;z-index:9999;display:flex;align-items:center;gap:12px;background:rgba(20,20,20,.92);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:8px 18px 8px 12px;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease;min-width:240px}
+.music-player{position:fixed;left:16px;bottom:24px;z-index:10000;display:flex;align-items:center;gap:12px;background:rgba(20,20,20,.92);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:8px 18px 8px 12px;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease;min-width:240px}
 .music-player.hidden{transform:translateX(calc(-100% - 32px));opacity:0;pointer-events:none}
 .music-album-container{position:relative;width:44px;height:44px;flex-shrink:0}
 .circular-progress{position:absolute;top:0;left:0;width:44px;height:44px;transform:rotate(-90deg)}
@@ -258,7 +258,7 @@ footer a{color:var(--purple);text-decoration:none;font-weight:600}
 .mc-play{background:rgba(70,95,255,.8)!important;color:#fff!important;width:32px;height:32px;border-radius:50%}
 .mc-play:hover{background:var(--purple)!important}
 .mc-play svg{width:14px;height:14px}
-.music-toggle{position:fixed;left:16px;bottom:24px;z-index:9998;background:rgba(20,20,20,.85);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);transition:opacity .3s,transform .3s;opacity:0;transform:scale(.8);pointer-events:none}
+.music-toggle{position:fixed;left:16px;bottom:24px;z-index:9999;background:rgba(20,20,20,.85);border:1px solid rgba(255,255,255,.1);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);transition:opacity .3s,transform .3s;opacity:0;transform:scale(.8);pointer-events:none}
 .music-toggle.show{opacity:1;transform:scale(1);pointer-events:all}
 .music-toggle svg{width:20px;height:20px;stroke:#fff;fill:none}
 
@@ -525,8 +525,13 @@ async function loadNotifications() {
     if (!r.ok) return;
     const d = await r.json();
     const dot = document.getElementById('notifDot');
-    if (d.unread > 0) dot.classList.add('show');
-    else dot.classList.remove('show');
+    if (d.unread > 0) {
+      dot.textContent = d.unread > 99 ? '99+' : String(d.unread);
+      dot.classList.add('show');
+    } else {
+      dot.classList.remove('show');
+      dot.textContent = '';
+    }
     const list = document.getElementById('notifList');
     if (!d.data || !d.data.length) {
       list.innerHTML = '<div class="notif-empty">Belum ada aktivitas pembelian</div>';
@@ -562,7 +567,9 @@ async function loadNotifications() {
 }
 async function markAllRead() {
   await fetch('/api/notifications/read', {method:'PUT'}).catch(()=>{});
-  document.getElementById('notifDot').classList.remove('show');
+  const dot = document.getElementById('notifDot');
+  dot.classList.remove('show');
+  dot.textContent = '';
   document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
 }
 document.getElementById('notifBtn').addEventListener('click', (e) => {
@@ -588,20 +595,25 @@ document.getElementById('serviceBtn').addEventListener('click', (e) => {
   chatOpen = !chatOpen;
   document.getElementById('chatOverlay').classList.toggle('open', chatOpen);
   if (chatOpen) {
-    // Reset form
     document.getElementById('chatForm').style.display = 'block';
     document.getElementById('chatSent').style.display = 'none';
+    // Sembunyikan music player saat chat dibuka
+    document.getElementById('musicPlayer').classList.add('hidden');
+    document.getElementById('musicToggle').classList.add('show');
   }
 });
-document.getElementById('chatClose').addEventListener('click', () => {
+function closeChat() {
   chatOpen = false;
   document.getElementById('chatOverlay').classList.remove('open');
-});
+  // Tampilkan kembali music player setelah 5 detik
+  setTimeout(() => {
+    document.getElementById('musicPlayer').classList.remove('hidden');
+    document.getElementById('musicToggle').classList.remove('show');
+  }, 5000);
+}
+document.getElementById('chatClose').addEventListener('click', closeChat);
 document.getElementById('chatOverlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('chatOverlay')) {
-    chatOpen = false;
-    document.getElementById('chatOverlay').classList.remove('open');
-  }
+  if (e.target === document.getElementById('chatOverlay')) closeChat();
 });
 
 async function sendReport() {
