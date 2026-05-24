@@ -210,6 +210,7 @@ body:not(.dark) .editor-textarea{background:#1e1e1e;color:#d4d4d4}
     <button class="tab" data-tab="files" onclick="switchTab('files')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit File</button>
     <button class="tab" data-tab="settings" onclick="switchTab('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.68 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Pengaturan</button>
     <button class="tab" data-tab="bans" onclick="switchTab('bans')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>IP Banned</button>
+    <button class="tab" data-tab="reports" onclick="switchTab('reports')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Report <span id="reportUnreadBadge" style="display:none;background:var(--sold);color:#fff;font-size:.5rem;font-weight:800;padding:1px 5px;border-radius:99px;margin-left:3px"></span></button>
   </div>
 
   <!-- TAB: IDS -->
@@ -371,6 +372,35 @@ body:not(.dark) .editor-textarea{background:#1e1e1e;color:#d4d4d4}
   </div>
 </div>
 
+  <!-- TAB: REPORTS -->
+  <div class="tab-content" id="tab-reports">
+    <div class="section-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Pesan dari Pengguna <span id="reportCount" style="font-size:.62rem;font-weight:400;color:var(--muted);margin-left:4px"></span></h3>
+      <div class="table-wrap" id="reportTableWrap">
+        <table>
+          <thead><tr><th>Nama</th><th>IP</th><th>Pesan</th><th>Status</th><th>Waktu</th><th>Aksi</th></tr></thead>
+          <tbody id="reportTableBody"><tr><td colspan="6" class="no-data">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<!-- REPLY MODAL -->
+<div class="confirm-overlay" id="replyOverlay" style="z-index:850">
+  <div class="confirm-box" style="max-width:380px">
+    <h4 style="margin-bottom:10px">Balas Pesan</h4>
+    <div style="background:var(--bg2);border-radius:10px;padding:10px 12px;margin-bottom:12px;text-align:left">
+      <div style="font-size:.6rem;color:var(--muted);margin-bottom:3px">Pesan dari <b id="replyFromName"></b> (<span id="replyFromIp" style="font-family:var(--mono)"></span>)</div>
+      <div style="font-size:.7rem;color:var(--text);line-height:1.5" id="replyOrigMsg"></div>
+    </div>
+    <textarea id="replyText" placeholder="Tulis balasan..." style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:.74rem;outline:none;resize:none;min-height:80px;margin-bottom:12px"></textarea>
+    <div class="confirm-actions">
+      <button class="btn btn-primary" id="replySubmitBtn" onclick="submitReply()"><svg viewBox="0 0 24 24" width="12" height="12"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Kirim Balasan</button>
+      <button class="btn" style="background:var(--bg2);border:1px solid var(--border)" onclick="closeReply()">Batal</button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM MODAL -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
@@ -429,6 +459,7 @@ function doLogout() { adminToken = ''; localStorage.removeItem('lapakid_admin_to
 async function initDashboard() {
   initTheme();
   await Promise.all([loadStats(), loadIds(), loadSettings(), loadMusic()]);
+  loadReports();
   await Promise.all([loadPayments(), loadPromos(), loadBans()]);
 }
 
@@ -792,6 +823,7 @@ function switchTab(tab) {
   document.getElementById(`tab-${tab}`)?.classList.add('active');
   document.querySelector(`[data-tab="${tab}"]`)?.classList.add('act');
   if (tab === 'files') loadFileContent();
+  if (tab === 'reports') loadReports();
 }
 
 // ── CONFIRM MODAL ─────────────────────────────────────────────────────────────
@@ -824,6 +856,92 @@ document.getElementById('themeBtn').addEventListener('click', () => {
 
 // ── TOAST ──────────────────────────────────────────────────────────────────────
 function showToast(msg) { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+
+// ── REPORTS ───────────────────────────────────────────────────────────────────
+let currentReplyId = null;
+
+async function loadReports() {
+  try {
+    const d = await apiFetch('/reports');
+    const tbody = document.getElementById('reportTableBody');
+    const countEl = document.getElementById('reportCount');
+    const badge = document.getElementById('reportUnreadBadge');
+
+    if (d.unread > 0) {
+      badge.textContent = d.unread;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    if (!d.data || !d.data.length) {
+      countEl.textContent = '';
+      tbody.innerHTML = '<tr><td colspan="6" class="no-data">Belum ada pesan</td></tr>';
+      return;
+    }
+    countEl.textContent = '(' + d.data.length + ' pesan)';
+
+    tbody.innerHTML = d.data.map(r => {
+      const rid = r._id?.$oid || r._id?.toString() || String(r._id);
+      const statusColor = r.status==='replied' ? 'badge-avail' : r.status==='read' ? 'badge-medium' : 'badge-sold';
+      const statusLabel = r.status==='replied' ? 'DIBALAS' : r.status==='read' ? 'DIBACA' : 'BARU';
+      const t = new Date(r.createdAt);
+      const timeStr = t.toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      return `<tr>
+        <td style="font-weight:700">${r.name}</td>
+        <td class="td-mono" style="font-size:.6rem">${r.ip}</td>
+        <td style="max-width:180px">
+          <div style="font-size:.68rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px" title="${r.message}">${r.message}</div>
+          ${r.reply ? `<div style="font-size:.6rem;color:var(--success);margin-top:2px">↩ ${r.reply}</div>` : ''}
+        </td>
+        <td><span class="badge ${statusColor}">${statusLabel}</span></td>
+        <td style="font-size:.62rem;color:var(--muted);white-space:nowrap">${timeStr}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-sm btn-primary" onclick="openReply('${rid}','${r.name.replace(/'/g,"\'")}','${r.ip}','${r.message.replace(/'/g,"\'").replace(/
+/g,' ')}')">
+              <svg viewBox="0 0 24 24" width="11" height="11"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+              Balas
+            </button>
+            ${r.status==='unread' ? `<button class="btn btn-sm" style="background:var(--bg2);border:1px solid var(--border);font-size:.58rem" onclick="markReportRead('${rid}')">Baca</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error('loadReports:', e); }
+}
+
+function openReply(id, name, ip, msg) {
+  currentReplyId = id;
+  document.getElementById('replyFromName').textContent = name;
+  document.getElementById('replyFromIp').textContent = ip;
+  document.getElementById('replyOrigMsg').textContent = msg;
+  document.getElementById('replyText').value = '';
+  document.getElementById('replyOverlay').classList.add('open');
+}
+function closeReply() {
+  document.getElementById('replyOverlay').classList.remove('open');
+  currentReplyId = null;
+}
+async function submitReply() {
+  const reply = document.getElementById('replyText').value.trim();
+  if (!reply) { showToast('Tulis balasan terlebih dahulu'); return; }
+  const btn = document.getElementById('replySubmitBtn');
+  btn.disabled = true;
+  try {
+    await apiFetch('/reports/'+currentReplyId+'/reply', { method:'PUT', body: JSON.stringify({ reply }) });
+    showToast('Balasan berhasil dikirim');
+    closeReply();
+    await loadReports();
+  } catch(e) { showToast(e.message||'Gagal mengirim balasan'); }
+  btn.disabled = false;
+}
+async function markReportRead(id) {
+  try {
+    await apiFetch('/reports/'+id+'/read', { method:'PUT' });
+    await loadReports();
+  } catch(e) { showToast('Gagal'); }
+}
 
 // ── BROADCAST ─────────────────────────────────────────────────────────────────
 async function sendBroadcast() {
