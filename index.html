@@ -808,14 +808,14 @@ function buildPagination(tier,cur,total){
 function hl(text){if(!searchQ)return text;const rx=new RegExp(`(${searchQ.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');return text.replace(rx,'<mark>$1</mark>');}
 function isNew(id){if(id.sold||!id.addedAt)return false;const added=new Date(id.addedAt).getTime();if(isNaN(added))return false;const diff=Date.now()-added;return diff>0&&diff<3*24*60*60*1000;}
 function buildCard(id){
-  const liked=likedSet.has(id.number);
-  const wished=wishlistSet.has(id.number);
-  const wishCount=wishlistCounts[id.number]||0;
-  const lc=id.likes||0;
-  const isNewId=isNew(id);
-  // Hanya angka, tanpa teks "suka" atau "simpan"
+  const liked = likedSet.has(id.number);
+  const wished = wishlistSet.has(id.number);
+  const wishCount = wishlistCounts[id.number] || 0;
+  const lc = id.likes || 0;
+  const isNewId = isNew(id);
   const likeText = lc === 0 ? '' : lc;
   const wishText = wishCount === 0 ? '' : wishCount;
+  
   return `<div class="id-card${id.sold?' is-sold':''}" data-num="${id.number}" data-tier="${id.tier}">
     ${id.sold?`<div class="card-badge badge-sold"><i data-lucide="x-circle" style="width:8px;height:8px"></i>SOLD</div>`:isNewId?`<div class="card-badge badge-new"><i data-lucide="sparkles" style="width:8px;height:8px"></i>NEW</div>`:''}
     <div class="id-num"><img src="https://files.catbox.moe/em51di.png" alt=""/>${hl(id.number)}</div>
