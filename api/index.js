@@ -1,5 +1,5 @@
 // api/index.js — lapakID Backend (Complete Version)
-// Features: IDs, Like, Promo, Payment, Settings, Notifications, Reports, Broadcast, Bans
+// Features: IDs, Like, Promo, Payment, Settings, Notifications, Reports, Broadcast, Bans, Reset Database
 
 const { MongoClient, ObjectId } = require('mongodb');
 
@@ -81,7 +81,7 @@ async function ensureSettings(db) {
     prices: { low: 125000, medium: 450000, high: 850000, legend: 1350000 },
     adminFee: { qris: 0, google: 5000 },
     siteInfo: { name: 'lapakID', description: 'Koleksi ID Premium', contact: '' },
-    music: { enabled: false, url: '', list: [] },
+    music: { enabled: false, list: [] },
     banners: [],
     popup: { active: false, title: '', desc: '', code: '', imageUrl: '' }
   };
@@ -391,7 +391,7 @@ module.exports = async function handler(req, res) {
         return created(res, { data: doc });
       }
       
-      // POST /api/notifications/broadcast (BROADCAST ke semua user)
+      // POST /api/notifications/broadcast
       if (r1 === 'broadcast' && M === 'POST') {
         if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
         const b = await readBody(req);
@@ -414,12 +414,6 @@ module.exports = async function handler(req, res) {
         });
       }
       
-      // PUT /api/notifications/read (mark all as read for current user)
-      if (r1 === 'read' && M === 'PUT') {
-        // This would require user identification, for now just return ok
-        return ok(res, { message: 'Notifikasi ditandai dibaca' });
-      }
-      
       // DELETE /api/notifications/:id
       if (r1 && M === 'DELETE') {
         if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
@@ -430,7 +424,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // ────────────────────────────────────────────── REPORTS (Live Chat) ──────
+    // ────────────────────────────────────────────── REPORTS ──────────────────
     if (r0 === 'reports') {
       // POST /api/reports
       if (!r1 && M === 'POST') {
@@ -607,7 +601,6 @@ module.exports = async function handler(req, res) {
           { $set: { sold: true, soldAt: new Date() } }
         );
         
-        // Buat notifikasi otomatis
         await db.collection('notifications').insertOne({
           title: '✅ Pembayaran Dikonfirmasi',
           message: `Pembelian ID ${payment.idNumber} telah dikonfirmasi. Terima kasih ${payment.buyer}!`,
@@ -637,6 +630,34 @@ module.exports = async function handler(req, res) {
           { $set: { active: false, unbannedAt: new Date() } }
         );
         return ok(res, { message: `IP ${ip} di-unban` });
+      }
+    }
+
+    // ── RESET DATABASE (Admin only) ─────────────────────────────────────────
+    if (r0 === 'reset' && r1 === 'database' && M === 'DELETE') {
+      if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
+      
+      try {
+        const collectionsToReset = ['ids', 'payments', 'likes', 'notifications', 'reports', 'bans', 'promos'];
+        
+        const results = {};
+        for (const colName of collectionsToReset) {
+          const col = db.collection(colName);
+          const count = await col.countDocuments();
+          const result = await col.deleteMany({});
+          results[colName] = { deleted: result.deletedCount, total: count };
+        }
+        
+        console.log('[RESET] Database reset by admin:', results);
+        
+        return ok(res, { 
+          message: 'Database berhasil direset',
+          details: results,
+          timestamp: new Date().toISOString()
+        });
+      } catch (err) {
+        console.error('[RESET ERROR]', err);
+        return fail(res, 500, 'Gagal reset database: ' + err.message);
       }
     }
 
