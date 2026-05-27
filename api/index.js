@@ -464,11 +464,27 @@ module.exports = async function handler(req, res) {
     if (r0 === 'wishlist') {
       const clientIp = getIP(req);
       
+      // GET /api/wishlist - Ambil wishlist user
       if (!r1 && M === 'GET') {
         const wishlist = await db.collection('wishlist').findOne({ ip: clientIp });
         return ok(res, { data: wishlist?.ids || [] });
       }
       
+      // GET /api/wishlist/counts - Hitung total penyimpan per ID
+      if (r1 === 'counts' && M === 'GET') {
+        const allWishlist = await db.collection('wishlist').find().toArray();
+        const counts = {};
+        for (const w of allWishlist) {
+          if (w.ids && Array.isArray(w.ids)) {
+            for (const id of w.ids) {
+              counts[id] = (counts[id] || 0) + 1;
+            }
+          }
+        }
+        return ok(res, { data: counts });
+      }
+      
+      // POST /api/wishlist/:id - Tambah ID ke wishlist
       if (r1 && M === 'POST') {
         const idNumber = r1;
         await db.collection('wishlist').updateOne(
@@ -479,6 +495,7 @@ module.exports = async function handler(req, res) {
         return ok(res, { message: 'Ditambahkan ke wishlist', id: idNumber });
       }
       
+      // DELETE /api/wishlist/:id - Hapus ID dari wishlist
       if (r1 && M === 'DELETE') {
         const idNumber = r1;
         await db.collection('wishlist').updateOne(
@@ -488,6 +505,7 @@ module.exports = async function handler(req, res) {
         return ok(res, { message: 'Dihapus dari wishlist', id: idNumber });
       }
       
+      // GET /api/wishlist/check/:id - Cek status wishlist
       if (r1 === 'check' && r2 && M === 'GET') {
         const idNumber = r2;
         const wishlist = await db.collection('wishlist').findOne({ ip: clientIp, ids: idNumber });
