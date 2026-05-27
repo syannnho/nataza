@@ -457,6 +457,7 @@ let currentModal=null,tierPages={low:1,medium:1,high:1,legend:1};
 let songs=[],currentSong=0,musicHideTimer=null;
 let notifOpen=false;
 let priceFilter='all';
+let showWishlistOnly=false;
 
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
@@ -669,7 +670,6 @@ async function toggleWishlist(number,btn){
   if(showWishlistOnly) render();
 }
 
-let showWishlistOnly=false;
 const wishlistFilterBtn=document.getElementById('wishlistFilterBtn');
 wishlistFilterBtn.addEventListener('click',()=>{
   showWishlistOnly=!showWishlistOnly;
@@ -865,8 +865,8 @@ async function openModal(number){
   document.getElementById('modalIdNum').textContent=number;
   document.getElementById('modalRows').innerHTML=`
     <div class="modal-row"><div class="modal-lbl"><i data-lucide="layers" style="width:12px;height:12px"></i>Tier</div><div class="modal-val"><span class="tier-tag ${TCLS[id.tier]}" style="font-size:.54rem">${id.tier.toUpperCase()}</span></div></div>
-    <div class="modal-row"><div class="modal-lbl"><i data-lucide="heart" style="width:12px;height:12px"></i>Suka</div><div class="modal-val">${id.likes||0}</div></div>
-    <div class="modal-row"><div class="modal-lbl"><i data-lucide="bookmark" style="width:12px;height:12px"></i>Disimpan</div><div class="modal-val">${wishCount}</div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="heart" style="width:12px;height:12px"></i>Suka</div><div class="modal-val">${id.likes||0} orang</div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="bookmark" style="width:12px;height:12px"></i>Disimpan</div><div class="modal-val">${wishCount} orang</div></div>
     <div class="modal-row"><div class="modal-lbl"><i data-lucide="calendar" style="width:12px;height:12px"></i>Ditambahkan</div><div class="modal-val" style="display:flex;align-items:center;gap:6px">${id.addedAt?new Date(id.addedAt).toLocaleDateString('id-ID'):'—'}${isNew(id)?'<span class="card-badge badge-new" style="position:static;font-size:.42rem">NEW</span>':''}</div></div>
     ${id.note?`<div class="modal-row"><div class="modal-lbl"><i data-lucide="file-text" style="width:12px;height:12px"></i>Catatan</div><div class="modal-val">${id.note}</div></div>`:''}
   `;
