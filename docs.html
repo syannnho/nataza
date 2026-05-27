@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dokumentasi — lapakID v2.2.2</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8fafc;--bg2:#f1f5f9;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--purple:#6366f1;--purple2:#818cf8;--success:#10b981;--warning:#f59e0b;--sold:#ef4444;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body.dark{--bg:#09090b;--bg2:#111113;--card:#141416;--border:#1e1e21;--text:#fafafa;--muted:#71717a}
+body{background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+nav{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(248,250,252,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+body.dark nav{background:rgba(9,9,11,.92)}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-size:.88rem;font-weight:800;color:var(--text)}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-icon-btn{width:32px;height:32px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:.15s}
+.nav-back{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;font-size:.65rem;font-weight:600;color:var(--muted);text-decoration:none;background:var(--bg2);border:1px solid var(--border)}
+.wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px;display:grid;grid-template-columns:200px 1fr;gap:32px}
+@media(max-width:640px){.wrap{grid-template-columns:1fr;padding:20px 16px 60px}}
+/* SIDEBAR */
+.sidebar{position:sticky;top:72px;height:fit-content}
+@media(max-width:640px){.sidebar{position:static}}
+.sidebar-title{font-size:.6rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding:0 8px}
+.nav-link{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;font-size:.68rem;font-weight:500;color:var(--muted);text-decoration:none;transition:.15s;cursor:pointer}
+.nav-link:hover{background:var(--bg2);color:var(--text)}
+.nav-link.active{background:rgba(99,102,241,.08);color:var(--purple);font-weight:700}
+.nav-link i{width:13px;height:13px;flex-shrink:0}
+.nav-sep{height:1px;background:var(--border);margin:8px 0}
+/* CONTENT */
+.content{min-width:0}
+.version-header{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid var(--border)}
+.version-tag{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:.6rem;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:.3px}
+.version-date{font-size:.62rem;color:var(--muted);font-family:var(--mono)}
+.doc-section{margin-bottom:36px;scroll-margin-top:80px}
+.doc-section h2{font-size:1.1rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.doc-section h2 i{width:18px;height:18px;color:var(--purple)}
+.doc-section h3{font-size:.82rem;font-weight:700;margin:16px 0 8px;color:var(--text)}
+.doc-section p{font-size:.72rem;color:var(--muted);line-height:1.75;margin-bottom:10px}
+.doc-section ul,.doc-section ol{padding-left:18px;margin-bottom:10px}
+.doc-section li{font-size:.72rem;color:var(--muted);line-height:1.75;margin-bottom:3px}
+.doc-section li b{color:var(--text)}
+.api-block{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.api-head{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border)}
+.method-badge{font-size:.55rem;font-weight:800;padding:2px 8px;border-radius:5px;letter-spacing:.3px}
+.GET{background:rgba(16,185,129,.12);color:var(--success)}
+.POST{background:rgba(99,102,241,.12);color:var(--purple)}
+.PUT{background:rgba(245,158,11,.12);color:var(--warning)}
+.DELETE{background:rgba(239,68,68,.12);color:var(--sold)}
+.api-path{font-family:var(--mono);font-size:.65rem;color:var(--text);font-weight:600}
+.api-desc{font-size:.62rem;color:var(--muted);padding:8px 12px}
+.code-block{background:#0f172a;border-radius:10px;padding:14px;font-family:var(--mono);font-size:.63rem;color:#94a3b8;line-height:1.7;overflow-x:auto;margin-bottom:10px;border:1px solid #1e293b}
+.code-block .key{color:#7dd3fc}.code-block .str{color:#86efac}.code-block .num{color:#fca5a5}.code-block .cm{color:#475569}
+.alert{border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.68rem;line-height:1.6;display:flex;gap:8px}
+.alert i{width:14px;height:14px;flex-shrink:0;margin-top:1px}
+.alert-info{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);color:var(--text)}
+.alert-info i{color:var(--purple)}
+.alert-warn{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);color:var(--text)}
+.alert-warn i{color:var(--warning)}
+.changelog-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.changelog-item:last-child{border:none}
+.change-type{min-width:60px;font-size:.52rem;font-weight:800;padding:2px 7px;border-radius:5px;height:fit-content;text-align:center}
+.new-feat{background:rgba(16,185,129,.1);color:var(--success)}
+.improved{background:rgba(99,102,241,.1);color:var(--purple)}
+.fixed{background:rgba(239,68,68,.1);color:var(--sold)}
+.change-text{font-size:.68rem;color:var(--muted);line-height:1.6}
+.change-text b{color:var(--text)}
+.tier-table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:.68rem}
+.tier-table th{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:6px 10px;text-align:left;border-bottom:2px solid var(--border)}
+.tier-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.tier-table tr:last-child td{border:none}
+.tier-table tr:hover td{background:var(--bg2)}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark"><i data-lucide="layers" style="width:13px;height:13px;color:#fff"></i></div>
+    lapakID Docs
+  </a>
+  <div class="nav-r">
+    <a href="index.html" class="nav-back"><i data-lucide="arrow-left" style="width:12px;height:12px"></i>Kembali</a>
+    <div class="nav-icon-btn" id="themeBtn"><i data-lucide="moon" id="themeIcon" style="width:14px;height:14px"></i></div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-title">Navigasi</div>
+    <a class="nav-link active" href="#overview"><i data-lucide="home"></i>Overview</a>
+    <a class="nav-link" href="#fitur"><i data-lucide="star"></i>Fitur</a>
+    <a class="nav-link" href="#tier"><i data-lucide="layers"></i>Sistem Tier</a>
+    <a class="nav-link" href="#api"><i data-lucide="code-2"></i>API Reference</a>
+    <a class="nav-link" href="#cara-beli"><i data-lucide="shopping-cart"></i>Cara Beli</a>
+    <a class="nav-link" href="#admin"><i data-lucide="settings"></i>Dashboard Admin</a>
+    <a class="nav-link" href="#env"><i data-lucide="key"></i>Environment</a>
+    <div class="nav-sep"></div>
+    <a class="nav-link" href="#changelog"><i data-lucide="git-branch"></i>Changelog</a>
+    <a class="nav-link" href="#support"><i data-lucide="message-circle"></i>Support</a>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="version-header">
+      <div>
+        <div style="font-size:1.3rem;font-weight:900;margin-bottom:4px">Dokumentasi lapakID</div>
+        <div class="version-date">Terakhir diperbarui: Mei 2026</div>
+      </div>
+      <div class="version-tag">v2.2.2</div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="doc-section" id="overview">
+      <h2><i data-lucide="home"></i>Overview</h2>
+      <p>lapakID adalah platform jual beli ID premium dengan sistem tier, pembayaran QRIS, dan dashboard admin lengkap. Dibangun dengan HTML/CSS/JS murni di frontend dan Node.js serverless di backend (Vercel), dengan database MongoDB Atlas.</p>
+      <div class="alert alert-info"><i data-lucide="info"></i><div>Platform ini berjalan sepenuhnya di Vercel dengan fungsi serverless. Tidak memerlukan server terpisah — cukup deploy ke Vercel dan set environment variables.</div></div>
+      <h3>Stack Teknologi</h3>
+      <ul>
+        <li><b>Frontend:</b> HTML5, CSS3, JavaScript (Vanilla) + Lucide Icons</li>
+        <li><b>Backend:</b> Node.js Serverless (Vercel Functions)</li>
+        <li><b>Database:</b> MongoDB Atlas (cloud)</li>
+        <li><b>Payment:</b> QRIS dinamis (CRC16 algorithm)</li>
+        <li><b>Deployment:</b> Vercel (auto-deploy dari GitHub)</li>
+      </ul>
+    </div>
+
+    <!-- FITUR -->
+    <div class="doc-section" id="fitur">
+      <h2><i data-lucide="star"></i>Fitur v2.2.2</h2>
+      <ul>
+        <li><b>Sistem Tier:</b> Low, Medium, High, Legend dengan harga berbeda</li>
+        <li><b>Pagination:</b> 20 ID per halaman per tier</li>
+        <li><b>Tag NEW & SOLD:</b> Otomatis berdasarkan tanggal (3 hari untuk NEW)</li>
+        <li><b>Kode Promo:</b> Diskon persentase dengan batas penggunaan & expiry</li>
+        <li><b>QRIS Dinamis:</b> QR code dengan nominal otomatis (CRC16)</li>
+        <li><b>Live Chat:</b> Chat real-time dengan admin, polling 8 detik</li>
+        <li><b>Notifikasi:</b> Bell notifikasi untuk pembelian yang dikonfirmasi</li>
+        <li><b>Music Player:</b> Playlist dari database, marquee untuk judul panjang</li>
+        <li><b>Banner & Popup:</b> Dikelola dari dashboard admin</li>
+        <li><b>Dark Mode:</b> Toggle tema dengan persistensi localStorage</li>
+        <li><b>Sound FX:</b> Suara klik saat ID dipilih, suara sukses saat bayar</li>
+        <li><b>GitHub Editor:</b> Edit file langsung dari dashboard, push otomatis</li>
+      </ul>
+    </div>
+
+    <!-- TIER -->
+    <div class="doc-section" id="tier">
+      <h2><i data-lucide="layers"></i>Sistem Tier</h2>
+      <p>Setiap ID dikategorikan ke dalam 4 tier berdasarkan keunikan dan nilai nomor:</p>
+      <table class="tier-table">
+        <thead><tr><th>Tier</th><th>Deskripsi</th><th>Harga Default</th></tr></thead>
+        <tbody>
+          <tr><td><span style="color:#64748b;font-weight:700">LOW</span></td><td>ID biasa, kurang spesial</td><td style="font-family:var(--mono)">Rp 125.000</td></tr>
+          <tr><td><span style="color:#3b82f6;font-weight:700">MEDIUM</span></td><td>ID cukup unik</td><td style="font-family:var(--mono)">Rp 450.000</td></tr>
+          <tr><td><span style="color:#f97316;font-weight:700">HIGH</span></td><td>ID sangat unik / cantik</td><td style="font-family:var(--mono)">Rp 850.000</td></tr>
+          <tr><td><span style="color:#eab308;font-weight:700">LEGEND</span></td><td>ID super langka</td><td style="font-family:var(--mono)">Rp 1.350.000</td></tr>
+        </tbody>
+      </table>
+      <div class="alert alert-info"><i data-lucide="info"></i><div>Harga dapat diubah dari Dashboard Admin → tab Pengaturan. Tier Legend mendukung harga khusus per ID.</div></div>
+    </div>
+
+    <!-- API -->
+    <div class="doc-section" id="api">
+      <h2><i data-lucide="code-2"></i>API Reference</h2>
+      <p>Semua endpoint berada di <code style="background:var(--bg2);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:.65rem">/api/*</code>. Admin endpoint membutuhkan header <code style="background:var(--bg2);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:.65rem">x-admin-token</code>.</p>
+      <h3>IDs</h3>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/ids</span></div><div class="api-desc">Ambil semua ID. Query: ?tier=low&sold=false&search=xxx&sort=likes</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/ids/popular</span></div><div class="api-desc">12 ID paling banyak disukai</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/ids/stats</span></div><div class="api-desc">Statistik: total, terjual, tersedia, likes</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge POST">POST</span><span class="api-path">/api/ids</span></div><div class="api-desc">Tambah ID baru (Admin). Body: {number, tier, note}</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge POST">POST</span><span class="api-path">/api/ids/bulk</span></div><div class="api-desc">Upload massal (Admin). Body: {ids[], tier, note}</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge PUT">PUT</span><span class="api-path">/api/ids/:number</span></div><div class="api-desc">Update ID (Admin). Body: {tier?, sold?, note?, likes?}</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge DELETE">DELETE</span><span class="api-path">/api/ids/:number</span></div><div class="api-desc">Hapus ID (Admin)</div></div>
+      <h3>Like, Payment, Promo</h3>
+      <div class="api-block"><div class="api-head"><span class="method-badge POST">POST</span><span class="api-path">/api/like/:number</span></div><div class="api-desc">Like ID (1x per IP, anti-spam)</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge POST">POST</span><span class="api-path">/api/payment</span></div><div class="api-desc">Buat pesanan. Body: {idNumber, method, buyer, phone, promoCode?}</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge PUT">PUT</span><span class="api-path">/api/payments/:id/confirm</span></div><div class="api-desc">Konfirmasi pembayaran (Admin) — otomatis tandai ID terjual & buat notifikasi</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge POST">POST</span><span class="api-path">/api/promo/validate</span></div><div class="api-desc">Validasi kode promo. Body: {code}</div></div>
+      <h3>Settings, Notif, Reports</h3>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/settings</span></div><div class="api-desc">Semua settings: prices, adminFee, music, banners, popup</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge PUT">PUT</span><span class="api-path">/api/settings/:key</span></div><div class="api-desc">Update setting (Admin). Body: {value: any}</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/notifications</span></div><div class="api-desc">Notifikasi untuk publik (confirmed + info)</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge POST">POST</span><span class="api-path">/api/reports</span></div><div class="api-desc">Kirim pesan live chat (1x per IP per hari)</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/reports/reply-check</span></div><div class="api-desc">Cek balasan admin. Query: ?name=xxx</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge PUT">PUT</span><span class="api-path">/api/reports/:id/reply</span></div><div class="api-desc">Balas pesan user (Admin). Body: {reply}</div></div>
+      <h3>GitHub Editor</h3>
+      <div class="api-block"><div class="api-head"><span class="method-badge GET">GET</span><span class="api-path">/api/github/file?path=index.html</span></div><div class="api-desc">Ambil konten file dari GitHub (Admin)</div></div>
+      <div class="api-block"><div class="api-head"><span class="method-badge PUT">PUT</span><span class="api-path">/api/github/file</span></div><div class="api-desc">Push perubahan file ke GitHub (Admin). Body: {path, content, sha, message?}</div></div>
+    </div>
+
+    <!-- CARA BELI -->
+    <div class="doc-section" id="cara-beli">
+      <h2><i data-lucide="shopping-cart"></i>Cara Beli</h2>
+      <ol>
+        <li><b>Browse ID</b> — Lihat daftar ID berdasarkan tier, atau gunakan fitur pencarian</li>
+        <li><b>Klik ID</b> — Buka modal detail untuk melihat harga dan info lengkap</li>
+        <li><b>Klik "Beli ID Ini"</b> — Diarahkan ke halaman payment</li>
+        <li><b>Isi Data</b> — Nama lengkap dan nomor WhatsApp aktif</li>
+        <li><b>Kode Promo</b> — Masukkan jika punya (opsional)</li>
+        <li><b>Lanjut Pembayaran</b> — Klik tombol untuk lanjut ke Step 2</li>
+        <li><b>Scan QRIS</b> — Bayar sesuai nominal yang tertera</li>
+        <li><b>Klik "Saya Sudah Bayar"</b> — Admin akan memverifikasi dalam 24 jam</li>
+      </ol>
+      <div class="alert alert-warn"><i data-lucide="alert-triangle"></i><div>Simpan bukti transfer sampai admin mengkonfirmasi. Konfirmasi akan dikirim via WhatsApp ke nomor yang didaftarkan.</div></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="doc-section" id="admin">
+      <h2><i data-lucide="settings"></i>Dashboard Admin</h2>
+      <p>Akses dashboard di <code style="background:var(--bg2);padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:.65rem">/dashboard.html</code> dengan token admin.</p>
+      <h3>Tab yang Tersedia</h3>
+      <ul>
+        <li><b>Kelola ID</b> — Tambah, hapus, tandai terjual, upload massal</li>
+        <li><b>Pembayaran</b> — Lihat semua pesanan, konfirmasi pembayaran</li>
+        <li><b>Promo</b> — Buat & kelola kode diskon</li>
+        <li><b>Musik</b> — Tambah, hapus, urutkan playlist</li>
+        <li><b>Banner</b> — Kelola banner slider dari database</li>
+        <li><b>Popup</b> — Atur konten popup promo</li>
+        <li><b>Edit File</b> — Edit HTML langsung, push ke GitHub</li>
+        <li><b>Pengaturan</b> — Harga tier, biaya admin</li>
+        <li><b>IP Banned & Broadcast</b> — Kelola spam & kirim info ke semua user</li>
+        <li><b>Report</b> — Balas pesan live chat dari user</li>
+        <li><b>Reset DB</b> — Hapus data ID, payment, likes (banner/musik/popup aman)</li>
+      </ul>
+    </div>
+
+    <!-- ENV -->
+    <div class="doc-section" id="env">
+      <h2><i data-lucide="key"></i>Environment Variables</h2>
+      <p>Set di Vercel Dashboard → Settings → Environment Variables:</p>
+      <div class="code-block">
+<span class="cm"># Wajib</span>
+<span class="key">MONGODB_URI</span>=<span class="str">mongodb+srv://user:pass@cluster.mongodb.net/lapakid</span>
+<span class="key">ADMIN_TOKEN</span>=<span class="str">your-secret-admin-token</span>
+
+<span class="cm"># Untuk GitHub File Editor</span>
+<span class="key">GITHUB_TOKEN</span>=<span class="str">ghp_xxxxxxxxxxxx</span>
+<span class="cm"># Repo sudah hardcode: syannnho/nataza (branch: main)</span>
+      </div>
+      <div class="alert alert-warn"><i data-lucide="alert-triangle"></i><div>Jangan commit file <code>.env</code> ke GitHub. Gunakan Vercel Dashboard untuk set environment variables dengan aman.</div></div>
+    </div>
+
+    <!-- CHANGELOG -->
+    <div class="doc-section" id="changelog">
+      <h2><i data-lucide="git-branch"></i>Changelog</h2>
+      <div style="margin-bottom:12px">
+        <div style="font-size:.8rem;font-weight:800;margin-bottom:8px">v2.2.2 — Mei 2026</div>
+        <div class="changelog-item"><span class="change-type new-feat">NEW</span><div class="change-text"><b>Live Chat real-time</b> — Chat dengan admin, polling balasan setiap 8 detik, indikator typing</div></div>
+        <div class="changelog-item"><span class="change-type new-feat">NEW</span><div class="change-text"><b>Banner & Popup dari DB</b> — Kelola banner slider dan popup promo langsung dari dashboard</div></div>
+        <div class="changelog-item"><span class="change-type new-feat">NEW</span><div class="change-text"><b>Sound FX</b> — Suara klik saat pilih ID, suara sukses saat konfirmasi pembayaran</div></div>
+        <div class="changelog-item"><span class="change-type new-feat">NEW</span><div class="change-text"><b>Docs page</b> — Halaman dokumentasi lengkap</div></div>
+        <div class="changelog-item"><span class="change-type new-feat">NEW</span><div class="change-text"><b>Reset Database</b> — Tab baru di dashboard untuk reset data</div></div>
+        <div class="changelog-item"><span class="change-type improved">IMPROVED</span><div class="change-text"><b>Lucide Icons</b> — Semua ikon diganti ke Lucide untuk konsistensi</div></div>
+        <div class="changelog-item"><span class="change-type improved">IMPROVED</span><div class="change-text"><b>Music Player</b> — Animasi lebih smooth, marquee untuk judul panjang, load dari DB</div></div>
+        <div class="changelog-item"><span class="change-type improved">IMPROVED</span><div class="change-text"><b>Notifikasi</b> — Detail notifikasi bisa diklik, tampil info lengkap</div></div>
+        <div class="changelog-item"><span class="change-type improved">IMPROVED</span><div class="change-text"><b>Tag NEW & SOLD</b> — Desain lebih keren dengan gradient dan animasi pulse</div></div>
+        <div class="changelog-item"><span class="change-type improved">IMPROVED</span><div class="change-text"><b>Payment Step 2</b> — Musik diputar saat user klik "Saya Sudah Bayar"</div></div>
+        <div class="changelog-item"><span class="change-type improved">IMPROVED</span><div class="change-text"><b>Dashboard dropdown</b> — Tab navigasi lebih rapi</div></div>
+        <div class="changelog-item"><span class="change-type fixed">FIXED</span><div class="change-text"><b>Route /api/reports</b> — Dipindah ke dalam try block yang benar</div></div>
+        <div class="changelog-item"><span class="change-type fixed">FIXED</span><div class="change-text"><b>Musik dari API</b> — Callback pattern agar load setelah settings siap</div></div>
+        <div class="changelog-item"><span class="change-type fixed">FIXED</span><div class="change-text"><b>Dashboard p.phone</b> — Kolom pembeli tidak lagi undefined</div></div>
+        <div class="changelog-item"><span class="change-type fixed">FIXED</span><div class="change-text"><b>GitHub route</b> — Dipindah sebelum DB connection agar tidak gagal timeout</div></div>
+      </div>
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="doc-section" id="support">
+      <h2><i data-lucide="message-circle"></i>Support</h2>
+      <p>Butuh bantuan? Gunakan fitur Live Chat di halaman utama atau hubungi admin langsung.</p>
+      <div class="alert alert-info"><i data-lucide="info"></i><div>Untuk laporan bug atau request fitur, gunakan fitur Report di halaman utama (icon CS di pojok kanan bawah).</div></div>
+      <h3>Tips Umum</h3>
+      <ul>
+        <li>Pastikan MongoDB Atlas cluster berstatus <b>Active</b></li>
+        <li>Whitelist IP <b>0.0.0.0/0</b> di MongoDB Network Access untuk Vercel</li>
+        <li>GitHub Token harus memiliki scope <b>repo</b> untuk Edit File berfungsi</li>
+        <li>Setelah push file via dashboard, Vercel akan auto-deploy dalam ~1 menit</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{if(window.lucide)lucide.createIcons();});
+// Theme
+const dark=localStorage.getItem('lapakid_dark')==='1';
+if(dark){document.body.classList.add('dark');const ico=document.getElementById('themeIcon');if(ico)ico.setAttribute('data-lucide','sun');}
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const d=document.body.classList.toggle('dark');localStorage.setItem('lapakid_dark',d?'1':'0');
+  const ico=document.getElementById('themeIcon');if(ico){ico.setAttribute('data-lucide',d?'sun':'moon');if(window.lucide)lucide.createIcons({nodes:[ico]});}
+});
+// Active nav link on scroll
+const sections=document.querySelectorAll('.doc-section');
+const links=document.querySelectorAll('.nav-link');
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('active'));const match=document.querySelector(`.nav-link[href="#${e.target.id}"]`);if(match)match.classList.add('active');}});},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>obs.observe(s));
+setTimeout(()=>{if(window.lucide)lucide.createIcons();},100);
+</script>
+</body>
+</html>
