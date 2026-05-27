@@ -812,9 +812,10 @@ function buildCard(id){
   const wished=wishlistSet.has(id.number);
   const wishCount=wishlistCounts[id.number]||0;
   const lc=id.likes||0;
-  const lt=lc===0?'Suka':lc+' suka';
-  const wt=wishCount===0?'Simpan':wishCount+' simpan';
   const isNewId=isNew(id);
+  // Hanya angka, tanpa teks "suka" atau "simpan"
+  const likeText = lc === 0 ? '' : lc;
+  const wishText = wishCount === 0 ? '' : wishCount;
   return `<div class="id-card${id.sold?' is-sold':''}" data-num="${id.number}" data-tier="${id.tier}">
     ${id.sold?`<div class="card-badge badge-sold"><i data-lucide="x-circle" style="width:8px;height:8px"></i>SOLD</div>`:isNewId?`<div class="card-badge badge-new"><i data-lucide="sparkles" style="width:8px;height:8px"></i>NEW</div>`:''}
     <div class="id-num"><img src="https://files.catbox.moe/em51di.png" alt=""/>${hl(id.number)}</div>
@@ -823,11 +824,11 @@ function buildCard(id){
       <div class="id-actions">
         <button class="like-btn${liked?' liked':''}" data-num="${id.number}" onclick="event.stopPropagation()">
           <i data-lucide="heart" style="width:11px;height:11px${liked?';fill:var(--purple)':''}"></i>
-          <span>${lt}</span>
+          <span>${likeText}</span>
         </button>
         <button class="wishlist-btn${wished?' wished':''}" data-num="${id.number}" onclick="event.stopPropagation()">
           <i data-lucide="bookmark" style="width:11px;height:11px"></i>
-          <span>${wt}</span>
+          <span>${wishText}</span>
         </button>
       </div>
     </div>
@@ -852,7 +853,7 @@ async function doLike(number,btn){
   if(d.success){
     likedSet.add(number);localStorage.setItem('lapakid_liked',JSON.stringify([...likedSet]));
     const idx=allIds.findIndex(i=>i.number===number);if(idx!==-1)allIds[idx].likes=d.likes;
-    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b=>{b.classList.add('liked');b.querySelector('span').textContent=d.likes+' suka';b.disabled=false;const ico=b.querySelector('[data-lucide]');if(ico){ico.style.fill='var(--purple)';}});
+    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b=>{b.classList.add('liked');b.querySelector('span').textContent=d.likes===0?'':d.likes;b.disabled=false;const ico=b.querySelector('[data-lucide]');if(ico){ico.style.fill='var(--purple)';}});
     if(currentModal?.number===number){document.getElementById('modalLikeCnt').textContent=d.likes;document.getElementById('modalLikeBtn').classList.add('liked');}
     showToast('Berhasil menyukai!');
   }else{btn.disabled=false;showToast(d.message||'Gagal like');}
@@ -865,8 +866,8 @@ async function openModal(number){
   document.getElementById('modalIdNum').textContent=number;
   document.getElementById('modalRows').innerHTML=`
     <div class="modal-row"><div class="modal-lbl"><i data-lucide="layers" style="width:12px;height:12px"></i>Tier</div><div class="modal-val"><span class="tier-tag ${TCLS[id.tier]}" style="font-size:.54rem">${id.tier.toUpperCase()}</span></div></div>
-    <div class="modal-row"><div class="modal-lbl"><i data-lucide="heart" style="width:12px;height:12px"></i>Suka</div><div class="modal-val">${id.likes||0} orang</div></div>
-    <div class="modal-row"><div class="modal-lbl"><i data-lucide="bookmark" style="width:12px;height:12px"></i>Disimpan</div><div class="modal-val">${wishCount} orang</div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="heart" style="width:12px;height:12px"></i>Suka</div><div class="modal-val">${id.likes||0}</div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="bookmark" style="width:12px;height:12px"></i>Disimpan</div><div class="modal-val">${wishCount}</div></div>
     <div class="modal-row"><div class="modal-lbl"><i data-lucide="calendar" style="width:12px;height:12px"></i>Ditambahkan</div><div class="modal-val" style="display:flex;align-items:center;gap:6px">${id.addedAt?new Date(id.addedAt).toLocaleDateString('id-ID'):'—'}${isNew(id)?'<span class="card-badge badge-new" style="position:static;font-size:.42rem">NEW</span>':''}</div></div>
     ${id.note?`<div class="modal-row"><div class="modal-lbl"><i data-lucide="file-text" style="width:12px;height:12px"></i>Catatan</div><div class="modal-val">${id.note}</div></div>`:''}
   `;
