@@ -465,6 +465,8 @@ const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
 const TCLS={low:'t-low',medium:'t-medium',high:'t-high',legend:'t-legend'};
 const clk=document.getElementById('clickSfx');
+const likeSfx=document.getElementById('likeSfx');
+const wishSfx=document.getElementById('wishSfx');
 
 document.addEventListener('DOMContentLoaded',()=>{ if(window.lucide) lucide.createIcons(); });
 
@@ -650,11 +652,12 @@ async function toggleWishlist(number,btn){
     response=await fetch(`${API}/wishlist/${number}`,{method:'DELETE'});
     if(response.ok){
       wishlistSet.delete(number);
-      // Update semua wishlist-btn di DOM
+      wishSfx.currentTime=0;
+      wishSfx.play().catch(()=>{});
       document.querySelectorAll(`.wishlist-btn[data-num="${number}"]`).forEach(b=>{
         b.classList.remove('wished');
         const ico=b.querySelector('[data-lucide]');
-        if(ico){ico.style.fill='';ico.style.color='';}
+        if(ico){ico.removeAttribute('fill');ico.style.fill='';ico.style.color='';}
       });
       showToast('Dihapus dari wishlist');
       await loadWishlistCounts();
@@ -663,14 +666,13 @@ async function toggleWishlist(number,btn){
   }else{
     response=await fetch(`${API}/wishlist/${number}`,{method:'POST'});
     if(response.ok){
-      // Play wishlist sound
-      try{const sfx=document.getElementById('wishSfx');sfx.currentTime=0;sfx.play().catch(()=>{});}catch(e){}
+      wishSfx.currentTime=0;
+      wishSfx.play().catch(()=>{});
       wishlistSet.add(number);
-      // Update semua wishlist-btn di DOM
       document.querySelectorAll(`.wishlist-btn[data-num="${number}"]`).forEach(b=>{
         b.classList.add('wished');
         const ico=b.querySelector('[data-lucide]');
-        if(ico){ico.style.fill='var(--warning)';ico.style.color='var(--warning)';}
+        if(ico){ico.setAttribute('fill','var(--warning)');ico.style.fill='var(--warning)';ico.style.color='var(--warning)';}
       });
       showToast('Ditambahkan ke wishlist');
       await loadWishlistCounts();
@@ -866,8 +868,10 @@ async function doLike(number,btn){
   const d=await r.json();
   if(d.success){
     likedSet.add(number);localStorage.setItem('lapakid_liked',JSON.stringify([...likedSet]));
+    likeSfx.currentTime=0;
+    likeSfx.play().catch(()=>{});
     const idx=allIds.findIndex(i=>i.number===number);if(idx!==-1)allIds[idx].likes=d.likes;
-    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b=>{b.classList.add('liked');b.querySelector('span').textContent=d.likes===0?'':d.likes;b.disabled=false;const ico=b.querySelector('[data-lucide]');if(ico){ico.style.fill='var(--purple)';}});
+    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b=>{b.classList.add('liked');b.querySelector('span').textContent=d.likes===0?'':d.likes;b.disabled=false;const ico=b.querySelector('[data-lucide]');if(ico){ico.setAttribute('fill','var(--purple)');ico.style.fill='var(--purple)';}});
     if(currentModal?.number===number){document.getElementById('modalLikeCnt').textContent=d.likes;document.getElementById('modalLikeBtn').classList.add('liked');}
     showToast('Berhasil menyukai!');
   }else{btn.disabled=false;showToast(d.message||'Gagal like');}
