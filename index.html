@@ -2,534 +2,971 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>lapakID — Koleksi ID Premium</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>lapakID — Koleksi ID Premium v2.2.2</title>
 <link rel="icon" type="image/png" href="https://files.catbox.moe/em51di.png"/>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<meta property="og:title" content="lapakID — Koleksi ID Premium"/>
+<meta property="og:description" content="Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend."/>
+<meta property="og:image" content="https://files.catbox.moe/em51di.png"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f9fafb;--bg2:#f2f4f7;--card:#fff;--border:#e4e7ec;--border2:#d0d5dd;
-  --text:#101828;--muted:#667085;--muted2:#475467;
-  --purple:#465fff;--purple2:#7c8eff;
-  --low:#6b7280;--medium:#3b82f6;--high:#f97316;--legend:#eab308;--sold:#ef4444;
-  --success:#12b76a;--warning:#f79009;--error:#ef4444;
-  --font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;
-  --radius:14px;
+  --bg:#f8fafc;--bg2:#f1f5f9;--bg3:#e2e8f0;--card:#ffffff;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#0f172a;--muted:#64748b;--muted2:#475569;
+  --purple:#6366f1;--purple2:#818cf8;--purple3:#4f46e5;
+  --low:#64748b;--medium:#3b82f6;--high:#f97316;--legend:#eab308;
+  --sold:#ef4444;--success:#10b981;--warning:#f59e0b;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:12px;--r2:16px;--r3:20px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+  --shadow2:0 4px 24px rgba(99,102,241,.12);
 }
-body.dark{--bg:#0d0d0d;--bg2:#151515;--card:#1a1a1a;--border:#252525;--border2:#2e2e2e;--text:#f5f5f5;--muted:#888;--muted2:#aaa}
-body{background:var(--bg);color:var(--text);font-family:var(--font);transition:background .3s,color .3s}
+body.dark{
+  --bg:#09090b;--bg2:#111113;--bg3:#1c1c1f;--card:#141416;
+  --border:#1e1e21;--border2:#2a2a2e;
+  --text:#fafafa;--muted:#71717a;--muted2:#a1a1aa;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(249,250,251,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-@media(min-width:768px){nav{height:68px;padding:0 32px}}
-body.dark nav{background:rgba(13,13,13,.95)}
-.nav-logo{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:800;color:var(--text);text-decoration:none}
-.logo-img{height:36px;width:auto;object-fit:contain}
-.nav-links{display:flex;align-items:center;gap:6px}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
-/* DEBUG BUTTON */
-.debug-btn{background:#ff4757;border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:white;font-weight:bold;font-size:14px;transition:0.2s;}
-.debug-btn:hover{background:#e8413c;transform:scale(0.95);}
-.debug-btn.active{background:#2ed573;box-shadow:0 0 0 2px #2ed573;}
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:200;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(248,250,252,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);transition:background .3s}
+@media(min-width:768px){nav{height:60px;padding:0 28px}}
+body.dark nav{background:rgba(9,9,11,.92)}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-img{height:32px;width:auto;object-fit:contain}
+.nav-r{display:flex;align-items:center;gap:6px}
+.nav-icon-btn{width:34px;height:34px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all .2s;color:var(--muted2)}
+.nav-icon-btn:hover{background:var(--bg3);border-color:var(--border2)}
+.nav-icon-btn svg{width:16px;height:16px}
+.notif-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:var(--sold);border-radius:99px;border:2px solid var(--bg);display:none;align-items:center;justify-content:center;font-size:.45rem;font-weight:800;color:#fff;padding:0 3px;font-family:var(--mono)}
+.notif-badge.show{display:flex}
 
-.theme-btn{background:var(--bg2);border:1px solid var(--border);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.theme-btn svg{width:14px;height:14px;stroke:var(--muted2);fill:none}
+/* ── HERO ── */
+.hero{padding:36px 16px 20px;max-width:1320px;margin:0 auto}
+@media(min-width:768px){.hero{padding:52px 28px 28px}}
+.hero-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);border-radius:99px;padding:4px 12px 4px 8px;font-size:.6rem;font-weight:700;color:var(--purple);letter-spacing:.3px;margin-bottom:14px}
+.hero-chip svg{width:10px;height:10px}
+.hero h1{font-size:1.9rem;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+@media(min-width:640px){.hero h1{font-size:2.8rem}}
+.hero h1 .grad{background:linear-gradient(135deg,var(--purple),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--muted);font-size:.78rem;line-height:1.7;max-width:480px}
 
-/* DEBUG PANEL */
-.debug-panel{position:fixed;bottom:20px;left:20px;right:20px;z-index:10000;max-width:500px;background:#1e1e2f;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);border:1px solid #444;color:#eee;font-family:monospace;font-size:11px;transition:0.2s;opacity:0;transform:translateY(20px);pointer-events:none;}
-.debug-panel.open{opacity:1;transform:translateY(0);pointer-events:all;}
-.debug-header{background:#ff4757;padding:10px 14px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;cursor:move;}
-.debug-header span{font-weight:bold;color:white;font-size:12px;}
-.debug-stats{display:flex;gap:12px;font-size:10px;}
-.debug-stats .ok{color:#2ed573;}
-.debug-stats .err{color:#ff4757;}
-.debug-clear{background:#2f3542;border:none;color:#fff;padding:4px 12px;border-radius:8px;cursor:pointer;font-size:10px;}
-.debug-content{height:280px;overflow-y:auto;padding:10px;background:#2f3542;border-radius:0 0 16px 16px;display:flex;flex-direction:column;gap:6px;}
-.debug-log{background:#1e1e2f;padding:6px 10px;border-radius:6px;border-left:3px solid;font-size:10px;word-break:break-word;font-family:monospace;}
-.debug-log.error{border-left-color:#ff4757;background:#ff475710;color:#ff9f9f;}
-.debug-log.warn{border-left-color:#ffa502;background:#ffa50210;color:#ffd28f;}
-.debug-log.info{border-left-color:#1e90ff;background:#1e90ff10;color:#a4d1ff;}
-.debug-log.success{border-left-color:#2ed573;background:#2ed57310;color:#b8f2d0;}
-.debug-log.http{border-left-color:#a855f7;background:#a855f710;color:#d8b4fe;}
-.debug-time{color:#aaa;margin-right:8px;font-size:9px;}
-.debug-url{color:#ffa502;font-size:9px;margin-top:2px;word-break:break-all;}
+/* ── BANNER SLIDER ── */
+.banner-sec{max-width:1320px;margin:0 auto;padding:0 16px 20px}
+@media(min-width:768px){.banner-sec{padding:0 28px 28px}}
+.banner-wrap{position:relative;border-radius:var(--r2);overflow:hidden;background:var(--bg2)}
+.banner-track{display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.banner-slide{flex:0 0 100%}
+.banner-slide img{width:100%;height:auto;display:block;max-height:180px;object-fit:cover}
+@media(min-width:640px){.banner-slide img{max-height:240px}}
+.banner-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.35);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;color:#fff;transition:.2s;backdrop-filter:blur(4px)}
+.banner-nav:hover{background:rgba(0,0,0,.6)}
+.banner-nav svg{width:14px;height:14px}
+.banner-prev{left:8px}.banner-next{right:8px}
+.banner-dots{display:flex;justify-content:center;gap:5px;margin-top:8px}
+.banner-dot{width:5px;height:5px;border-radius:99px;background:var(--border2);border:none;cursor:pointer;padding:0;transition:.3s}
+.banner-dot.active{background:var(--purple);width:16px}
 
-/* HERO & OTHER STYLES (disederhanakan) */
-.hero{padding:40px 16px 24px;max-width:1400px;margin:0 auto}
-.hero h1{font-size:2rem;font-weight:900;color:var(--text);margin-bottom:10px}
-.hero h1 span{background:linear-gradient(135deg,var(--purple),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{color:var(--muted);font-size:.8rem;margin-bottom:24px}
-.filter-sticky{position:sticky;top:60px;z-index:100;background:var(--bg);padding:10px 16px;border-bottom:1px solid var(--border)}
-.filter-bar{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}
-.fb{background:var(--bg2);border:none;color:var(--muted2);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:.65rem;font-weight:600}
-.fb.act{background:var(--purple);color:white}
-.search-wrap{position:relative;margin-bottom:10px}
-.search-wrap input{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:.72rem}
-.result-info{font-size:.65rem;color:var(--muted)}
-.ids-section{padding:12px 16px 80px;max-width:1400px;margin:0 auto}
-.id-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-.id-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer}
-.id-card.is-sold{opacity:.5}
-.id-num{font-family:var(--mono);font-size:.7rem;font-weight:600;margin-bottom:8px;word-break:break-all}
-.id-tier{font-size:.5rem;font-weight:700;padding:2px 7px;border-radius:99px}
-.id-bottom{display:flex;justify-content:space-between;align-items:center}
-.like-btn{background:none;border:none;cursor:pointer;font-size:.58rem;color:var(--muted)}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:99px;font-size:.68rem;z-index:9999}
-.empty-state{text-align:center;padding:40px;color:var(--muted)}
+/* ── POPULAR ── */
+.section{max-width:1320px;margin:0 auto;padding:0 16px 24px}
+@media(min-width:768px){.section{padding:0 28px 32px}}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{display:flex;align-items:center;gap:7px;font-size:.9rem;font-weight:800}
+.sec-title svg{width:15px;height:15px;color:var(--legend)}
+.sec-link{font-size:.62rem;color:var(--purple);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:3px;transition:.2s}
+.sec-link:hover{opacity:.75}
+.sec-link svg{width:12px;height:12px}
+.pop-wrap{position:relative;overflow:hidden}
+.pop-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:0}
+.pop-track::-webkit-scrollbar{display:none}
+.pop-slide{flex:0 0 100%;scroll-snap-align:start;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pop-dots{display:flex;justify-content:center;gap:5px;margin-top:10px}
+.pop-dot{width:5px;height:5px;border-radius:99px;background:var(--border2);border:none;cursor:pointer;padding:0;transition:.3s}
+.pop-dot.active{background:var(--purple);width:16px}
+
+/* ── ID CARD ── */
+.id-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:12px;display:flex;flex-direction:column;gap:9px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.id-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,.03),transparent);opacity:0;transition:.3s}
+.id-card:hover{border-color:var(--purple);transform:translateY(-3px);box-shadow:var(--shadow2)}
+.id-card:hover::before{opacity:1}
+.id-card:active{transform:translateY(-1px)}
+.id-card.is-sold{opacity:.5;cursor:not-allowed;pointer-events:none}
+.card-badge{position:absolute;top:7px;right:7px;font-size:.42rem;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.5px;display:flex;align-items:center;gap:3px}
+.card-badge svg{width:8px;height:8px}
+.badge-new{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 0 0 0 rgba(16,185,129,.4);animation:newPulse 2.5s ease-in-out infinite}
+@keyframes newPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}
+.badge-sold{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.id-num{font-family:var(--mono);font-size:.75rem;font-weight:600;color:var(--text);word-break:break-all;line-height:1.4;display:flex;align-items:center;gap:6px}
+.id-num img{width:18px;height:18px;object-fit:contain;flex-shrink:0;border-radius:4px}
+.id-foot{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.tier-tag{font-size:.48rem;font-weight:800;padding:3px 8px;border-radius:99px;letter-spacing:.4px;text-transform:uppercase;border:1px solid}
+.t-low{background:rgba(100,116,139,.1);color:var(--low);border-color:rgba(100,116,139,.2)}
+.t-medium{background:rgba(59,130,246,.1);color:var(--medium);border-color:rgba(59,130,246,.2)}
+.t-high{background:rgba(249,115,22,.1);color:var(--high);border-color:rgba(249,115,22,.2)}
+.t-legend{background:rgba(234,179,8,.12);color:var(--legend);border-color:rgba(234,179,8,.25)}
+.like-btn{display:flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-size:.55rem;color:var(--muted);font-family:var(--mono);transition:.15s;padding:3px 5px;border-radius:7px}
+.like-btn:hover{color:var(--purple);background:rgba(99,102,241,.06)}
+.like-btn.liked{color:var(--purple)}
+.like-btn svg{width:11px;height:11px}
+
+/* ── FILTER ── */
+.filter-sec{margin:0}
+.filter-sticky{position:sticky;top:56px;z-index:100;background:var(--bg);padding:8px 16px;border-bottom:1px solid var(--border);transition:background .3s}
+@media(min-width:768px){.filter-sticky{top:60px;padding:10px 28px}}
+.filter-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.filter-pills{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--bg2);border-radius:10px;padding:4px}
+.filter-pills::-webkit-scrollbar{display:none}
+.fp{background:transparent;border:none;color:var(--muted);padding:5px 11px;border-radius:7px;cursor:pointer;font-size:.62rem;font-weight:600;white-space:nowrap;font-family:var(--font);transition:.15s}
+.fp.act{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.search-box{position:relative;flex:1;min-width:160px}
+.search-box input{width:100%;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:7px 10px 7px 32px;color:var(--text);font-family:var(--mono);font-size:.7rem;outline:none;transition:.15s}
+.search-box input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.search-box input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-icon svg{width:13px;height:13px}
+.result-label{font-size:.6rem;color:var(--muted);font-family:var(--mono)}
+.result-label b{color:var(--text)}
+
+/* ── TIER BLOCKS ── */
+.ids-sec{max-width:1320px;margin:0 auto;padding:10px 16px 80px}
+@media(min-width:768px){.ids-sec{padding:0 28px 80px}}
+.tier-block{margin-bottom:28px}
+.tier-head{display:flex;align-items:center;gap:8px;padding:8px 0;margin-bottom:12px;border-bottom:2px solid var(--border);background:var(--bg)}
+.tier-head.stuck{position:fixed;left:0;right:0;z-index:90;padding:8px 16px;background:var(--bg);border-bottom:2px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+@media(min-width:768px){.tier-head.stuck{padding:8px 28px}}
+.tier-head.hide{opacity:0;pointer-events:none;transform:translateY(-4px)}
+.tier-name{font-size:1rem;font-weight:800}
+.tier-cnt{font-size:.58rem;color:var(--muted);font-family:var(--mono);margin-left:auto}
+.id-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(min-width:480px){.id-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:640px){.id-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.id-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1100px){.id-grid{grid-template-columns:repeat(5,1fr)}}
+mark{background:rgba(99,102,241,.15);color:var(--purple);border-radius:3px;padding:0 2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.id-card{animation:fadeUp .3s ease both}
+
+/* ── PAGINATION ── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:14px;flex-wrap:wrap}
+.pg-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:.65rem;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;transition:.15s}
+.pg-btn svg{width:12px;height:12px}
+.pg-btn:hover:not(:disabled){border-color:var(--purple);color:var(--purple)}
+.pg-btn.active{background:var(--purple);border-color:var(--purple);color:#fff}
+.pg-btn:disabled{opacity:.3;cursor:not-allowed}
+.pg-sep{font-size:.6rem;color:var(--muted);padding:0 2px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--r3);max-width:400px;width:92%;padding:20px;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:scale(.94) translateY(8px);transition:.22s cubic-bezier(.4,0,.2,1)}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-title{font-size:.88rem;font-weight:800}
+.modal-close-btn{width:26px;height:26px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:.15s}
+.modal-close-btn:hover{background:var(--bg3)}
+.modal-close-btn svg{width:12px;height:12px}
+.modal-id-num{font-family:var(--mono);font-size:1.3rem;font-weight:700;margin-bottom:14px;padding:10px 14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)}
+.modal-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.7rem}
+.modal-row:last-child{border:none}
+.modal-lbl{color:var(--muted);display:flex;align-items:center;gap:5px}
+.modal-lbl svg{width:12px;height:12px}
+.modal-val{font-weight:700}
+.modal-acts{display:flex;gap:7px;margin-top:16px}
+.btn-buy{flex:1;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;padding:10px;border-radius:10px;font-weight:700;font-size:.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.btn-buy:hover{opacity:.88}
+.btn-buy svg{width:13px;height:13px}
+.btn-like-modal{background:var(--bg2);border:1px solid var(--border);padding:10px 14px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:.68rem;font-weight:600;color:var(--text);transition:.15s}
+.btn-like-modal svg{width:13px;height:13px}
+.btn-like-modal.liked svg{color:var(--sold);fill:var(--sold)}
+
+/* ── NOTIF PANEL ── */
+.notif-panel{position:fixed;top:62px;right:12px;width:290px;max-height:360px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);box-shadow:0 8px 32px rgba(0,0,0,.14);z-index:300;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-6px) scale(.97);transition:.2s cubic-bezier(.4,0,.2,1)}
+.notif-panel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border)}
+.notif-panel-title{font-size:.72rem;font-weight:800}
+.notif-mark-btn{font-size:.58rem;color:var(--purple);font-weight:600;cursor:pointer;background:none;border:none;font-family:var(--font)}
+.notif-list{overflow-y:auto;max-height:290px;scrollbar-width:thin}
+.notif-item{padding:9px 12px;border-bottom:1px solid var(--border);display:flex;gap:9px;cursor:pointer;transition:.15s}
+.notif-item:last-child{border:none}
+.notif-item:hover{background:var(--bg2)}
+.notif-item.unread{background:rgba(99,102,241,.04)}
+.notif-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-ico-ok{background:rgba(16,185,129,.1);color:var(--success)}
+.notif-ico-info{background:rgba(99,102,241,.1);color:var(--purple)}
+.notif-ico svg{width:12px;height:12px}
+.notif-body{flex:1;min-width:0}
+.notif-msg-txt{font-size:.63rem;color:var(--text);line-height:1.4}
+.notif-time-txt{font-size:.54rem;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.notif-empty{text-align:center;padding:24px;color:var(--muted);font-size:.65rem}
+
+/* ── NOTIF DETAIL MODAL ── */
+.notif-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.notif-detail-overlay.open{opacity:1;pointer-events:all}
+.notif-detail-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);max-width:360px;width:90%;padding:20px;transform:scale(.95);transition:.2s}
+.notif-detail-overlay.open .notif-detail-box{transform:scale(1)}
+
+/* ── MUSIC PLAYER ── */
+.music-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:10000;background:rgba(15,15,20,.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:99px;padding:8px 16px 8px 10px;display:flex;align-items:center;gap:10px;min-width:220px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.35);transition:transform .45s cubic-bezier(.34,1.56,.64,1),opacity .35s ease}
+.music-bar.hidden{transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none}
+.music-album{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.music-album svg{width:16px;height:16px;color:#fff}
+.music-album.spin{animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.music-progress-ring{position:absolute;inset:-3px;border-radius:50%}
+.music-info{flex:1;min-width:0}
+.music-title-wrap{overflow:hidden;width:100%}
+.music-title-inner{display:inline-block;white-space:nowrap;font-size:.63rem;font-weight:700;color:#fff}
+.music-title-inner.marquee{animation:marquee 7s linear infinite}
+@keyframes marquee{0%{transform:translateX(0)}45%{transform:translateX(calc(-100% + 100px))}55%{transform:translateX(calc(-100% + 100px))}100%{transform:translateX(0)}}
+.music-sub{font-size:.52rem;color:rgba(255,255,255,.45);margin-top:1px;font-family:var(--mono)}
+.music-ctrls{display:flex;align-items:center;gap:4px}
+.mc{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;border-radius:50%;width:26px;height:26px;transition:.15s}
+.mc:hover{color:#fff;background:rgba(255,255,255,.1)}
+.mc svg{width:14px;height:14px}
+.mc-play{background:rgba(99,102,241,.75)!important;color:#fff!important;width:30px;height:30px}
+.mc-play:hover{background:var(--purple)!important}
+.music-fab{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:rgba(15,15,20,.85);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:7px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;opacity:0;pointer-events:none;transition:.3s;color:rgba(255,255,255,.7);font-size:.6rem;font-weight:600}
+.music-fab.show{opacity:1;pointer-events:all}
+.music-fab svg{width:14px;height:14px}
+
+/* ── LIVE CHAT ── */
+.chat-fab{position:fixed;bottom:22px;right:16px;z-index:9999;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(99,102,241,.4);transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.chat-fab:hover{transform:scale(1.08)}
+.chat-fab svg{width:20px;height:20px;color:#fff}
+.chat-unread-dot{position:absolute;top:-2px;right:-2px;width:10px;height:10px;background:var(--sold);border-radius:50%;border:2px solid var(--bg);display:none}
+.chat-unread-dot.show{display:block}
+
+.chat-window{position:fixed;bottom:76px;right:16px;z-index:9998;width:300px;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);box-shadow:0 12px 48px rgba(0,0,0,.18);overflow:hidden;opacity:0;pointer-events:none;transform:translateY(10px) scale(.96);transition:.25s cubic-bezier(.4,0,.2,1)}
+.chat-window.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+@media(min-width:480px){.chat-window{width:320px}}
+.chat-win-head{background:linear-gradient(135deg,var(--purple),var(--purple2));padding:12px 14px;display:flex;align-items:center;gap:9px}
+.chat-win-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-win-avatar svg{width:15px;height:15px;color:#fff}
+.chat-win-info{flex:1}
+.chat-win-title{font-size:.74rem;font-weight:700;color:#fff}
+.chat-win-status{font-size:.56rem;color:rgba(255,255,255,.7);margin-top:1px;display:flex;align-items:center;gap:4px}
+.status-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:statusPulse 2s infinite}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.chat-win-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.7);display:flex;align-items:center}
+.chat-win-close svg{width:16px;height:16px}
+.chat-msgs{height:220px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px;scrollbar-width:thin}
+.chat-bubble{max-width:85%;padding:7px 10px;border-radius:12px;font-size:.65rem;line-height:1.5}
+.chat-bubble.bot{background:var(--bg2);border:1px solid var(--border);border-bottom-left-radius:3px;align-self:flex-start}
+.chat-bubble.user{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-bottom-right-radius:3px;align-self:flex-end}
+.chat-bubble.reply{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--success);border-bottom-left-radius:3px;align-self:flex-start}
+.chat-bubble-time{font-size:.48rem;opacity:.6;margin-top:3px;text-align:right}
+.chat-typing{display:flex;align-items:center;gap:3px;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;border-bottom-left-radius:3px;align-self:flex-start;width:fit-content}
+.typing-dot{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:typingDot 1.2s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chat-input-row{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--border)}
+.chat-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:7px 10px;font-family:var(--font);font-size:.68rem;color:var(--text);outline:none;transition:.15s}
+.chat-input:focus{border-color:var(--purple)}
+.chat-input::placeholder{color:var(--muted)}
+.chat-send-btn{background:var(--purple);border:none;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0;transition:.15s}
+.chat-send-btn:hover{background:var(--purple3)}
+.chat-send-btn svg{width:13px;height:13px}
+.chat-name-step{padding:12px}
+.chat-name-label{font-size:.65rem;color:var(--muted);margin-bottom:8px;line-height:1.5}
+.chat-name-input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:8px 10px;font-size:.7rem;color:var(--text);outline:none;margin-bottom:8px;font-family:var(--font)}
+.chat-name-input:focus{border-color:var(--purple)}
+.chat-start-btn{width:100%;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;padding:9px;border-radius:9px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--font)}
+
+/* ── POPUP PROMO ── */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.3s}
+.popup-overlay.open{opacity:1;pointer-events:all}
+.popup-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r3);max-width:340px;width:90%;overflow:hidden;transform:scale(.9) translateY(16px);transition:.3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 24px 64px rgba(0,0,0,.25)}
+.popup-overlay.open .popup-box{transform:scale(1) translateY(0)}
+.popup-img{width:100%;display:block;max-height:180px;object-fit:cover}
+.popup-body{padding:18px}
+.popup-title{font-size:1rem;font-weight:800;margin-bottom:5px}
+.popup-desc{font-size:.68rem;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.popup-code-wrap{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px dashed var(--purple);border-radius:10px;padding:8px 12px;margin-bottom:14px}
+.popup-code{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--purple);letter-spacing:1px}
+.popup-copy-btn{background:var(--purple);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.58rem;font-weight:700;cursor:pointer}
+.popup-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.popup-check{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.62rem;color:var(--muted)}
+.popup-check input{accent-color:var(--purple);cursor:pointer}
+.popup-ok-btn{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;border-radius:99px;padding:8px 20px;font-size:.68rem;font-weight:700;cursor:pointer}
+.popup-close-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.4);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.popup-close-btn svg{width:12px;height:12px}
+
+/* ── BANNER SLIDER ── */
+.banner-sec{max-width:1320px;margin:0 auto;padding:0 16px 20px}
+@media(min-width:768px){.banner-sec{padding:0 28px 28px}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:7px 16px;border-radius:99px;font-size:.63rem;font-weight:600;z-index:99999;white-space:nowrap;animation:toastIn .2s ease;pointer-events:none}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:20px 28px;text-align:center;background:var(--card);color:var(--muted);font-size:.6rem;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+footer a{color:var(--purple);text-decoration:none;font-weight:600}
+.version-tag{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);color:var(--purple);font-size:.52rem;font-weight:800;padding:2px 8px;border-radius:99px;letter-spacing:.3px}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:52px 16px;color:var(--muted)}
+.empty svg{width:36px;height:36px;margin:0 auto 10px;display:block;opacity:.3}
+.empty p{font-size:.7rem}
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="#" class="nav-logo">
-    <img id="logoImg" src="https://files.catbox.moe/j4ittw.png" alt="lapakID" class="logo-img" style="height:32px"/>
+  <a href="index.html" class="nav-logo">
+    <img id="logoImg" src="https://files.catbox.moe/j4ittw.png" alt="lapakID" class="logo-img"/>
   </a>
-  <div class="nav-links">
-    <button class="debug-btn" id="debugBtn">🐞</button>
-    <div class="theme-btn" id="themeBtn"><svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+  <div class="nav-r">
+    <div class="nav-icon-btn" id="notifBtn" title="Notifikasi">
+      <i data-lucide="bell" style="width:16px;height:16px"></i>
+      <div class="notif-badge" id="notifBadge"></div>
+    </div>
+    <div class="nav-icon-btn" id="themeBtn" title="Ganti tema">
+      <i data-lucide="moon" id="themeIcon" style="width:16px;height:16px"></i>
+    </div>
   </div>
 </nav>
 
-<!-- DEBUG PANEL -->
-<div class="debug-panel" id="debugPanel">
-  <div class="debug-header" id="debugHeader">
-    <span>🐞 Debug Console</span>
-    <div class="debug-stats">
-      <span class="ok" id="debugOkCount">OK:0</span>
-      <span class="err" id="debugErrCount">ERR:0</span>
-    </div>
-    <button class="debug-clear" id="clearDebugBtn">Clear</button>
+<!-- NOTIF PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-head">
+    <div class="notif-panel-title">Aktivitas</div>
+    <button class="notif-mark-btn" onclick="markAllRead()">Tandai dibaca</button>
   </div>
-  <div class="debug-content" id="debugLogs"></div>
+  <div class="notif-list" id="notifList"><div class="notif-empty">Memuat...</div></div>
+</div>
+
+<!-- NOTIF DETAIL MODAL -->
+<div class="notif-detail-overlay" id="notifDetailOverlay">
+  <div class="notif-detail-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:.82rem;font-weight:800">Detail Notifikasi</div>
+      <div class="modal-close-btn" onclick="closeNotifDetail()"><i data-lucide="x" style="width:12px;height:12px"></i></div>
+    </div>
+    <div id="notifDetailContent"></div>
+  </div>
 </div>
 
 <div class="hero">
-  <h1>Temukan ID <span>Impianmu</span></h1>
-  <p class="hero-sub">Koleksi ID premium pilihan. Beli dengan aman, bergaransi.</p>
+  <div class="hero-chip"><i data-lucide="star" style="width:10px;height:10px"></i>ID PREMIUM TERPERCAYA</div>
+  <h1>Temukan ID <span class="grad">Impianmu</span></h1>
+  <p class="hero-sub">Koleksi ID premium pilihan. Tersedia dalam 4 tier: Low, Medium, High, dan Legend. Beli dengan aman, bergaransi, dan proses cepat.</p>
 </div>
 
-<div class="filter-sticky" id="filterSticky">
-  <div class="filter-bar" id="filterBar">
-    <button class="fb act" data-f="all">Semua</button>
-    <button class="fb" data-f="low">Low</button>
-    <button class="fb" data-f="medium">Medium</button>
-    <button class="fb" data-f="high">High</button>
-    <button class="fb" data-f="legend">Legend</button>
+<!-- BANNER -->
+<div class="banner-sec">
+  <div class="banner-wrap" id="bannerWrap">
+    <div class="banner-track" id="bannerTrack"></div>
+    <button class="banner-nav banner-prev" id="bannerPrev"><i data-lucide="chevron-left" style="width:14px;height:14px"></i></button>
+    <button class="banner-nav banner-next" id="bannerNext"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></button>
   </div>
-  <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="Cari nomor ID..."/>
+  <div class="banner-dots" id="bannerDots"></div>
+</div>
+
+<!-- POPULAR -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-title"><i data-lucide="flame" style="width:15px;height:15px;color:var(--legend)"></i>Banyak Disukai</div>
+    <a href="#semua" class="sec-link">Lihat semua <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
   </div>
-  <div class="result-info" id="resultInfo">Memuat data...</div>
+  <div class="pop-wrap">
+    <div class="pop-track" id="popGrid"><div class="empty"><i data-lucide="loader-circle" style="width:24px;height:24px;animation:spin 1s linear infinite;margin:0 auto 8px;display:block"></i></div></div>
+    <div class="pop-dots" id="popDots"></div>
+  </div>
 </div>
 
-<div class="ids-section" id="gridContainer">
-  <div class="empty-state">⏳ Memuat data ID...</div>
+<!-- FILTER -->
+<div class="filter-sec" id="semua">
+  <div class="filter-sticky" id="filterSticky">
+    <div class="filter-row">
+      <div class="filter-pills" id="filterBar">
+        <button class="fp act" data-f="all">Semua</button>
+        <button class="fp" data-f="low">Low</button>
+        <button class="fp" data-f="medium">Medium</button>
+        <button class="fp" data-f="high">High</button>
+        <button class="fp" data-f="legend">Legend</button>
+        <button class="fp" data-f="sold">Terjual</button>
+      </div>
+      <div class="search-box">
+        <div class="search-icon"><i data-lucide="search" style="width:13px;height:13px"></i></div>
+        <input type="text" id="searchInput" placeholder="Cari nomor ID..."/>
+      </div>
+    </div>
+    <div class="result-label" id="resultInfo">Memuat...</div>
+  </div>
 </div>
 
-<footer style="text-align:center;padding:20px;border-top:1px solid var(--border);font-size:.6rem">
-  &copy; 2026 lapakID
+<!-- ID LIST -->
+<div class="ids-sec" id="gridContainer"></div>
+
+<!-- ID MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-top">
+      <div class="modal-title">Detail ID</div>
+      <div class="modal-close-btn" id="modalClose"><i data-lucide="x" style="width:12px;height:12px"></i></div>
+    </div>
+    <div class="modal-id-num" id="modalIdNum"></div>
+    <div id="modalRows"></div>
+    <div class="modal-acts">
+      <button class="btn-buy" id="modalBuyBtn"><i data-lucide="shopping-cart" style="width:13px;height:13px"></i>Beli ID Ini</button>
+      <button class="btn-like-modal" id="modalLikeBtn"><i data-lucide="heart" style="width:13px;height:13px"></i><span id="modalLikeCnt">0</span></button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>&copy; 2026 <a href="index.html">LapakID</a></span>
+  <span class="version-tag">v2.2.2</span>
+  <span><a href="about.html">Tentang</a> &mdash; <a href="dashboard.html">Admin</a></span>
 </footer>
 
-<script>
-// ==================== DEBUG SYSTEM LENGKAP ====================
-let debugLogs = [];
-let debugOpen = false;
-let okCount = 0;
-let errCount = 0;
-
-function addDebugLog(type, message, details = null) {
-  const time = new Date().toLocaleTimeString('id-ID');
-  const logEntry = { time, type, message, details };
-  debugLogs.unshift(logEntry);
-  if (debugLogs.length > 150) debugLogs.pop();
-  
-  if (type === 'error') errCount++;
-  if (type === 'success' || type === 'info') okCount++;
-  
-  updateDebugUI();
-}
-
-function updateDebugUI() {
-  const container = document.getElementById('debugLogs');
-  if (!container) return;
-  
-  container.innerHTML = debugLogs.map(log => {
-    let detailHtml = '';
-    if (log.details) {
-      if (typeof log.details === 'object') {
-        detailHtml = `<div class="debug-url">📦 ${JSON.stringify(log.details).substring(0, 200)}</div>`;
-      } else {
-        detailHtml = `<div class="debug-url">📝 ${String(log.details).substring(0, 200)}</div>`;
-      }
-    }
-    return `<div class="debug-log ${log.type}">
-      <span class="debug-time">[${log.time}]</span> ${log.message}
-      ${detailHtml}
-    </div>`;
-  }).join('');
-  
-  document.getElementById('debugOkCount').innerHTML = `✓ ${okCount}`;
-  document.getElementById('debugErrCount').innerHTML = `✗ ${errCount}`;
-}
-
-// Override fetch untuk capture semua request API
-const originalFetch = window.fetch;
-window.fetch = async function(...args) {
-  const url = args[0];
-  const options = args[1] || {};
-  
-  // Hanya log request ke /api/
-  if (typeof url === 'string' && url.includes('/api/')) {
-    addDebugLog('http', `🌐 REQUEST: ${options.method || 'GET'} ${url}`, { body: options.body });
-  }
-  
-  try {
-    const response = await originalFetch(...args);
-    
-    if (typeof url === 'string' && url.includes('/api/')) {
-      const status = response.status;
-      const statusText = response.statusText;
-      
-      // Clone response untuk dibaca
-      const clone = response.clone();
-      let responseText = '';
-      try {
-        const data = await clone.text();
-        responseText = data.length > 300 ? data.substring(0, 300) + '...' : data;
-      } catch(e) { responseText = 'Cannot read response'; }
-      
-      if (status >= 200 && status < 300) {
-        addDebugLog('success', `✅ RESPONSE: ${status} ${url}`, responseText);
-      } else {
-        addDebugLog('error', `❌ RESPONSE: ${status} ${statusText} - ${url}`, responseText);
-      }
-    }
-    
-    return response;
-  } catch(error) {
-    if (typeof url === 'string' && url.includes('/api/')) {
-      addDebugLog('error', `💥 FETCH ERROR: ${url} - ${error.message}`, error.stack);
-    }
-    throw error;
-  }
-};
-
-// Override console.error
-const originalError = console.error;
-console.error = function(...args) {
-  addDebugLog('error', args.join(' '));
-  originalError.apply(console, args);
-};
-const originalWarn = console.warn;
-console.warn = function(...args) {
-  addDebugLog('warn', args.join(' '));
-  originalWarn.apply(console, args);
-};
-
-// Global error handler
-window.addEventListener('error', (e) => {
-  addDebugLog('error', `Uncaught: ${e.message} at ${e.filename}:${e.lineno}`);
-});
-window.addEventListener('unhandledrejection', (e) => {
-  addDebugLog('error', `Unhandled Rejection: ${e.reason}`);
-});
-
-addDebugLog('success', 'Debug system siap 🐞');
-addDebugLog('info', 'Inisialisasi aplikasi dimulai');
-
-// ==================== DATA & STATE ====================
-const API = '/api';
-let allIds = [];
-let activeFilter = 'all';
-let searchQ = '';
-let settings = {};
-
-// ==================== API CALLS DENGAN DEBUG LENGKAP ====================
-async function loadSettings() {
-  addDebugLog('info', 'Memuat settings dari /api/settings...');
-  try {
-    const r = await fetch(`${API}/settings`);
-    addDebugLog('http', `Settings response status: ${r.status}`);
-    
-    if (!r.ok) {
-      addDebugLog('error', `Settings gagal: HTTP ${r.status} ${r.statusText}`);
-      return;
-    }
-    
-    const text = await r.text();
-    addDebugLog('http', `Settings raw response (200 chars): ${text.substring(0, 200)}`);
-    
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch(e) {
-      addDebugLog('error', `Settings JSON parse error: ${e.message}`, text.substring(0, 500));
-      return;
-    }
-    
-    settings = data.data || {};
-    addDebugLog('success', `Settings berhasil dimuat`, { prices: settings.prices });
-  } catch(e) {
-    addDebugLog('error', `Settings exception: ${e.message}`, e.stack);
-  }
-}
-
-async function loadIds() {
-  addDebugLog('info', `Memuat ID dari /api/ids (filter: ${activeFilter}, search: "${searchQ}")...`);
-  try {
-    let url = `${API}/ids`;
-    const params = new URLSearchParams();
-    if (activeFilter !== 'all' && activeFilter !== 'sold') params.set('tier', activeFilter);
-    if (searchQ) params.set('search', searchQ);
-    if (params.toString()) url += '?' + params.toString();
-    
-    addDebugLog('http', `GET ${url}`);
-    const r = await fetch(url);
-    addDebugLog('http', `IDs response status: ${r.status}`);
-    
-    if (!r.ok) {
-      addDebugLog('error', `IDs gagal: HTTP ${r.status} ${r.statusText}`);
-      // Gunakan data dummy
-      useDummyData();
-      return;
-    }
-    
-    const text = await r.text();
-    addDebugLog('http', `IDs raw response (300 chars): ${text.substring(0, 300)}`);
-    
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch(e) {
-      addDebugLog('error', `IDs JSON parse error: ${e.message}`, text.substring(0, 500));
-      useDummyData();
-      return;
-    }
-    
-    if (!data.success) {
-      addDebugLog('error', `IDs API error: ${data.message || 'Unknown error'}`);
-      useDummyData();
-      return;
-    }
-    
-    allIds = data.data || [];
-    addDebugLog('success', `IDs berhasil dimuat: ${allIds.length} item`, { sample: allIds.slice(0, 2) });
-    render();
-    
-  } catch(e) {
-    addDebugLog('error', `IDs exception: ${e.message}`, e.stack);
-    useDummyData();
-  }
-}
-
-function useDummyData() {
-  addDebugLog('warn', 'Menggunakan data dummy karena API error');
-  allIds = [
-    { number: "ID7654321", tier: "legend", sold: false, likes: 42, addedAt: new Date().toISOString(), note: "ID langka premium" },
-    { number: "ID1234567", tier: "high", sold: false, likes: 28, addedAt: new Date().toISOString() },
-    { number: "ID9876543", tier: "medium", sold: false, likes: 15, addedAt: new Date().toISOString() },
-    { number: "ID5555555", tier: "low", sold: false, likes: 7, addedAt: new Date().toISOString() },
-    { number: "ID1111111", tier: "legend", sold: true, likes: 31, addedAt: new Date().toISOString() },
-    { number: "ID2222222", tier: "high", sold: false, likes: 19, addedAt: new Date().toISOString() },
-    { number: "ID3333333", tier: "medium", sold: false, likes: 11, addedAt: new Date().toISOString() },
-    { number: "ID4444444", tier: "low", sold: false, likes: 4, addedAt: new Date().toISOString() },
-    { number: "IDabcdefg", tier: "legend", sold: false, likes: 56, addedAt: new Date().toISOString(), note: "NEW!" }
-  ];
-  render();
-}
-
-// Test endpoint API root
-async function testApiConnection() {
-  addDebugLog('info', '🔌 Testing API connection...');
-  try {
-    const r = await fetch('/api/ids?limit=1');
-    addDebugLog('http', `Test API - Status: ${r.status} ${r.statusText}`);
-    if (r.ok) {
-      const text = await r.text();
-      addDebugLog('success', `API merespon dengan status ${r.status}, response type: ${text.includes('{') ? 'JSON' : 'HTML/other'}`);
-      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-        addDebugLog('error', '⚠️ API mengembalikan HTML, bukan JSON! Pastikan Vercel routing benar.');
-      }
-    } else {
-      addDebugLog('error', `API tidak merespon dengan baik: ${r.status}`);
-    }
-  } catch(e) {
-    addDebugLog('error', `Test API gagal: ${e.message}`);
-  }
-}
-
-// ==================== RENDER FUNCTION ====================
-function render() {
-  let filtered = allIds;
-  
-  // Filter tier
-  if (activeFilter !== 'all') {
-    filtered = filtered.filter(id => id.tier === activeFilter);
-  }
-  
-  // Filter search
-  if (searchQ) {
-    filtered = filtered.filter(id => id.number.toLowerCase().includes(searchQ.toLowerCase()));
-  }
-  
-  document.getElementById('resultInfo').innerHTML = `Menampilkan <b>${filtered.length}</b> ID dari ${allIds.length} total`;
-  
-  const container = document.getElementById('gridContainer');
-  if (filtered.length === 0) {
-    container.innerHTML = '<div class="empty-state">😕 Tidak ada ID ditemukan</div>';
-    return;
-  }
-  
-  container.innerHTML = `
-    <div class="id-grid">
-      ${filtered.map(id => `
-        <div class="id-card ${id.sold ? 'is-sold' : ''}" data-number="${id.number}">
-          <div class="id-num">${id.number}</div>
-          <div class="id-bottom">
-            <span class="id-tier tier-${id.tier}">${id.tier.toUpperCase()}</span>
-            <button class="like-btn" data-number="${id.number}">❤️ ${id.likes || 0}</button>
-          </div>
-        </div>
-      `).join('')}
+<!-- POPUP PROMO -->
+<div class="popup-overlay" id="promoPopup">
+  <div class="popup-box" style="position:relative">
+    <button class="popup-close-btn" id="popupClose"><i data-lucide="x" style="width:12px;height:12px"></i></button>
+    <img id="popupImg" src="" alt="Promo" class="popup-img" style="display:none"/>
+    <div class="popup-body">
+      <div class="popup-title" id="popupTitle">🎉 Promo Spesial!</div>
+      <div class="popup-desc" id="popupDesc">Gunakan kode promo berikut saat checkout.</div>
+      <div class="popup-code-wrap">
+        <span class="popup-code" id="popupCode">LAPAK10</span>
+        <button class="popup-copy-btn" onclick="copyPromoCode()">Salin</button>
+      </div>
+      <div class="popup-foot">
+        <label class="popup-check"><input type="checkbox" id="dontShow"/> Jangan tampilkan lagi</label>
+        <button class="popup-ok-btn" id="popupOk">Mengerti!</button>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- MUSIC PLAYER -->
+<audio id="musicAudio" preload="none"></audio>
+<div class="music-bar" id="musicBar">
+  <div class="music-album" id="musicAlbum">
+    <i data-lucide="music" style="width:16px;height:16px;color:#fff"></i>
+  </div>
+  <div class="music-info">
+    <div class="music-title-wrap"><div class="music-title-inner" id="musicTitle">Memuat...</div></div>
+    <div class="music-sub" id="musicSub">—</div>
+  </div>
+  <div class="music-ctrls">
+    <button class="mc" id="mcPrev"><i data-lucide="skip-back" style="width:14px;height:14px"></i></button>
+    <button class="mc mc-play" id="mcPlay"><i data-lucide="play" id="mcPlayIcon" style="width:14px;height:14px"></i></button>
+    <button class="mc" id="mcNext"><i data-lucide="skip-forward" style="width:14px;height:14px"></i></button>
+  </div>
+</div>
+<div class="music-fab" id="musicFab">
+  <i data-lucide="music-2" style="width:14px;height:14px"></i>
+  <span>Musik</span>
+</div>
+
+<!-- LIVE CHAT FAB -->
+<button class="chat-fab" id="chatFab" title="Hubungi Admin">
+  <i data-lucide="message-circle" style="width:20px;height:20px"></i>
+  <div class="chat-unread-dot" id="chatUnreadDot"></div>
+</button>
+
+<!-- CHAT WINDOW -->
+<div class="chat-window" id="chatWindow">
+  <div class="chat-win-head">
+    <div class="chat-win-avatar"><i data-lucide="headphones" style="width:15px;height:15px;color:#fff"></i></div>
+    <div class="chat-win-info">
+      <div class="chat-win-title">Admin lapakID</div>
+      <div class="chat-win-status"><div class="status-dot"></div>Online &bull; Siap membantu</div>
+    </div>
+    <button class="chat-win-close" id="chatClose"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+  </div>
+  <div id="chatNameStep" class="chat-name-step">
+    <div class="chat-name-label">Hai! 👋 Sebelum mulai, perkenalkan dirimu dulu ya.</div>
+    <input class="chat-name-input" id="chatNameInput" type="text" placeholder="Nama kamu..."/>
+    <button class="chat-start-btn" onclick="startChat()">Mulai Chat <i data-lucide="arrow-right" style="width:12px;height:12px;vertical-align:middle"></i></button>
+  </div>
+  <div id="chatMain" style="display:none">
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="chat-send-btn" onclick="sendChat()"><i data-lucide="send" style="width:13px;height:13px"></i></button>
+    </div>
+  </div>
+</div>
+
+<audio id="clickSfx" src="https://files.catbox.moe/u5zsfh.wav" preload="auto"></audio>
+
+<script>
+const API='/api';
+const PER_PAGE=20;
+let allIds=[],activeFilter='all',searchQ='',settings={},likedSet=new Set(JSON.parse(localStorage.getItem('lapakid_liked')||'[]')),currentModal=null,tierPages={low:1,medium:1,high:1,legend:1};
+let songs=[],currentSong=0,musicHideTimer=null;
+let chatName=localStorage.getItem('lapakid_chat_name')||'',chatOpen=false,chatPolling=null,lastMsgId=null;
+let notifOpen=false;
+const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
+const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
+const TCLS={low:'t-low',medium:'t-medium',high:'t-high',legend:'t-legend'};
+const clk=document.getElementById('clickSfx');
+
+// ── LUCIDE ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{ if(window.lucide) lucide.createIcons(); });
+
+// ── THEME ────────────────────────────────────────────────────────────────────
+function initTheme(){
+  const dark=localStorage.getItem('lapakid_dark')==='1';
+  if(dark) document.body.classList.add('dark');
+  setThemeIcon(dark);
+  setLogoAndSvc(dark);
+}
+function setThemeIcon(dark){
+  const el=document.getElementById('themeIcon');
+  if(el){ el.setAttribute('data-lucide', dark?'sun':'moon'); if(window.lucide)lucide.createIcons({nodes:[el]}); }
+}
+function setLogoAndSvc(dark){
+  const logo=document.getElementById('logoImg');
+  if(logo) logo.src=dark?'https://files.catbox.moe/6esihc.png':'https://files.catbox.moe/j4ittw.png';
+}
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const dark=document.body.classList.toggle('dark');
+  localStorage.setItem('lapakid_dark',dark?'1':'0');
+  setThemeIcon(dark); setLogoAndSvc(dark);
+});
+
+// ── NOTIF ────────────────────────────────────────────────────────────────────
+document.getElementById('notifBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  notifOpen=!notifOpen;
+  document.getElementById('notifPanel').classList.toggle('open',notifOpen);
+  if(notifOpen) loadNotifications();
+});
+document.addEventListener('click',e=>{
+  if(notifOpen&&!document.getElementById('notifPanel').contains(e.target)&&e.target!==document.getElementById('notifBtn')){
+    notifOpen=false; document.getElementById('notifPanel').classList.remove('open');
+  }
+});
+async function loadNotifications(){
+  try{
+    const r=await fetch(`${API}/notifications?limit=20`);
+    if(!r.ok) return;
+    const d=await r.json();
+    const badge=document.getElementById('notifBadge');
+    if(d.unread>0){badge.textContent=d.unread>99?'99+':String(d.unread);badge.classList.add('show');}
+    else{badge.classList.remove('show');badge.textContent='';}
+    const list=document.getElementById('notifList');
+    if(!d.data||!d.data.length){list.innerHTML='<div class="notif-empty">Belum ada aktivitas</div>';return;}
+    list.innerHTML=d.data.map(n=>{
+      const isInfo=n.type==='info';
+      const t=new Date(n.createdAt);const now=Date.now();const diff=now-t.getTime();
+      const tStr=diff<60000?'Baru saja':diff<3600000?Math.floor(diff/60000)+' mnt lalu':diff<86400000?Math.floor(diff/3600000)+' jam lalu':t.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
+      const tc={low:'#64748b',medium:'#3b82f6',high:'#f97316',legend:'#eab308'}[n.tier]||'#6366f1';
+      return `<div class="notif-item${n.read?'':' unread'}" onclick="openNotifDetail(${JSON.stringify(JSON.stringify(n))})">
+        <div class="notif-ico ${isInfo?'notif-ico-info':'notif-ico-ok'}"><i data-lucide="${isInfo?'info':'check-circle'}" style="width:12px;height:12px"></i></div>
+        <div class="notif-body">
+          <div class="notif-msg-txt">${n.message}</div>
+          ${n.tier&&!isInfo?`<span style="font-size:.5rem;font-weight:700;padding:1px 5px;border-radius:99px;background:${tc}22;color:${tc};border:1px solid ${tc}44">${n.tier.toUpperCase()}</span>`:''}
+          <div class="notif-time-txt">${tStr}</div>
+        </div>
+      </div>`;
+    }).join('');
+    if(window.lucide) lucide.createIcons({nodes:document.querySelectorAll('.notif-item [data-lucide]')});
+  }catch(e){}
+}
+function openNotifDetail(jsonStr){
+  const n=JSON.parse(jsonStr);
+  const tc={low:'#64748b',medium:'#3b82f6',high:'#f97316',legend:'#eab308'}[n.tier]||'#6366f1';
+  document.getElementById('notifDetailContent').innerHTML=`
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:44px;height:44px;border-radius:50%;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <i data-lucide="check-circle" style="width:20px;height:20px;color:var(--success)"></i>
+      </div>
+      <div style="font-size:.88rem;font-weight:800;margin-bottom:4px">${n.title||'Aktivitas'}</div>
+      <div style="font-size:.7rem;color:var(--muted);line-height:1.6">${n.message}</div>
+    </div>
+    ${n.idNumber?`<div style="background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:.68rem">
+      <div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--muted)">ID</span><span style="font-family:var(--mono);font-weight:700">${n.idNumber}</span></div>
+      ${n.tier?`<div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border)"><span style="color:var(--muted)">Tier</span><span style="color:${tc};font-weight:700">${n.tier.toUpperCase()}</span></div>`:''}
+      ${n.finalPrice?`<div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border)"><span style="color:var(--muted)">Harga</span><span style="font-weight:800;color:var(--purple);font-family:var(--mono)">${fmt(n.finalPrice)}</span></div>`:''}
+      ${n.buyer?`<div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border)"><span style="color:var(--muted)">Pembeli</span><span style="font-weight:600">${n.buyer}</span></div>`:''}
+    </div>`:''}
+    <div style="font-size:.58rem;color:var(--muted);text-align:center;margin-top:10px;font-family:var(--mono)">${new Date(n.createdAt).toLocaleString('id-ID')}</div>
   `;
-  
-  // Attach event listeners
-  document.querySelectorAll('.id-card:not(.is-sold)').forEach(card => {
-    card.addEventListener('click', () => {
-      addDebugLog('info', `Klik ID: ${card.dataset.number}`);
-      alert(`Detail ID: ${card.dataset.number}\nTier: ${allIds.find(i => i.number === card.dataset.number)?.tier}\nLike: ${allIds.find(i => i.number === card.dataset.number)?.likes || 0}`);
+  document.getElementById('notifDetailOverlay').classList.add('open');
+  if(window.lucide) lucide.createIcons({nodes:document.querySelectorAll('#notifDetailContent [data-lucide]')});
+}
+function closeNotifDetail(){ document.getElementById('notifDetailOverlay').classList.remove('open'); }
+document.getElementById('notifDetailOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('notifDetailOverlay'))closeNotifDetail();});
+async function markAllRead(){
+  await fetch(`${API}/notifications/read`,{method:'PUT'}).catch(()=>{});
+  const b=document.getElementById('notifBadge');b.classList.remove('show');b.textContent='';
+  document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
+}
+setInterval(loadNotifications,30000);
+
+// ── BANNER (from DB) ─────────────────────────────────────────────────────────
+let bannerCur=0,bannerTotal=0,bannerTimer=null;
+async function loadBanners(){
+  try{
+    const r=await fetch(`${API}/settings`);if(!r.ok)return;
+    const d=await r.json();settings=d.data||{};
+    const banners=(settings.banners&&settings.banners.length)?settings.banners:[
+      {url:'https://files.catbox.moe/kv3k51.png'},{url:'https://files.catbox.moe/l28ii6.png'},{url:'https://files.catbox.moe/5bm0fq.png'}
+    ];
+    bannerTotal=banners.length;
+    document.getElementById('bannerTrack').innerHTML=banners.map((b,i)=>`<div class="banner-slide"><img src="${b.url}" alt="Banner ${i+1}" loading="lazy"/></div>`).join('');
+    document.getElementById('bannerDots').innerHTML=banners.map((_,i)=>`<button class="banner-dot${i===0?' active':''}" data-idx="${i}"></button>`).join('');
+    document.querySelectorAll('.banner-dot').forEach(dot=>{dot.addEventListener('click',()=>{bannerGo(parseInt(dot.dataset.idx));bannerStartAuto();});});
+    bannerStartAuto();
+    // Init musik dari settings
+    applyMusic(settings);
+    // Init popup dari settings
+    initPopup(settings);
+  }catch(e){}
+}
+function bannerGo(idx){
+  bannerCur=(idx+bannerTotal)%bannerTotal;
+  document.getElementById('bannerTrack').style.transform=`translateX(-${bannerCur*100}%)`;
+  document.querySelectorAll('.banner-dot').forEach((d,i)=>d.classList.toggle('active',i===bannerCur));
+}
+function bannerStartAuto(){clearInterval(bannerTimer);bannerTimer=setInterval(()=>bannerGo(bannerCur+1),4000);}
+document.getElementById('bannerPrev').addEventListener('click',()=>{bannerGo(bannerCur-1);bannerStartAuto();});
+document.getElementById('bannerNext').addEventListener('click',()=>{bannerGo(bannerCur+1);bannerStartAuto();});
+const bWrap=document.getElementById('bannerWrap');
+bWrap.addEventListener('mouseenter',()=>clearInterval(bannerTimer));bWrap.addEventListener('mouseleave',bannerStartAuto);
+let bTx=0;
+bWrap.addEventListener('touchstart',e=>{bTx=e.touches[0].clientX;clearInterval(bannerTimer);},{passive:true});
+bWrap.addEventListener('touchend',e=>{const diff=bTx-e.changedTouches[0].clientX;if(Math.abs(diff)>40)diff>0?bannerGo(bannerCur+1):bannerGo(bannerCur-1);bannerStartAuto();},{passive:true});
+
+// ── POPUP (from DB) ──────────────────────────────────────────────────────────
+function initPopup(s){
+  const STORAGE_KEY='lapakid_popup_hide';
+  if(localStorage.getItem(STORAGE_KEY)==='1') return;
+  const popup=s.popup||{};
+  if(!popup.active) return;
+  const img=document.getElementById('popupImg');
+  if(popup.imageUrl){img.src=popup.imageUrl;img.style.display='block';}
+  document.getElementById('popupTitle').textContent=popup.title||'🎉 Promo Spesial!';
+  document.getElementById('popupDesc').textContent=popup.desc||'Gunakan kode promo saat checkout.';
+  document.getElementById('popupCode').textContent=popup.code||'LAPAK10';
+  const closePopup=()=>{if(document.getElementById('dontShow').checked)localStorage.setItem(STORAGE_KEY,'1');document.getElementById('promoPopup').classList.remove('open');};
+  document.getElementById('popupClose').onclick=closePopup;
+  document.getElementById('popupOk').onclick=closePopup;
+  document.getElementById('promoPopup').addEventListener('click',e=>{if(e.target===document.getElementById('promoPopup'))closePopup();});
+  setTimeout(()=>document.getElementById('promoPopup').classList.add('open'),1800);
+}
+function copyPromoCode(){const code=document.getElementById('popupCode').textContent;navigator.clipboard.writeText(code).then(()=>showToast('Kode '+code+' disalin!')).catch(()=>showToast('Kode: '+code));}
+
+// ── POPULAR ──────────────────────────────────────────────────────────────────
+async function loadPopular(){
+  const r=await fetch(`${API}/ids/popular`).catch(()=>null);
+  const grid=document.getElementById('popGrid');
+  if(!r||!r.ok){grid.innerHTML='<div class="empty"><p>Gagal memuat</p></div>';return;}
+  const{data}=await r.json();
+  if(!data.length){grid.innerHTML='<div class="empty"><p>Belum ada data</p></div>';return;}
+  const slides=[];for(let i=0;i<data.length;i+=4)slides.push(data.slice(i,i+4));
+  grid.innerHTML=slides.map((g,si)=>`<div class="pop-slide" data-slide="${si}">${g.map(id=>buildCard(id,true)).join('')}</div>`).join('');
+  const dots=document.getElementById('popDots');
+  dots.innerHTML=slides.map((_,i)=>`<button class="pop-dot${i===0?' active':''}" data-idx="${i}"></button>`).join('');
+  dots.querySelectorAll('.pop-dot').forEach(dot=>{dot.addEventListener('click',()=>popGo(grid,parseInt(dot.dataset.idx),dots));});
+  attachCardEvents(grid);initPopScroll(grid,slides.length,dots);
+  if(window.lucide) lucide.createIcons({nodes:grid.querySelectorAll('[data-lucide]')});
+}
+function popGo(grid,idx,dots){grid.scrollTo({left:idx*grid.clientWidth,behavior:'smooth'});dots.querySelectorAll('.pop-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));}
+function initPopScroll(grid,total,dots){
+  let cur=0,paused=false,timer=null;
+  const go=()=>{cur=(cur+1)%total;popGo(grid,cur,dots);};
+  const start=()=>{clearInterval(timer);timer=setInterval(()=>{if(!paused)go();},3200);};
+  grid.addEventListener('scroll',()=>{const i=Math.round(grid.scrollLeft/(grid.clientWidth||1));if(i!==cur){cur=i;dots.querySelectorAll('.pop-dot').forEach((d,j)=>d.classList.toggle('active',j===i));}},{passive:true});
+  grid.addEventListener('touchstart',()=>{paused=true;clearInterval(timer);},{passive:true});
+  grid.addEventListener('touchend',()=>{setTimeout(()=>{paused=false;start();},2500);},{passive:true});
+  grid.addEventListener('mouseenter',()=>{paused=true;});grid.addEventListener('mouseleave',()=>{paused=false;});
+  start();
+}
+
+// ── LOAD IDS ─────────────────────────────────────────────────────────────────
+async function loadIds(){
+  const r=await fetch(`${API}/ids`).catch(()=>null);
+  if(!r||!r.ok){document.getElementById('gridContainer').innerHTML='<div class="empty"><p>Gagal memuat ID</p></div>';return;}
+  const{data}=await r.json();allIds=data||[];render();
+}
+function render(){
+  const filtered=filterIds();let total=0;Object.values(filtered).forEach(v=>total+=v.length);
+  document.getElementById('resultInfo').innerHTML=`Menampilkan <b>${total.toLocaleString('id-ID')}</b> ID`;
+  const container=document.getElementById('gridContainer');
+  if(total===0){container.innerHTML='<div class="empty"><i data-lucide="search-x" style="width:36px;height:36px;margin:0 auto 10px;display:block;opacity:.3"></i><p>Tidak ada ID ditemukan</p></div>';if(window.lucide)lucide.createIcons({nodes:container.querySelectorAll('[data-lucide]')});return;}
+  const tiers=['low','medium','high','legend'];let html='';
+  for(const tier of tiers){
+    const ids=filtered[tier];if(!ids||!ids.length)continue;
+    const tp=Math.ceil(ids.length/PER_PAGE);if(tierPages[tier]>tp)tierPages[tier]=1;
+    const pg=tierPages[tier];const pgIds=ids.slice((pg-1)*PER_PAGE,pg*PER_PAGE);
+    html+=`<div class="tier-block" data-tier="${tier}">
+      <div class="tier-head" id="tierhead-${tier}">
+        <span class="tier-name">${TNAME[tier]}</span>
+        <span class="tier-tag ${TCLS[tier]}">${tier.toUpperCase()}</span>
+        <span class="tier-cnt"><b>${ids.length}</b> ID</span>
+      </div>
+      <div class="id-grid">${pgIds.map(id=>buildCard(id,false)).join('')}</div>
+      ${tp>1?buildPagination(tier,pg,tp):''}
+      <div data-sentinel="${tier}"></div>
+    </div>`;
+  }
+  container.innerHTML=html;
+  attachCardEvents(container);
+  container.querySelectorAll('.id-card').forEach((card,i)=>{card.style.animationDelay=`${Math.min(i*0.035,.5)}s`;});
+  container.querySelectorAll('.pg-btn[data-tier]').forEach(btn=>{
+    btn.addEventListener('click',()=>{tierPages[btn.dataset.tier]=parseInt(btn.dataset.page);render();setTimeout(()=>{document.querySelector(`.tier-block[data-tier="${btn.dataset.tier}"]`)?.scrollIntoView({behavior:'smooth',block:'start'});},50);});
+  });
+  if(window.lucide) lucide.createIcons({nodes:container.querySelectorAll('[data-lucide]')});
+  setupTierSticky();
+}
+function buildPagination(tier,cur,total){
+  let h='<div class="pagination">';
+  h+=`<button class="pg-btn" data-tier="${tier}" data-page="${cur-1}" ${cur===1?'disabled':''}><i data-lucide="chevron-left" style="width:12px;height:12px"></i></button>`;
+  for(let i=1;i<=total;i++){
+    if(total>6&&i>2&&i<total-1&&Math.abs(i-cur)>1){if(i===3||i===total-2)h+='<span class="pg-sep">…</span>';continue;}
+    h+=`<button class="pg-btn${i===cur?' active':''}" data-tier="${tier}" data-page="${i}">${i}</button>`;
+  }
+  h+=`<button class="pg-btn" data-tier="${tier}" data-page="${cur+1}" ${cur===total?'disabled':''}><i data-lucide="chevron-right" style="width:12px;height:12px"></i></button>`;
+  return h+'</div>';
+}
+function filterIds(){
+  const tiers=activeFilter==='all'?['low','medium','high','legend']:activeFilter==='sold'?['low','medium','high','legend']:[activeFilter];
+  const result={};
+  for(const tier of tiers){
+    let ids=allIds.filter(id=>id.tier===tier);
+    if(activeFilter==='sold')ids=ids.filter(id=>id.sold);
+    else if(activeFilter!=='all')ids=ids.filter(id=>!id.sold);
+    if(searchQ)ids=ids.filter(id=>id.number.includes(searchQ));
+    result[tier]=ids;
+  }
+  return result;
+}
+function hl(text){if(!searchQ)return text;const rx=new RegExp(`(${searchQ.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');return text.replace(rx,'<mark>$1</mark>');}
+function isNew(id){if(id.sold||!id.addedAt)return false;const added=new Date(id.addedAt).getTime();if(isNaN(added))return false;const diff=Date.now()-added;return diff>0&&diff<3*24*60*60*1000;}
+function buildCard(id){
+  const liked=likedSet.has(id.number);
+  const lc=id.likes||0;const lt=lc===0?'Suka':lc+' suka';
+  const isNewId=isNew(id);
+  return `<div class="id-card${id.sold?' is-sold':''}" data-num="${id.number}" data-tier="${id.tier}">
+    ${id.sold?`<div class="card-badge badge-sold"><i data-lucide="x-circle" style="width:8px;height:8px"></i>SOLD</div>`:isNewId?`<div class="card-badge badge-new"><i data-lucide="sparkles" style="width:8px;height:8px"></i>NEW</div>`:''}
+    <div class="id-num"><img src="https://files.catbox.moe/em51di.png" alt=""/>${hl(id.number)}</div>
+    <div class="id-foot">
+      <span class="tier-tag ${TCLS[id.tier]}">${id.tier.toUpperCase()}</span>
+      <button class="like-btn${liked?' liked':''}" data-num="${id.number}" onclick="event.stopPropagation()">
+        <i data-lucide="heart" style="width:11px;height:11px${liked?';fill:var(--purple)':''}"></i>
+        <span>${lt}</span>
+      </button>
+    </div>
+  </div>`;
+}
+function attachCardEvents(container){
+  container.querySelectorAll('.id-card:not(.is-sold)').forEach(card=>{
+    card.addEventListener('click',()=>{
+      try{clk.currentTime=0;clk.play().catch(()=>{});}catch(e){}
+      openModal(card.dataset.num);
     });
   });
-  
-  document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const number = btn.dataset.number;
-      addDebugLog('info', `Like ID: ${number}`);
-      
-      try {
-        const r = await fetch(`${API}/like/${number}`, { method: 'POST' });
-        const data = await r.json();
-        if (data.success) {
-          const idx = allIds.findIndex(i => i.number === number);
-          if (idx !== -1) allIds[idx].likes = data.likes;
-          render();
-          showToast(`👍 Berhasil menyukai ${number}!`);
-          addDebugLog('success', `Like ${number} berhasil, total: ${data.likes}`);
-        } else {
-          showToast(data.message || 'Gagal like');
-          addDebugLog('error', `Like gagal: ${data.message}`);
-        }
-      } catch(e) {
-        addDebugLog('error', `Like error: ${e.message}`);
-        showToast('Gagal, cek koneksi');
-      }
+  container.querySelectorAll('.like-btn').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();doLike(btn.dataset.num,btn);});});
+}
+async function doLike(number,btn){
+  if(likedSet.has(number)){showToast('Sudah menyukai ID ini');return;}
+  btn.disabled=true;
+  const r=await fetch(`${API}/like/${number}`,{method:'POST'}).catch(()=>null);
+  if(!r){btn.disabled=false;showToast('Gagal, coba lagi');return;}
+  const d=await r.json();
+  if(d.success){
+    likedSet.add(number);localStorage.setItem('lapakid_liked',JSON.stringify([...likedSet]));
+    const idx=allIds.findIndex(i=>i.number===number);if(idx!==-1)allIds[idx].likes=d.likes;
+    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b=>{b.classList.add('liked');b.querySelector('span').textContent=d.likes+' suka';b.disabled=false;const ico=b.querySelector('[data-lucide]');if(ico){ico.style.fill='var(--purple)';}});
+    if(currentModal?.number===number){document.getElementById('modalLikeCnt').textContent=d.likes;document.getElementById('modalLikeBtn').classList.add('liked');}
+    showToast('Berhasil menyukai!');
+  }else{btn.disabled=false;showToast(d.message||'Gagal like');}
+}
+async function openModal(number){
+  const id=allIds.find(i=>i.number===number);if(!id)return;currentModal=id;
+  const price=settings.prices?fmt(settings.prices[id.tier]||0):'—';
+  const liked=likedSet.has(number);
+  document.getElementById('modalIdNum').textContent=number;
+  const tc={low:'var(--low)',medium:'var(--medium)',high:'var(--high)',legend:'var(--legend)'}[id.tier];
+  document.getElementById('modalRows').innerHTML=`
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="layers" style="width:12px;height:12px"></i>Tier</div><div class="modal-val"><span class="tier-tag ${TCLS[id.tier]}" style="font-size:.54rem">${id.tier.toUpperCase()}</span></div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="credit-card" style="width:12px;height:12px"></i>Harga</div><div class="modal-val" style="color:var(--purple);font-family:var(--mono)">${price}</div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="heart" style="width:12px;height:12px"></i>Suka</div><div class="modal-val">${id.likes||0}</div></div>
+    <div class="modal-row"><div class="modal-lbl"><i data-lucide="calendar" style="width:12px;height:12px"></i>Ditambahkan</div><div class="modal-val" style="display:flex;align-items:center;gap:6px">${id.addedAt?new Date(id.addedAt).toLocaleDateString('id-ID'):'—'}${isNew(id)?'<span class="card-badge badge-new" style="position:static;font-size:.42rem">NEW</span>':''}</div></div>
+    ${id.note?`<div class="modal-row"><div class="modal-lbl"><i data-lucide="file-text" style="width:12px;height:12px"></i>Catatan</div><div class="modal-val">${id.note}</div></div>`:''}
+  `;
+  document.getElementById('modalLikeCnt').textContent=id.likes||0;
+  const lb=document.getElementById('modalLikeBtn');lb.className='btn-like-modal'+(liked?' liked':'');
+  lb.onclick=()=>doLike(number,lb);
+  document.getElementById('modalBuyBtn').onclick=()=>{window.location.href=`payment.html?id=${encodeURIComponent(number)}`;};
+  document.getElementById('modalOverlay').classList.add('open');
+  if(window.lucide) lucide.createIcons({nodes:document.querySelectorAll('#modalRows [data-lucide]')});
+}
+document.getElementById('modalClose').addEventListener('click',()=>{document.getElementById('modalOverlay').classList.remove('open');currentModal=null;});
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay')){document.getElementById('modalOverlay').classList.remove('open');currentModal=null;}});
+
+// ── FILTER ───────────────────────────────────────────────────────────────────
+document.getElementById('filterBar').querySelectorAll('.fp').forEach(btn=>{
+  btn.addEventListener('click',()=>{activeFilter=btn.dataset.f;tierPages={low:1,medium:1,high:1,legend:1};document.querySelectorAll('.fp').forEach(b=>b.classList.remove('act'));btn.classList.add('act');render();});
+});
+document.getElementById('searchInput').addEventListener('input',e=>{searchQ=e.target.value.trim();tierPages={low:1,medium:1,high:1,legend:1};render();});
+
+// ── TIER STICKY ───────────────────────────────────────────────────────────────
+let tierScrollFn=null;
+function setupTierSticky(){
+  if(tierScrollFn) window.removeEventListener('scroll',tierScrollFn,{passive:true});
+  tierScrollFn=()=>{
+    const fs=document.getElementById('filterSticky');if(!fs)return;
+    const fb=fs.getBoundingClientRect().bottom;
+    document.querySelectorAll('.tier-block').forEach(block=>{
+      const head=block.querySelector('.tier-head');if(!head)return;
+      const br=block.getBoundingClientRect();
+      const stick=br.top<fb&&br.bottom>fb;
+      if(stick){head.style.top=fb+'px';head.classList.add('stuck');block.style.paddingTop=head.offsetHeight+'px';head.classList.toggle('hide',br.bottom<fb+head.offsetHeight+10);}
+      else{head.classList.remove('stuck','hide');block.style.paddingTop='';}
     });
-  });
+  };
+  window.addEventListener('scroll',tierScrollFn,{passive:true});tierScrollFn();
 }
 
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2000);
+// ── MUSIC PLAYER ─────────────────────────────────────────────────────────────
+const audio=document.getElementById('musicAudio');
+function applyMusic(s){
+  const list=(s&&Array.isArray(s.music)&&s.music.length)?s.music:[];
+  songs=list;
+  if(songs.length)loadSong(0);
+  else{document.getElementById('musicTitle').textContent='Belum ada musik';document.getElementById('musicSub').textContent='—';}
+}
+function loadSong(idx){
+  currentSong=idx;audio.src=songs[idx].src;
+  const title=songs[idx].title;
+  document.getElementById('musicTitle').textContent=title;
+  document.getElementById('musicSub').textContent=`Track ${idx+1} / ${songs.length}`;
+  const ti=document.getElementById('musicTitle');const wrap=ti.parentElement;
+  ti.classList.remove('marquee');
+  setTimeout(()=>{if(ti.scrollWidth>wrap.clientWidth)ti.classList.add('marquee');},200);
+}
+function togglePlay(){
+  if(audio.paused){audio.play();document.getElementById('musicAlbum').classList.add('spin');updatePlayIcon(true);}
+  else{audio.pause();document.getElementById('musicAlbum').classList.remove('spin');updatePlayIcon(false);}
+  resetMusicHide();
+}
+function updatePlayIcon(playing){
+  const ico=document.getElementById('mcPlayIcon');
+  ico.setAttribute('data-lucide',playing?'pause':'play');
+  if(window.lucide) lucide.createIcons({nodes:[ico]});
+}
+function nextSong(){currentSong=(currentSong+1)%songs.length;loadSong(currentSong);audio.play();document.getElementById('musicAlbum').classList.add('spin');updatePlayIcon(true);resetMusicHide();}
+function prevSong(){currentSong=(currentSong-1+songs.length)%songs.length;loadSong(currentSong);audio.play();document.getElementById('musicAlbum').classList.add('spin');updatePlayIcon(true);resetMusicHide();}
+audio.addEventListener('ended',nextSong);
+audio.addEventListener('pause',()=>{document.getElementById('musicAlbum').classList.remove('spin');updatePlayIcon(false);});
+document.getElementById('mcPlay').addEventListener('click',togglePlay);
+document.getElementById('mcPrev').addEventListener('click',prevSong);
+document.getElementById('mcNext').addEventListener('click',nextSong);
+document.getElementById('musicFab').addEventListener('click',showMusicBar);
+function showMusicBar(){document.getElementById('musicBar').classList.remove('hidden');document.getElementById('musicFab').classList.remove('show');resetMusicHide();}
+function hideMusicBar(){document.getElementById('musicBar').classList.add('hidden');setTimeout(()=>document.getElementById('musicFab').classList.add('show'),400);}
+function resetMusicHide(){clearTimeout(musicHideTimer);musicHideTimer=setTimeout(()=>{hideMusicBar();setTimeout(showMusicBar,18000);},18000);}
+const mBar=document.getElementById('musicBar');
+mBar.addEventListener('mouseenter',()=>clearTimeout(musicHideTimer));
+mBar.addEventListener('mouseleave',resetMusicHide);
+mBar.addEventListener('touchstart',()=>{clearTimeout(musicHideTimer);setTimeout(resetMusicHide,3000);},{passive:true});
+
+// ── LIVE CHAT ─────────────────────────────────────────────────────────────────
+function openChat(){
+  chatOpen=true;document.getElementById('chatWindow').classList.add('open');
+  if(chatName){showChatMain();}else{document.getElementById('chatNameStep').style.display='block';document.getElementById('chatMain').style.display='none';}
+}
+function closeChat(){chatOpen=false;document.getElementById('chatWindow').classList.remove('open');if(chatPolling){clearInterval(chatPolling);chatPolling=null;}}
+document.getElementById('chatFab').addEventListener('click',()=>{if(chatOpen)closeChat();else openChat();});
+document.getElementById('chatClose').addEventListener('click',closeChat);
+function startChat(){
+  const name=document.getElementById('chatNameInput').value.trim();
+  if(!name){return;}
+  chatName=name;localStorage.setItem('lapakid_chat_name',name);
+  showChatMain();
+}
+function showChatMain(){
+  document.getElementById('chatNameStep').style.display='none';
+  document.getElementById('chatMain').style.display='block';
+  const msgs=document.getElementById('chatMsgs');
+  if(!msgs.children.length){addBotMsg('Halo '+chatName+'! 👋 Ada yang bisa kami bantu?');}
+  pollReply();
+}
+function addBotMsg(text){
+  const msgs=document.getElementById('chatMsgs');
+  const t=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  const el=document.createElement('div');el.className='chat-bubble bot';el.innerHTML=text+'<div class="chat-bubble-time">'+t+'</div>';
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+}
+function addUserMsg(text){
+  const msgs=document.getElementById('chatMsgs');
+  const t=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  const el=document.createElement('div');el.className='chat-bubble user';el.innerHTML=text+'<div class="chat-bubble-time">'+t+'</div>';
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+}
+function addReplyMsg(text){
+  const msgs=document.getElementById('chatMsgs');
+  const t=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  const el=document.createElement('div');el.className='chat-bubble reply';el.innerHTML='<b>Admin:</b> '+text+'<div class="chat-bubble-time">'+t+'</div>';
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+  document.getElementById('chatUnreadDot').classList.add('show');
+}
+function showTyping(){
+  const msgs=document.getElementById('chatMsgs');
+  const el=document.createElement('div');el.className='chat-typing';el.id='typingIndicator';
+  el.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+}
+function hideTyping(){const el=document.getElementById('typingIndicator');if(el)el.remove();}
+async function sendChat(){
+  const inp=document.getElementById('chatInput');const msg=inp.value.trim();
+  if(!msg||!chatName)return;
+  inp.value='';addUserMsg(msg);showTyping();
+  try{
+    const r=await fetch(`${API}/reports`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:chatName,message:msg})});
+    const d=await r.json();
+    setTimeout(()=>{
+      hideTyping();
+      if(d.success)addBotMsg('Pesan kamu sudah kami terima! Admin akan membalas segera. 😊');
+      else addBotMsg(d.message||'Pesan gagal terkirim. Coba lagi ya.');
+    },1200);
+  }catch(e){setTimeout(()=>{hideTyping();addBotMsg('Gagal mengirim pesan. Cek koneksi kamu.');},1000);}
+}
+async function pollReply(){
+  if(chatPolling)clearInterval(chatPolling);
+  chatPolling=setInterval(async()=>{
+    if(!chatName||!chatOpen)return;
+    try{
+      const r=await fetch(`${API}/reports/reply-check?name=${encodeURIComponent(chatName)}`);
+      if(!r.ok)return;const d=await r.json();
+      if(d.reply&&d.reply!==lastMsgId){lastMsgId=d.reply;addReplyMsg(d.replyText);}
+    }catch(e){}
+  },8000);
 }
 
-// ==================== INITIALIZATION ====================
-async function init() {
-  addDebugLog('info', '🚀 Memulai inisialisasi aplikasi...');
-  
-  // Test API dulu
-  await testApiConnection();
-  
-  // Load data
-  await loadSettings();
-  await loadIds();
-  
-  addDebugLog('success', '✅ Aplikasi siap digunakan!');
-  addDebugLog('info', `Total data: ${allIds.length} ID`);
+// ── INIT ─────────────────────────────────────────────────────────────────────
+async function init(){
+  initTheme();
+  loadNotifications();
+  await loadBanners(); // loads settings + music + popup
+  await Promise.all([loadPopular(),loadIds()]);
+  resetMusicHide();
+  if(window.lucide) lucide.createIcons();
 }
 
-// Theme
-function initTheme() {
-  const dark = localStorage.getItem('lapakid_dark') === '1';
-  if (dark) document.body.classList.add('dark');
-  document.getElementById('themeBtn').addEventListener('click', () => {
-    const dark = document.body.classList.toggle('dark');
-    localStorage.setItem('lapakid_dark', dark ? '1' : '0');
-  });
-}
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500);}
 
-// Filter & Search
-document.getElementById('filterBar').querySelectorAll('.fb').forEach(btn => {
-  btn.addEventListener('click', () => {
-    activeFilter = btn.dataset.f;
-    document.querySelectorAll('.fb').forEach(b => b.classList.remove('act'));
-    btn.classList.add('act');
-    addDebugLog('info', `Filter berubah ke: ${activeFilter}`);
-    loadIds(); // Reload dengan filter baru
-  });
-});
-
-document.getElementById('searchInput').addEventListener('input', e => {
-  searchQ = e.target.value.trim();
-  addDebugLog('info', `Pencarian: "${searchQ || '(kosong)'}"`);
-  loadIds();
-});
-
-// Debug panel
-document.getElementById('debugBtn').addEventListener('click', () => {
-  debugOpen = !debugOpen;
-  document.getElementById('debugPanel').classList.toggle('open', debugOpen);
-  if (debugOpen) addDebugLog('info', 'Debug panel dibuka');
-});
-
-document.getElementById('clearDebugBtn').addEventListener('click', () => {
-  debugLogs = [];
-  okCount = 0;
-  errCount = 0;
-  updateDebugUI();
-  addDebugLog('success', 'Log dibersihkan');
-});
-
-// Make debug panel draggable
-let isDragging = false, dragStartX, dragStartY, panelLeft, panelTop;
-const debugPanel = document.getElementById('debugPanel');
-const debugHeader = document.getElementById('debugHeader');
-
-debugHeader.addEventListener('mousedown', (e) => {
-  if (e.target.tagName === 'BUTTON') return;
-  isDragging = true;
-  dragStartX = e.clientX;
-  dragStartY = e.clientY;
-  const rect = debugPanel.getBoundingClientRect();
-  panelLeft = rect.left;
-  panelTop = rect.top;
-  debugPanel.style.position = 'fixed';
-  debugPanel.style.margin = '0';
-  e.preventDefault();
-});
-
-document.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  const dx = e.clientX - dragStartX;
-  const dy = e.clientY - dragStartY;
-  debugPanel.style.left = `${panelLeft + dx}px`;
-  debugPanel.style.top = `${panelTop + dy}px`;
-  debugPanel.style.right = 'auto';
-  debugPanel.style.bottom = 'auto';
-});
-
-document.addEventListener('mouseup', () => { isDragging = false; });
-
-// Start app
-initTheme();
+window.addEventListener('resize',()=>{setupTierSticky();});
 init();
-
-addDebugLog('info', 'Script loaded, menunggu inisialisasi...');
 </script>
 </body>
 </html>
