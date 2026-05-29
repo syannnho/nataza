@@ -8,27 +8,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'Exo 2',sans-serif;overflow:hidden}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0e0e1a}::-webkit-scrollbar-thumb{background:#7b2fff;border-radius:2px}
+html,body{width:100%;height:100%;background:#0b0b16;color:#fff;font-family:'Exo 2',sans-serif;overflow:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0b0b16}::-webkit-scrollbar-thumb{background:#7b2fff;border-radius:99px}
 
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:480px;margin:0 auto;position:relative;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:480px;margin:0 auto;position:relative;overflow:hidden;background:radial-gradient(circle at top right,rgba(123,47,255,.18),transparent 35%),#0b0b16}
 
 /* TOP NAV */
-#topnav{flex-shrink:0;background:rgba(14,14,26,.96);backdrop-filter:blur(16px);border-bottom:1px solid #232338;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:50}
+#topnav{flex-shrink:0;background:rgba(10,10,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.05);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:50}
 .logo{display:flex;align-items:center;gap:0}
-.logo-mark{width:40px;height:40px;border-radius:10px;overflow:hidden}
+.logo-mark{width:72px;height:auto}
 .logo-mark img{width:100%;height:100%;object-fit:cover}
 .nav-r{display:flex;align-items:center;gap:8px}
-.nav-icon{position:relative;background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:34px;height:34px;border-radius:9px;display:grid;place-items:center;cursor:pointer}
+.nav-icon{position:relative;background:rgba(123,47,255,.12);border:1px solid rgba(123,47,255,.22);width:42px;height:42px;border-radius:14px;display:grid;place-items:center;cursor:pointer;transition:.2s}
 .nav-icon:hover{background:rgba(123,47,255,.2)}
-.nav-icon svg{color:#a06bff;width:16px;height:16px}
-.notif-badge{position:absolute;top:-4px;right:-4px;min-width:15px;height:15px;background:#ef4444;border-radius:99px;border:2px solid #0e0e1a;display:none;align-items:center;justify-content:center;font-size:.44rem;font-weight:800;color:#fff;padding:0 2px}
+.nav-icon svg{color:#b78cff;width:18px;height:18px}
+.notif-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:#ef4444;border-radius:99px;border:2px solid #0b0b16;display:none;align-items:center;justify-content:center;font-size:.44rem;font-weight:800;color:#fff;padding:0 3px}
 .notif-badge.show{display:flex}
 
 /* BREADCRUMB */
-.breadcrumb{display:flex;align-items:center;gap:6px;padding:12px 16px 4px;font-size:12px;color:#6060a0;flex-shrink:0}
-.breadcrumb a{color:#6060a0;text-decoration:none}
-.breadcrumb a:hover{color:#e8e8f5}
+.breadcrumb{display:flex;align-items:center;gap:8px;padding:18px 18px 0;font-size:12px;color:#66669a;flex-shrink:0}
+.breadcrumb a{color:#66669a;text-decoration:none}
+.breadcrumb a:hover{color:#fff}
 .breadcrumb .active{color:#a06bff;font-weight:700}
 .breadcrumb .sep{font-size:10px;opacity:.5}
 
@@ -36,45 +36,47 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 #scrollarea{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
 /* WRAPPER */
-.wrap{padding:12px 16px;display:flex;flex-direction:column;gap:12px}
+.wrap{padding:18px;display:flex;flex-direction:column;gap:18px}
 
 /* Status Card */
-.status-card{background:#181826;border:1px solid #232338;border-radius:16px;padding:20px;text-align:center;margin-bottom:16px}
-.status-icon{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px}
-.status-icon.pending{background:rgba(245,200,66,.15);color:#f5c842}
-.status-icon.confirmed{background:rgba(34,187,114,.15);color:#22bb72}
+.status-card{background:#161625;border:1px solid rgba(255,255,255,.05);border-radius:22px;padding:20px;text-align:center}
+.status-icon{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.status-icon.pending{background:rgba(245,200,66,.15)}
+.status-icon.confirmed{background:rgba(34,187,114,.1)}
+.status-icon svg{width:28px;height:28px}
+.status-icon.pending svg{color:#f5c842}
+.status-icon.confirmed svg{color:#22bb72}
 .status-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:6px}
-.status-desc{font-size:.75rem;color:#6060a0}
+.status-desc{font-size:.75rem;color:#7777aa}
 
 /* Transaction Card */
-.trans-card{background:#181826;border:1px solid #232338;border-radius:14px;padding:14px;margin-bottom:12px}
-.trans-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1a1a2e}
+.trans-card{background:#161625;border:1px solid rgba(255,255,255,.05);border-radius:20px;padding:18px;margin-bottom:12px}
+.trans-card:last-child{margin-bottom:0}
+.trans-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05)}
 .trans-id{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;color:#a06bff}
-.trans-badge{padding:3px 8px;border-radius:20px;font-size:.6rem;font-weight:700}
-.trans-badge.pending{background:rgba(245,200,66,.15);color:#f5c842;border:1px solid rgba(245,200,66,.2)}
-.trans-badge.confirmed{background:rgba(34,187,114,.15);color:#22bb72;border:1px solid rgba(34,187,114,.2)}
-.trans-row{display:flex;justify-content:space-between;padding:6px 0;font-size:.7rem}
-.trans-label{color:#6060a0}
-.trans-value{font-weight:600;color:#e8e8f5}
+.trans-badge{padding:4px 10px;border-radius:99px;font-size:.6rem;font-weight:700}
+.trans-badge.pending{background:rgba(245,200,66,.12);color:#f5c842;border:1px solid rgba(245,200,66,.2)}
+.trans-badge.confirmed{background:rgba(34,187,114,.12);color:#22bb72;border:1px solid rgba(34,187,114,.2)}
+.trans-row{display:flex;justify-content:space-between;padding:8px 0;font-size:.72rem}
+.trans-label{color:#7777aa}
+.trans-value{font-weight:600;color:#fff}
 .trans-price{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:#a06bff}
-.warning-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin-top:16px;text-align:center}
+.warning-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:14px;margin-top:16px;text-align:center}
 .warning-box svg{width:18px;height:18px;color:#ef4444;margin-right:6px;vertical-align:middle}
 .warning-text{font-size:.7rem;color:#ef4444}
-.btn-back{background:#7b2fff;color:#fff;border:none;border-radius:12px;padding:12px;width:100%;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:12px;transition:.2s}
-.btn-back:hover{background:#5a1fd1}
-
-/* EMPTY STATE - DENGAN GAMBAR */
-.empty-state{text-align:center;padding:40px 20px;color:#6060a0}
-.empty-state img{width:120px;height:auto;margin-bottom:16px;opacity:0.7}
-.empty-state .empty-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;margin-bottom:8px;color:#e8e8f5}
-.empty-state .empty-desc{font-size:.7rem;margin-bottom:16px}
+.btn-back{background:linear-gradient(135deg,#7b2fff,#9e57ff);color:#fff;border:none;border-radius:16px;padding:14px;width:100%;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:12px;transition:.2s}
+.btn-back:hover{transform:translateY(-1px)}
+.empty-state{text-align:center;padding:50px 20px;color:#7777aa}
+.empty-state svg{width:64px;height:64px;margin-bottom:16px;opacity:.5}
+.empty-state-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;margin-bottom:8px;color:#fff}
+.empty-state-desc{font-size:.7rem;margin-bottom:16px}
 
 /* BOTTOM NAV */
-#botnav{flex-shrink:0;background:rgba(14,14,26,.97);backdrop-filter:blur(16px);border-top:1px solid #1a1a2e;display:flex;justify-content:space-around;padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:50}
-.bni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;color:#4040a0;cursor:pointer;padding:4px 8px;border-radius:9px;transition:.18s;text-decoration:none}
-.bni:hover{color:#a06bff;background:rgba(123,47,255,.07)}
+#botnav{flex-shrink:0;background:rgba(10,10,20,.97);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-around;padding:10px 0 calc(10px + env(safe-area-inset-bottom));z-index:50}
+.bni{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.58rem;color:#66669a;cursor:pointer;padding:6px 12px;border-radius:12px;transition:.18s;text-decoration:none}
+.bni:hover{color:#a06bff;background:rgba(123,47,255,.08)}
 .bni.active{color:#a06bff}
-.bni svg{width:19px;height:19px}
+.bni svg{width:20px;height:20px}
 
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,187,114,.15);border:1px solid #22bb72;color:#22bb72;font-size:13px;font-weight:700;padding:9px 20px;border-radius:50px;opacity:0;pointer-events:none;transition:.25s;z-index:999}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -108,15 +110,14 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 <div id="scrollarea">
   <div class="wrap" id="transactionContent">
     <div class="empty-state">
-      <div style="width:40px;height:40px;border:3px solid #232338;border-top-color:#7b2fff;border-radius:50%;margin:0 auto 12px;animation:spin 1s linear infinite"></div>
-      Memuat transaksi...
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M4 4 L20 20"/>
+      </svg>
+      <div class="empty-state-title">Memuat...</div>
     </div>
   </div>
 </div>
-
-<style>
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
 
 <!-- BOTTOM NAV -->
 <nav id="botnav">
@@ -140,8 +141,15 @@ let hasPendingTransaction = false;
 function showToast(msg, isError = false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast ' + (isError ? 'warn show' : 'show');
+  t.style.background = isError ? 'rgba(239,68,68,.15)' : 'rgba(34,187,114,.15)';
+  t.style.borderColor = isError ? '#ef4444' : '#22bb72';
+  t.style.color = isError ? '#ef4444' : '#22bb72';
+  t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function formatRupiah(num) {
+  return 'Rp ' + Number(num).toLocaleString('id-ID');
 }
 
 async function loadTransactions() {
@@ -158,9 +166,13 @@ async function loadTransactions() {
     if (transactions.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <img src="https://files.catbox.moe/8quwsu.png" alt="Belum ada transaksi">
-          <div class="empty-title">Belum Ada Transaksi</div>
-          <div class="empty-desc">Yuk beli ID premium sekarang!</div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="16" rx="2"/>
+            <line x1="8" y1="10" x2="16" y2="10"/>
+            <line x1="8" y1="14" x2="12" y2="14"/>
+          </svg>
+          <div class="empty-state-title">Belum Ada Transaksi</div>
+          <div class="empty-state-desc">Yuk beli ID premium sekarang</div>
           <button class="btn-back" onclick="window.location.href='index.html'">Lihat Koleksi ID</button>
         </div>
       `;
@@ -173,7 +185,12 @@ async function loadTransactions() {
     if (hasPendingTransaction) {
       html += `
         <div class="status-card">
-          <div class="status-icon pending">⏳</div>
+          <div class="status-icon pending">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
           <div class="status-title">Menunggu Konfirmasi</div>
           <div class="status-desc">Ada transaksi yang belum dikonfirmasi. Silakan tunggu admin memverifikasi pembayaran Anda.</div>
         </div>
@@ -182,19 +199,26 @@ async function loadTransactions() {
       const lastConfirmed = transactions.filter(t => t.status === 'confirmed').length;
       html += `
         <div class="status-card">
-          <div class="status-icon confirmed">✅</div>
+          <div class="status-icon confirmed">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
           <div class="status-title">Transaksi Selesai</div>
-          <div class="status-desc">${lastConfirmed} transaksi telah berhasil. Terima kasih telah berbelanja!</div>
+          <div class="status-desc">${lastConfirmed} transaksi telah berhasil. Terima kasih telah berbelanja</div>
         </div>
       `;
     }
     
     // Daftar Transaksi
-    html += `<div style="margin-top:8px"><div style="font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:10px">📋 Riwayat Transaksi</div></div>`;
+    html += `<div style="margin-top:8px"><div style="font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Riwayat Transaksi
+    </div></div>`;
     
     transactions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(t => {
       const statusClass = t.status === 'confirmed' ? 'confirmed' : 'pending';
-      const statusText = t.status === 'confirmed' ? '✓ Berhasil' : '⏳ Menunggu Konfirmasi';
+      const statusText = t.status === 'confirmed' ? 'Berhasil' : 'Menunggu Konfirmasi';
       const date = t.createdAt ? new Date(t.createdAt).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
       
       html += `
@@ -205,7 +229,7 @@ async function loadTransactions() {
           </div>
           <div class="trans-row">
             <span class="trans-label">Harga</span>
-            <span class="trans-price">Rp ${(t.finalPrice || t.price || 0).toLocaleString('id-ID')}</span>
+            <span class="trans-price">${formatRupiah(t.finalPrice || t.price || 0)}</span>
           </div>
           <div class="trans-row">
             <span class="trans-label">Metode</span>
@@ -226,7 +250,11 @@ async function loadTransactions() {
     if (hasPendingTransaction) {
       html += `
         <div class="warning-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
           <span class="warning-text">Anda hanya bisa melakukan 1 transaksi aktif. Selesaikan pembayaran yang tertunda untuk membeli ID lain.</span>
         </div>
       `;
@@ -238,9 +266,13 @@ async function loadTransactions() {
     console.error(err);
     container.innerHTML = `
       <div class="empty-state">
-        <img src="https://files.catbox.moe/8quwsu.png" alt="Error">
-        <div class="empty-title">Gagal Memuat Data</div>
-        <div class="empty-desc">Coba lagi nanti</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div class="empty-state-title">Gagal Memuat Data</div>
+        <div class="empty-state-desc">Coba lagi nanti</div>
         <button class="btn-back" onclick="location.reload()">Coba Lagi</button>
       </div>
     `;
@@ -263,7 +295,7 @@ async function loadNotifications() {
 }
 
 document.getElementById('notifBtn').addEventListener('click', () => {
-  showToast('🔔 Tidak ada notifikasi baru');
+  showToast('Belum ada notifikasi baru');
 });
 
 loadTransactions();
