@@ -253,8 +253,6 @@ module.exports = async function handler(req, res) {
 
     // ── wishlist ──────────────────────────────────────────────────────────
     if (r0 === 'wishlist') {
-
-      // GET /api/wishlist/counts — jumlah total wishlist per ID (publik)
       if (r1 === 'counts' && !r2 && M === 'GET') {
         const agg = await db.collection('wishlists').aggregate([
           { $group: { _id: '$idNumber', count: { $sum: 1 } } }
@@ -263,32 +261,23 @@ module.exports = async function handler(req, res) {
         agg.forEach(a => { data[a._id] = a.count; });
         return ok(res, { data });
       }
-
-      // GET /api/wishlist — ambil wishlist milik IP ini
       if (!r1 && M === 'GET') {
         const ip = getIP(req);
         const rows = await db.collection('wishlists').find({ ip }).toArray();
         return ok(res, { data: rows.map(r => r.idNumber) });
       }
-
-      // POST /api/wishlist/:number — tambah ke wishlist
       if (r1 && !r2 && M === 'POST') {
         const ip = getIP(req);
         const number = r1;
-        // Cek ID ada
         if (!(await db.collection('ids').findOne({ number }))) return fail(res, 404, 'ID tidak ditemukan');
-        // Cek sudah ada di wishlist
         const exists = await db.collection('wishlists').findOne({ ip, idNumber: number });
         if (exists) return fail(res, 409, 'Sudah ada di wishlist');
-        // Batas max 50 wishlist per IP
         const total = await db.collection('wishlists').countDocuments({ ip });
         if (total >= 50) return fail(res, 429, 'Maksimal 50 item dalam wishlist');
         await db.collection('wishlists').insertOne({ ip, idNumber: number, addedAt: new Date() });
         const count = await db.collection('wishlists').countDocuments({ idNumber: number });
         return created(res, { message: 'Ditambahkan ke wishlist', count });
       }
-
-      // DELETE /api/wishlist/:number — hapus dari wishlist
       if (r1 && !r2 && M === 'DELETE') {
         const ip = getIP(req);
         const number = r1;
@@ -297,8 +286,6 @@ module.exports = async function handler(req, res) {
         const count = await db.collection('wishlists').countDocuments({ idNumber: number });
         return ok(res, { message: 'Dihapus dari wishlist', count });
       }
-
-      // GET /api/wishlist/admin — admin lihat semua wishlist (rangking)
       if (r1 === 'admin' && !r2 && M === 'GET') {
         if (!isAdmin(req)) return fail(res, 401, 'Unauthorized');
         const agg = await db.collection('wishlists').aggregate([
@@ -397,6 +384,14 @@ module.exports = async function handler(req, res) {
       const b = await readBody(req);
       const {idNumber,method:pMethod,buyer,phone,promoCode} = b;
       if (!idNumber||!pMethod||!buyer||!phone) return fail(res,400,'idNumber, method, buyer, phone wajib');
+      
+      // CEK APAKAH SUDAH ADA TRANSAKSI PENDING UNTUK IP INI
+      const ip = getIP(req);
+      const existingPending = await db.collection('payments').findOne({ ip, status: 'pending' });
+      if (existingPending) {
+        return fail(res,409,'Anda memiliki transaksi yang belum dikonfirmasi. Selesaikan pembayaran terlebih dahulu.');
+      }
+      
       const idDoc = await db.collection('ids').findOne({number:String(idNumber)});
       if (!idDoc) return fail(res,404,'ID tidak ditemukan');
       if (idDoc.sold) return fail(res,409,'ID sudah terjual');
@@ -414,10 +409,23 @@ module.exports = async function handler(req, res) {
       }
       const adminFee   = fees[pMethod]||0;
       const finalPrice = Math.round(base*(1-disc/100))+adminFee;
-      const ip = getIP(req);
       const payment = {idNumber:String(idNumber),tier:idDoc.tier,price:base,method:pMethod,status:'pending',buyer,phone,promoCode:promoUsed,discount:disc,adminFee,finalPrice,ip,createdAt:new Date()};
       const ins = await db.collection('payments').insertOne(payment);
       return created(res,{data:{...payment,_id:ins.insertedId}});
+    }
+
+    // ── transactions (cek transaksi berdasarkan IP) ────────────────────────
+    if (r0 === 'transactions') {
+      if (r1 === 'check' && M === 'GET') {
+        const ip = getIP(req);
+        const pending = await db.collection('payments').findOne({ ip, status: 'pending' });
+        return ok(res, { hasPending: !!pending });
+      }
+      if (r1 === 'my' && M === 'GET') {
+        const ip = getIP(req);
+        const transactions = await db.collection('payments').find({ ip }).sort({ createdAt: -1 }).toArray();
+        return ok(res, { data: transactions });
+      }
     }
 
     if (r0 === 'payments') {
