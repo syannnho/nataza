@@ -31,11 +31,9 @@ html,body{width:100%;min-height:100%;background:#0e0e1a;color:#e8e8f5;font-famil
 
 /* Status Card */
 .status-card{background:#181826;border:1px solid #232338;border-radius:16px;padding:20px;text-align:center;margin-bottom:16px}
-.status-icon{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.status-icon{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px}
 .status-icon.pending{background:rgba(245,200,66,.15);color:#f5c842}
 .status-icon.confirmed{background:rgba(34,187,114,.15);color:#22bb72}
-.status-icon.none{background:rgba(96,96,160,.15);color:#6060a0}
-.status-icon svg{width:28px;height:28px}
 .status-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:6px}
 .status-desc{font-size:.75rem;color:#6060a0}
 
@@ -60,7 +58,7 @@ html,body{width:100%;min-height:100%;background:#0e0e1a;color:#e8e8f5;font-famil
 
 /* BOTTOM NAV */
 #botnav{flex-shrink:0;background:rgba(14,14,26,.97);backdrop-filter:blur(16px);border-top:1px solid #1a1a2e;display:flex;justify-content:space-around;padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:50}
-.bni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;color:#4040a0;cursor:pointer;padding:4px 8px;border-radius:9px;text-decoration:none;position:relative}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;color:#4040a0;cursor:pointer;padding:4px 8px;border-radius:9px;text-decoration:none;background:none;border:none}
 .bni:hover{color:#a06bff;background:rgba(123,47,255,.07)}
 .bni.active{color:#a06bff}
 .bni svg{width:19px;height:19px}
@@ -73,6 +71,7 @@ html,body{width:100%;min-height:100%;background:#0e0e1a;color:#e8e8f5;font-famil
 <body>
 <div id="app">
 
+<!-- TOP NAV -->
 <nav id="topnav">
   <div class="logo">
     <div class="logo-mark"><img src="https://files.catbox.moe/eeimlh.png" alt="Lapak ID"></div>
@@ -104,6 +103,7 @@ html,body{width:100%;min-height:100%;background:#0e0e1a;color:#e8e8f5;font-famil
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 
+<!-- BOTTOM NAV -->
 <nav id="botnav">
   <a class="bni" href="index.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
@@ -161,12 +161,7 @@ async function loadTransactions() {
     if (hasPendingTransaction) {
       html += `
         <div class="status-card">
-          <div class="status-icon pending">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-          </div>
+          <div class="status-icon pending">⏳</div>
           <div class="status-title">Menunggu Konfirmasi</div>
           <div class="status-desc">Ada transaksi yang belum dikonfirmasi. Silakan tunggu admin memverifikasi pembayaran Anda.</div>
         </div>
@@ -175,11 +170,7 @@ async function loadTransactions() {
       const lastConfirmed = transactions.filter(t => t.status === 'confirmed').length;
       html += `
         <div class="status-card">
-          <div class="status-icon confirmed">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </div>
+          <div class="status-icon confirmed">✅</div>
           <div class="status-title">Transaksi Selesai</div>
           <div class="status-desc">${lastConfirmed} transaksi telah berhasil. Terima kasih telah berbelanja!</div>
         </div>
