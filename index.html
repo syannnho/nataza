@@ -189,25 +189,187 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .modal-close{background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:26px;height:26px;border-radius:7px;display:grid;place-items:center;cursor:pointer;color:#a06bff}
 .modal-close svg{width:12px;height:12px}
 
-/* MUSIC BAR */
-.music-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(0);z-index:400;max-width:460px;width:calc(100% - 24px);background:rgba(14,14,26,.92);backdrop-filter:blur(20px);border:1px solid rgba(123,47,255,.25);border-radius:99px;padding:7px 14px 7px 9px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .3s,opacity .3s;cursor:pointer}
-.music-bar.hidden{transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none}
-.music-alb{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7b2fff,#a06bff);display:grid;place-items:center;flex-shrink:0}
-.music-alb svg{width:15px;height:15px;color:#fff}
-.music-alb.spin{animation:spin 8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.music-info{flex:1;min-width:0}
-.music-title{font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;color:#e8e8f5;white-space:nowrap;overflow:hidden}
-.music-title.marquee{animation:marquee 7s linear infinite}
-@keyframes marquee{0%{transform:translateX(0)}45%{transform:translateX(calc(-100% + 100px))}55%{transform:translateX(calc(-100% + 100px))}100%{transform:translateX(0)}}
-.music-sub{font-size:.54rem;color:#5050a0}
-.music-ctrls{display:flex;align-items:center;gap:3px}
-.mc{background:none;border:none;cursor:pointer;color:#6060a0;display:grid;place-items:center;border-radius:50%;width:26px;height:26px;transition:.15s}
-.mc:hover{color:#e8e8f5;background:rgba(255,255,255,.07)}
-.mc svg{width:13px;height:13px}
-.mc-play{background:rgba(123,47,255,.8)!important;color:#fff!important;width:29px;height:29px}
-.music-fab{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:399;background:rgba(14,14,26,.88);border:1px solid rgba(123,47,255,.2);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#a06bff;font-size:.62rem;font-weight:600;opacity:0;pointer-events:none;transition:.3s}
-.music-fab.show{opacity:1;pointer-events:all}
+/* MUSIC VISUALIZER - 3 GIF ANIMASI (Transparan, Tanpa Glow) */
+.music-visualizer {
+  position: fixed;
+  bottom: 100px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  z-index: 398;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.music-visualizer.show {
+  opacity: 1;
+}
+.music-visualizer img {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: transparent;
+}
+.music-visualizer .gif-left {
+  animation: bounceLeft 0.8s ease-in-out infinite;
+}
+.music-visualizer .gif-center {
+  width: 75px;
+  height: 75px;
+  animation: bounceCenter 0.6s ease-in-out infinite;
+}
+.music-visualizer .gif-right {
+  animation: bounceRight 0.8s ease-in-out infinite;
+}
+@keyframes bounceLeft {
+  0%,100%{transform:translateX(0) scale(1);}
+  50%{transform:translateX(-10px) scale(1.08);}
+}
+@keyframes bounceCenter {
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.2);}
+}
+@keyframes bounceRight {
+  0%,100%{transform:translateX(0) scale(1);}
+  50%{transform:translateX(10px) scale(1.08);}
+}
+
+/* MUSIC BAR KICAU MANIA - SAMA DENGAN MUSIK BAWAAN (WARNA UNGU) */
+.music-bar-kicau {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  z-index: 400;
+  max-width: 460px;
+  width: calc(100% - 24px);
+  background: rgba(14,14,26,.92);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(123,47,255,.25);
+  border-radius: 99px;
+  padding: 7px 14px 7px 9px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  transition: transform 0.3s, opacity 0.3s;
+  cursor: pointer;
+}
+.music-bar-kicau.hidden {
+  transform: translateX(-50%) translateY(100px);
+  opacity: 0;
+  pointer-events: none;
+}
+.music-bar-kicau .music-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7b2fff, #a06bff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.music-bar-kicau .music-icon svg {
+  width: 15px;
+  height: 15px;
+  color: #fff;
+}
+.music-bar-kicau .music-icon.spin {
+  animation: spinMusic 2s linear infinite;
+}
+@keyframes spinMusic {
+  to { transform: rotate(360deg); }
+}
+.music-bar-kicau .music-info {
+  flex: 1;
+  min-width: 0;
+}
+.music-bar-kicau .music-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e8e8f5;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.music-bar-kicau .music-title.marquee {
+  animation: marquee 7s linear infinite;
+}
+@keyframes marquee {
+  0%{transform:translateX(0)}
+  45%{transform:translateX(calc(-100% + 100px))}
+  55%{transform:translateX(calc(-100% + 100px))}
+  100%{transform:translateX(0)}
+}
+.music-bar-kicau .music-artist {
+  font-size: 0.54rem;
+  color: #6060a0;
+}
+.music-bar-kicau .music-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.music-bar-kicau .mc {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6060a0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  transition: 0.15s;
+}
+.music-bar-kicau .mc:hover {
+  color: #e8e8f5;
+  background: rgba(255,255,255,.07);
+}
+.music-bar-kicau .mc svg {
+  width: 13px;
+  height: 13px;
+}
+.music-bar-kicau .mc-play {
+  background: rgba(123,47,255,.8) !important;
+  color: #fff !important;
+  width: 29px;
+  height: 29px;
+}
+.music-fab-kicau {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 399;
+  background: rgba(14,14,26,.88);
+  border: 1px solid rgba(123,47,255,.2);
+  border-radius: 99px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #a06bff;
+  font-size: 0.62rem;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+}
+.music-fab-kicau.show {
+  opacity: 1;
+  pointer-events: all;
+}
+.music-fab-kicau svg {
+  width: 13px;
+  height: 13px;
+}
 
 /* BOTTOM NAV */
 #botnav{flex-shrink:0;background:rgba(14,14,26,.97);backdrop-filter:blur(16px);border-top:1px solid #1a1a2e;display:flex;justify-content:space-around;padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:50}
@@ -326,18 +488,53 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 
 </div><!-- /scrollarea -->
 
-<!-- MUSIC BAR -->
-<div class="music-bar" id="musicBar" style="display:none">
-  <div class="music-alb" id="musicAlb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
-  <div class="music-info"><div class="music-title" id="musicTitle">Memuat...</div><div class="music-sub" id="musicSub">—</div></div>
-  <div class="music-ctrls">
-    <button class="mc" id="mcPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
-    <button class="mc mc-play" id="mcPlay"><svg id="mcPlayIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/></svg></button>
-    <button class="mc" id="mcNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg></button>
+<!-- MUSIC VISUALIZER 3 GIF (Transparan) -->
+<div class="music-visualizer" id="musicVisualizer">
+  <img src="https://files.catbox.moe/a59a9g.gif" alt="gif kiri" class="gif-left">
+  <img src="https://files.catbox.moe/a59a9g.gif" alt="gif tengah" class="gif-center">
+  <img src="https://files.catbox.moe/a59a9g.gif" alt="gif kanan" class="gif-right">
+</div>
+
+<!-- MUSIC BAR KICAU MANIA (WARNA SAMA DENGAN MUSIK BAWAAN) -->
+<div class="music-bar-kicau" id="musicBarKicau" style="display:flex">
+  <div class="music-icon" id="musicIconKicau">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18V5l12-2v13"/>
+      <circle cx="6" cy="18" r="3"/>
+      <circle cx="18" cy="16" r="3"/>
+    </svg>
+  </div>
+  <div class="music-info">
+    <div class="music-title" id="kicauTitle">Kicau Mania</div>
+    <div class="music-artist">—</div>
+  </div>
+  <div class="music-controls">
+    <button class="mc" id="mcPrevKicau">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon points="19 20 9 12 19 4 19 20"/>
+        <line x1="5" y1="19" x2="5" y2="5"/>
+      </svg>
+    </button>
+    <button class="mc mc-play" id="mcPlayKicau">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+    <button class="mc" id="mcNextKicau">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon points="5 4 15 12 5 20 5 4"/>
+        <line x1="19" y1="5" x2="19" y2="19"/>
+      </svg>
+    </button>
   </div>
 </div>
-<div class="music-fab" id="musicFab" onclick="showMusicBar()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Musik
+<div class="music-fab-kicau" id="musicFabKicau" onclick="showKicauBar()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/>
+    <circle cx="18" cy="16" r="3"/>
+  </svg>
+  Kicau Mania
 </div>
 
 <!-- BOTTOM NAV -->
@@ -358,6 +555,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 <div class="toast" id="toast"></div>
 <audio id="clickSfx" src="https://files.catbox.moe/u5zsfh.wav" preload="auto"></audio>
 <audio id="musicAudio" preload="none"></audio>
+<audio id="kicauAudio" src="https://files.catbox.moe/5fom9q.mp3" preload="auto"></audio>
 
 <script>
 const API='/api';
@@ -371,6 +569,107 @@ let notifOpen=false;
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
 const TCLS={low:'tier-low',medium:'tier-medium',high:'tier-high',legend:'tier-legend'};
+
+// ========== MUSIK KICAU MANIA ==========
+const kicauAudio = document.getElementById('kicauAudio');
+const musicBarKicau = document.getElementById('musicBarKicau');
+const musicFabKicau = document.getElementById('musicFabKicau');
+const musicIconKicau = document.getElementById('musicIconKicau');
+const visualizer = document.getElementById('musicVisualizer');
+let autoHideTimerKicau = null;
+let isPlayingKicau = false;
+
+function showKicauBar() {
+  musicBarKicau.classList.remove('hidden');
+  musicFabKicau.classList.remove('show');
+  if (autoHideTimerKicau) clearTimeout(autoHideTimerKicau);
+  autoHideTimerKicau = setTimeout(() => {
+    if (!isPlayingKicau) {
+      musicBarKicau.classList.add('hidden');
+      musicFabKicau.classList.add('show');
+    }
+  }, 5000);
+}
+
+function toggleKicauPlay() {
+  if (kicauAudio.paused) {
+    kicauAudio.play();
+    musicIconKicau.classList.add('spin');
+    setKicauPlayIcon(true);
+    isPlayingKicau = true;
+    visualizer.classList.add('show');
+    if (autoHideTimerKicau) clearTimeout(autoHideTimerKicau);
+  } else {
+    kicauAudio.pause();
+    musicIconKicau.classList.remove('spin');
+    setKicauPlayIcon(false);
+    isPlayingKicau = false;
+    visualizer.classList.remove('show');
+    autoHideTimerKicau = setTimeout(() => {
+      musicBarKicau.classList.add('hidden');
+      musicFabKicau.classList.add('show');
+    }, 5000);
+  }
+}
+
+function setKicauPlayIcon(playing) {
+  const playBtn = document.getElementById('mcPlayKicau');
+  if (playing) {
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <rect x="6" y="4" width="4" height="16" fill="currentColor"/>
+      <rect x="14" y="4" width="4" height="16" fill="currentColor"/>
+    </svg>`;
+  } else {
+    playBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
+    </svg>`;
+  }
+}
+
+kicauAudio.addEventListener('play', () => {
+  isPlayingKicau = true;
+  visualizer.classList.add('show');
+  musicIconKicau.classList.add('spin');
+});
+kicauAudio.addEventListener('pause', () => {
+  isPlayingKicau = false;
+  visualizer.classList.remove('show');
+  musicIconKicau.classList.remove('spin');
+});
+kicauAudio.addEventListener('ended', () => {
+  isPlayingKicau = false;
+  visualizer.classList.remove('show');
+  musicIconKicau.classList.remove('spin');
+  setKicauPlayIcon(false);
+});
+
+document.getElementById('mcPlayKicau').addEventListener('click', toggleKicauPlay);
+document.getElementById('mcPrevKicau').addEventListener('click', () => {
+  kicauAudio.currentTime = 0;
+  if (kicauAudio.paused) toggleKicauPlay();
+});
+document.getElementById('mcNextKicau').addEventListener('click', () => {
+  kicauAudio.currentTime = 0;
+  if (kicauAudio.paused) toggleKicauPlay();
+});
+
+setTimeout(() => {
+  if (!isPlayingKicau) {
+    musicBarKicau.classList.add('hidden');
+    musicFabKicau.classList.add('show');
+  }
+}, 1000);
+
+// Marquee effect for title
+const kicauTitle = document.getElementById('kicauTitle');
+if (kicauTitle) {
+  kicauTitle.classList.remove('marquee');
+  setTimeout(() => {
+    if (kicauTitle.scrollWidth > kicauTitle.parentElement.clientWidth) {
+      kicauTitle.classList.add('marquee');
+    }
+  }, 200);
+}
 
 // ── BANNER ──────────────────────────────────────────
 let bannerCur=0,bannerTotal=0,bannerTimer=null;
@@ -620,7 +919,7 @@ async function markAllRead(){await fetch(`${API}/notifications/read`,{method:'PU
 setInterval(loadNotifications,30000);
 setInterval(checkPendingTransaction,5000);
 
-// ── MUSIC ──────────────────────────────────────────
+// ── MUSIK (BAWAAN) ──────────────────────────────────────────
 const audio=document.getElementById('musicAudio');
 let autoHideTimer=null;
 
