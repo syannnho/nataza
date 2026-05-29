@@ -538,13 +538,18 @@ async function loadPopular(){
   if(!data.length){el.innerHTML='<div class="empty" style="padding:.5rem">Belum ada</div>';return;}
   el.innerHTML=data.map(id=>{
     const price=settings.prices?fmt(settings.prices[id.tier]||0):'—';
-    return `<div class="mini-card" onclick="openModal('${id.number}')">
+    return `<div class="mini-card" onclick="goToDetail('${id.number}')">
       <div class="mini-id">${id.number}</div>
       <span class="tier-badge ${TCLS[id.tier]}">${TNAME[id.tier]}</span>
       <div class="mini-price">${price}</div>
       <div class="mini-likes"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${id.likes||0}</div>
     </div>`;
   }).join('');
+}
+
+// ── NAVIGASI KE DETAIL ────────────────────────────────────────────────────────
+function goToDetail(idNumber) {
+  window.location.href = `detail.html?id=${encodeURIComponent(idNumber)}`;
 }
 
 // ── LOAD IDS ─────────────────────────────────────────────────────────────────
@@ -570,17 +575,28 @@ function render(){
       <span class="tier-badge ${TCLS[tier]}">${tier.toUpperCase()}</span>
       <span style="font-size:.6rem;color:#4040a0;font-family:'Rajdhani',sans-serif;margin-left:auto">${ids.length} ID</span>
     </div>`;
-    html+=pgIds.map(id=>buildCard(id)).join('');
+    html+=pgIds.map((id,idx)=>buildCard(id,idx)).join('');
     if(tp>1) html+=buildPagination(tier,pg,tp);
     html+=`<div style="height:6px"></div>`;
   }
   container.innerHTML=html;
   container.querySelectorAll('.acard:not(.is-sold)').forEach(card=>{
-    card.addEventListener('click',()=>{try{clk.currentTime=0;clk.play().catch(()=>{});}catch(e){}openModal(card.dataset.num);});
+    card.addEventListener('click',(e)=>{
+      if(e.target.classList.contains('btn-beli') || e.target.closest('.btn-beli')) return;
+      if(e.target.classList.contains('like-btn') || e.target.closest('.like-btn')) return;
+      const num = card.dataset.num;
+      if(num) goToDetail(num);
+    });
     card.style.animationDelay=`${Math.min(parseInt(card.dataset.ani||0)*0.035,.5)}s`;
   });
   container.querySelectorAll('.like-btn').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();doLike(btn.dataset.num,btn);});});
-  container.querySelectorAll('.btn-beli').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();window.location.href=`payment.html?id=${encodeURIComponent(btn.dataset.num)}`;});});
+  container.querySelectorAll('.btn-beli').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const num = btn.dataset.num;
+      if(num) window.location.href = `payment.html?id=${encodeURIComponent(num)}`;
+    });
+  });
   container.querySelectorAll('.pg-btn[data-tier]').forEach(btn=>{
     btn.addEventListener('click',()=>{tierPages[btn.dataset.tier]=parseInt(btn.dataset.page);render();setTimeout(()=>{const el=document.querySelector(`.tier-section[data-tier="${btn.dataset.tier}"]`);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},50);});
   });
@@ -660,30 +676,6 @@ async function doLike(number,btn){
   }else{btn.disabled=false;showToast(d.message||'Gagal like','warn');}
 }
 
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-async function openModal(number){
-  const id=allIds.find(i=>i.number===number)||await fetchId(number);if(!id)return;currentModal=id;
-  const price=settings.prices?fmt((id.price!=null?id.price:settings.prices[id.tier])||0):'—';
-  const liked=likedSet.has(number);
-  document.getElementById('modalIdNum').textContent=number;
-  const tc={low:'#6eca6e',medium:'#f5c842',high:'#70aaff',legend:'#c090ff'}[id.tier]||'#a06bff';
-  document.getElementById('modalRows').innerHTML=`
-    <div class="modal-row"><div class="modal-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>Tier</div><div class="modal-val"><span class="tier-badge ${TCLS[id.tier]}">${TNAME[id.tier]}</span></div></div>
-    <div class="modal-row"><div class="modal-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Harga</div><div class="modal-val" style="color:#a06bff;font-family:'Rajdhani',sans-serif">${price}</div></div>
-    <div class="modal-row"><div class="modal-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Suka</div><div class="modal-val">${id.likes||0}</div></div>
-    <div class="modal-row"><div class="modal-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ditambahkan</div><div class="modal-val">${id.addedAt?new Date(id.addedAt).toLocaleDateString('id-ID'):'—'}${isNew(id)?'<span class="acard is-new" style="position:static;display:inline-block;width:auto;border:none;background:none;font-size:.44rem;vertical-align:middle;margin-left:4px"></span>':''}</div></div>
-    ${id.note?`<div class="modal-row"><div class="modal-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Catatan</div><div class="modal-val">${id.note}</div></div>`:''}
-  `;
-  document.getElementById('modalLikeCnt').textContent=id.likes||0;
-  const lb=document.getElementById('modalLikeBtn');lb.className='btn-like-modal'+(liked?' liked':'');
-  lb.onclick=()=>doLike(number,lb);
-  document.getElementById('modalBuyBtn').onclick=()=>window.location.href=`payment.html?id=${encodeURIComponent(number)}`;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-async function fetchId(number){try{const r=await fetch(`${API}/ids/${encodeURIComponent(number)}`);if(!r.ok)return null;const d=await r.json();return d.data;}catch{return null;}}
-document.getElementById('modalClose').addEventListener('click',()=>{document.getElementById('modalOverlay').classList.remove('open');currentModal=null;});
-document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay')){document.getElementById('modalOverlay').classList.remove('open');currentModal=null;}});
-
 // ── NOTIF ─────────────────────────────────────────────────────────────────────
 document.getElementById('notifBtn').addEventListener('click',e=>{e.stopPropagation();notifOpen=!notifOpen;document.getElementById('notifPanel').classList.toggle('open',notifOpen);if(notifOpen)loadNotifications();});
 document.addEventListener('click',e=>{if(notifOpen&&!document.getElementById('notifPanel').contains(e.target)&&e.target!==document.getElementById('notifBtn')){notifOpen=false;document.getElementById('notifPanel').classList.remove('open');}});
@@ -701,7 +693,7 @@ async function loadNotifications(){
       const isInfo=n.type==='info';
       return `<div class="notif-item${n.read?'':' unread'}" onclick='openNotifDetail(${JSON.stringify(JSON.stringify(n))})'>
         <div class="notif-ico" style="${isInfo?'background:rgba(123,47,255,.12);color:#a06bff':''}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${isInfo?'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>':'<polyline points="20 6 9 17 4 12"/>'}</svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${isInfo?'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>':'<polyline points="20 6 9 17 4 12"/>'}</svg>
         </div>
         <div style="flex:1;min-width:0">
           <div class="notif-msg">${n.message}</div>
@@ -716,7 +708,7 @@ function openNotifDetail(jsonStr){
   document.getElementById('ndContent').innerHTML=`
     <div style="text-align:center;margin-bottom:12px">
       <div style="width:42px;height:42px;border-radius:50%;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;margin-bottom:5px">${n.title||'Aktivitas'}</div>
       <div style="font-size:.68rem;color:#6060a0;line-height:1.6">${n.message}</div>
