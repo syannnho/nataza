@@ -354,7 +354,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
     Docs
   </a>
   <a class="bni" href="dashboard.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.68 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.68 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     Admin
   </a>
 </nav>
@@ -371,8 +371,8 @@ const PER_PAGE=20;
 let allIds=[],activeFilter='all',searchQ='',settings={},sortBy='newest';
 let likedSet=new Set(JSON.parse(localStorage.getItem('lapakid_liked')||'[]'));
 let tierPages={low:1,medium:1,high:1,legend:1};
-let songs=[],currentSong=0,musicHideTimer=null;
-let autoHideTimer=null;
+let songs=[],currentSong=0;
+let notifOpen=false;
 
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
@@ -608,8 +608,7 @@ setInterval(loadNotifications,30000);
 
 // ── MUSIC ──────────────────────────────────────────
 const audio=document.getElementById('musicAudio');
-let musicVisible=false;
-let musicHideTimer=null;
+let autoHideTimer=null;
 
 function applyMusic(s){
   const list=(s&&Array.isArray(s.music)&&s.music.length)?s.music:[];
@@ -700,6 +699,25 @@ function showToast(msg,type='success'){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>{t.className='toast '+(type==='warn'?'warn':'');},2500);
 }
+
+// ── POPUP ELEMENTS ─────────────────────────────────
+const popupHTML=`
+<div class="popup-overlay" id="promoPopup">
+  <div class="popup-box" style="position:relative">
+    <button class="popup-close-btn" id="popupClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <img id="popupImg" src="" alt="Promo" class="popup-img" style="display:none"/>
+    <div class="popup-body">
+      <div class="popup-title" id="popupTitle">🎉 Promo Spesial!</div>
+      <div class="popup-desc" id="popupDesc">Gunakan kode promo berikut saat checkout.</div>
+      <div class="popup-code-wrap"><span class="popup-code" id="popupCode">LAPAK10</span><button class="popup-copy" onclick="copyPromo()">Salin</button></div>
+      <div class="popup-foot">
+        <label class="popup-check"><input type="checkbox" id="dontShow"/> Jangan tampilkan lagi</label>
+        <button class="popup-ok" id="popupOk">Mengerti!</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+document.body.insertAdjacentHTML('beforeend',popupHTML);
 
 // ── INIT ───────────────────────────────────────────
 async function init(){
