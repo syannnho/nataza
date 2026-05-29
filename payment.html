@@ -37,11 +37,11 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 /* SCROLL AREA */
 #scrollarea{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
-/* WRAPPER */
-.wrap{padding:12px 16px 20px;display:flex;flex-direction:column;gap:16px}
+/* WRAPPER — satu sumber kebenaran untuk jarak antar box */
+.wrap{padding:14px 16px 28px;display:flex;flex-direction:column;gap:12px}
 
 /* STEPPER */
-.stepper{display:flex;align-items:center;margin-bottom:4px}
+.stepper{display:flex;align-items:center}
 .step-item{display:flex;align-items:center;gap:6px;font-size:.62rem;font-weight:600;color:#6060a0}
 .step-num{width:24px;height:24px;border-radius:50%;border:2px solid #4040a0;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;flex-shrink:0;transition:.3s}
 .step-item.active .step-num{background:#7b2fff;border-color:#7b2fff;color:#fff}
@@ -63,8 +63,8 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .tier-legend{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.25)}
 .id-price{font-size:.7rem;font-weight:800;font-family:'Rajdhani',sans-serif;color:#a06bff}
 
-/* FORM CARD */
-.form-card{background:#181826;border:1px solid #232338;border-radius:16px;padding:16px;margin-bottom:0}
+/* FORM CARD — hapus margin-bottom, biarkan gap di .wrap yang ngatur */
+.form-card{background:#181826;border:1px solid #232338;border-radius:16px;padding:16px}
 .form-card h3{font-size:.78rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px}
 .form-card h3 svg{width:15px;height:15px;color:#a06bff}
 .field{margin-bottom:12px}
@@ -87,7 +87,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .promo-err{background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
 
 /* METHOD */
-.method-opt{display:flex;align-items:center;gap:12px;background:#0e0e1a;border:2px solid #232338;border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s;margin-bottom:0}
+.method-opt{display:flex;align-items:center;gap:12px;background:#0e0e1a;border:2px solid #232338;border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s}
 .method-opt:hover{border-color:#4040a0}
 .method-opt.selected{border-color:#7b2fff;background:rgba(123,47,255,.03)}
 .method-opt input[type=radio]{accent-color:#7b2fff;width:16px;height:16px;flex-shrink:0}
@@ -101,14 +101,14 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 /* SUMMARY */
 .summary{background:#181826;border:1px solid #232338;border-radius:16px;padding:16px}
 .sum-row{display:flex;justify-content:space-between;font-size:.7rem;padding:6px 0}
-.sum-row:last-child{padding-top:12px;margin-top:4px;border-top:1px solid #1a1a2e}
+.sum-row+.sum-row{border-top:1px solid #1a1a2e}
 .sum-row:last-child .sum-lbl{font-weight:800;font-size:.75rem}
 .sum-row:last-child .sum-val{font-weight:900;font-size:.9rem;color:#a06bff;font-family:'Rajdhani',sans-serif}
 .sum-lbl{color:#6060a0}
 .sum-val{font-weight:600;font-family:'Rajdhani',sans-serif}
 .sum-green{color:#22bb72}
 
-.btn-next{width:100%;background:#7b2fff;color:#fff;border:none;padding:14px;border-radius:14px;font-size:.8rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Rajdhani',sans-serif;transition:.2s;box-shadow:0 4px 18px rgba(123,47,255,.35);margin-top:4px}
+.btn-next{width:100%;background:#7b2fff;color:#fff;border:none;padding:14px;border-radius:14px;font-size:.8rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Rajdhani',sans-serif;transition:.2s;box-shadow:0 4px 18px rgba(123,47,255,.35)}
 .btn-next:hover{background:#5a1fd1}
 .btn-next:disabled{opacity:.4;cursor:not-allowed}
 .btn-next svg{width:15px;height:15px}
@@ -141,11 +141,11 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .oi-lbl{color:#6060a0}
 .oi-val{font-weight:600;font-family:'Rajdhani',sans-serif}
 
-.btn-paid{width:100%;background:#22bb72;color:#fff;border:none;padding:14px;border-radius:14px;font-size:.8rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Rajdhani',sans-serif;transition:.2s;margin-top:12px;box-shadow:0 4px 18px rgba(34,187,114,.35)}
+.btn-paid{width:100%;background:#22bb72;color:#fff;border:none;padding:14px;border-radius:14px;font-size:.8rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Rajdhani',sans-serif;transition:.2s;box-shadow:0 4px 18px rgba(34,187,114,.35)}
 .btn-paid:hover{background:#1a9e60}
 .btn-paid:disabled{opacity:.4;cursor:not-allowed}
 .btn-paid svg{width:15px;height:15px}
-.paid-note{font-size:.62rem;color:#6060a0;text-align:center;margin-top:10px;line-height:1.5}
+.paid-note{font-size:.62rem;color:#6060a0;text-align:center;line-height:1.5}
 
 /* SUCCESS OVERLAY */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
@@ -198,7 +198,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
     </div>
 
     <!-- STEP 1 -->
-    <div id="step1">
+    <div id="step1" style="display:contents">
       <!-- ID BANNER -->
       <div class="id-banner">
         <div class="id-banner-ico">
@@ -248,30 +248,37 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
         <div class="sum-row" id="sumDiscRow" style="display:none"><div class="sum-lbl">Diskon promo</div><div class="sum-val sum-green" id="sumDisc">—</div></div>
         <div class="sum-row"><div class="sum-lbl">Total</div><div class="sum-val" id="sumTotal">—</div></div>
       </div>
-      <button class="btn-next" id="btnNext" onclick="goStep2()" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>Lanjut Pembayaran</button>
+
+      <button class="btn-next" id="btnNext" onclick="goStep2()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>Lanjut Pembayaran
+      </button>
     </div>
 
     <!-- STEP 2 -->
-    <div class="step2" id="step2">
-      <div class="qris-card">
-        <div class="qris-head"><div class="qris-title">Bayar via QRIS</div><div class="qris-badge">QRIS</div></div>
-        <div class="qris-sub">Scan dengan e-wallet atau m-banking • Berlaku 10 menit</div>
-        <div class="qris-canvas"><div id="qrCanvas"></div></div>
-        <div class="qris-amount-lbl">Nominal Pembayaran</div>
-        <div class="qris-amount" id="qrisAmt">—</div>
-        <div class="qris-merchant">Penerima: <b>Aestroshop, GREGED</b> • Cirebon</div>
-        <button class="btn-dl-qr" onclick="downloadQR()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download QR</button>
+    <div class="step2" id="step2" style="display:none">
+      <div class="wrap" style="padding:0;gap:12px">
+        <div class="qris-card">
+          <div class="qris-head"><div class="qris-title">Bayar via QRIS</div><div class="qris-badge">QRIS</div></div>
+          <div class="qris-sub">Scan dengan e-wallet atau m-banking • Berlaku 10 menit</div>
+          <div class="qris-canvas"><div id="qrCanvas"></div></div>
+          <div class="qris-amount-lbl">Nominal Pembayaran</div>
+          <div class="qris-amount" id="qrisAmt">—</div>
+          <div class="qris-merchant">Penerima: <b>Aestroshop, GREGED</b> • Cirebon</div>
+          <button class="btn-dl-qr" onclick="downloadQR()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download QR</button>
+        </div>
+        <div class="order-info">
+          <div class="oi-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Detail Pesanan</div>
+          <div class="oi-row"><div class="oi-lbl">ID</div><div class="oi-val" id="oiId">—</div></div>
+          <div class="oi-row"><div class="oi-lbl">Tier</div><div class="oi-val" id="oiTier">—</div></div>
+          <div class="oi-row"><div class="oi-lbl">Harga dasar</div><div class="oi-val" id="oiBase">—</div></div>
+          <div class="oi-row" id="oiDiscRow" style="display:none"><div class="oi-lbl">Diskon</div><div class="oi-val sum-green" id="oiDisc">—</div></div>
+          <div class="oi-row"><div class="oi-lbl">Total</div><div class="oi-val" id="oiTotal">—</div></div>
+        </div>
+        <button class="btn-paid" id="btnPaid" onclick="doSubmit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Saya Sudah Bayar
+        </button>
+        <div class="paid-note">Setelah klik di atas, admin akan memverifikasi dan menghubungi via WhatsApp.</div>
       </div>
-      <div class="order-info">
-        <div class="oi-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Detail Pesanan</div>
-        <div class="oi-row"><div class="oi-lbl">ID</div><div class="oi-val" id="oiId">—</div></div>
-        <div class="oi-row"><div class="oi-lbl">Tier</div><div class="oi-val" id="oiTier">—</div></div>
-        <div class="oi-row"><div class="oi-lbl">Harga dasar</div><div class="oi-val" id="oiBase">—</div></div>
-        <div class="oi-row" id="oiDiscRow" style="display:none"><div class="oi-lbl">Diskon</div><div class="oi-val sum-green" id="oiDisc">—</div></div>
-        <div class="oi-row"><div class="oi-lbl">Total</div><div class="oi-val" id="oiTotal">—</div></div>
-      </div>
-      <button class="btn-paid" id="btnPaid" onclick="doSubmit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Saya Sudah Bayar</button>
-      <div class="paid-note">Setelah klik di atas, admin akan memverifikasi dan menghubungi via WhatsApp.</div>
     </div>
 
   </div>
@@ -302,7 +309,7 @@ let qrcodeInstance=null;
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TCLS={low:'tier-low',medium:'tier-medium',high:'tier-high',legend:'tier-legend'};
 
-function showToast(msg, isError=false){
+function showToast(msg,isError=false){
   const t=document.getElementById('toast');
   t.textContent=msg;
   t.style.background=isError?'rgba(239,68,68,.15)':'rgba(34,187,114,.15)';
@@ -312,7 +319,6 @@ function showToast(msg, isError=false){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// QRIS Functions
 function crc16(str){
   let c=0xFFFF;
   for(let i=0;i<str.length;i++){
@@ -333,9 +339,7 @@ function renderQR(amount){
   const qris=makeDynQRIS(DEFAULT_QRIS,String(Math.round(amount)));
   const container=document.getElementById('qrCanvas');
   container.innerHTML='';
-  qrcodeInstance=new QRCode(container,{
-    text:qris,width:180,height:180,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M
-  });
+  qrcodeInstance=new QRCode(container,{text:qris,width:180,height:180,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
   document.getElementById('qrisAmt').textContent=fmt(amount);
 }
 
@@ -357,7 +361,6 @@ function downloadQR(){
   a.click();
 }
 
-// Load ID dari URL
 async function loadId(number){
   const r=await fetch(`${API}/ids/${encodeURIComponent(number)}`).catch(()=>null);
   if(!r||!r.ok){
@@ -383,27 +386,18 @@ async function loadId(number){
   }
 }
 
-// Promo
 async function validatePromo(){
   const code=document.getElementById('promoInput').value.trim().toUpperCase();
   const msgDiv=document.getElementById('promoMsg');
-  if(!code){
-    showMsg(msgDiv,'err','Masukkan kode promo');
-    return;
-  }
+  if(!code){showMsg(msgDiv,'err','Masukkan kode promo');return;}
   const r=await fetch(`${API}/promo/validate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).catch(()=>null);
-  if(!r){
-    showMsg(msgDiv,'err','Gagal terhubung');
-    return;
-  }
+  if(!r){showMsg(msgDiv,'err','Gagal terhubung');return;}
   const d=await r.json();
   if(d.success){
-    promoDisc=d.discount;
-    promoCode=d.code;
+    promoDisc=d.discount;promoCode=d.code;
     showMsg(msgDiv,'ok',`Diskon ${d.discount}% berhasil diterapkan!`);
   }else{
-    promoDisc=0;
-    promoCode='';
+    promoDisc=0;promoCode='';
     showMsg(msgDiv,'err',d.message||'Kode tidak valid');
   }
   updateSummary();
@@ -415,7 +409,6 @@ function showMsg(el,type,text){
   el.style.display='flex';
 }
 
-// Summary
 function calcTotal(){
   if(!idDoc)return 0;
   const p=settings.prices||{low:125000,medium:450000,high:850000,legend:1350000};
@@ -433,10 +426,8 @@ function updateSummary(){
   document.getElementById('sumBase').textContent=fmt(base);
   document.getElementById('sumTotal').textContent=fmt(total);
   const dr=document.getElementById('sumDiscRow');
-  if(promoDisc>0){
-    dr.style.display='flex';
-    document.getElementById('sumDisc').textContent=`-${fmt(disc)} (${promoDisc}%)`;
-  }else dr.style.display='none';
+  if(promoDisc>0){dr.style.display='flex';document.getElementById('sumDisc').textContent=`-${fmt(disc)} (${promoDisc}%)`;}
+  else dr.style.display='none';
 }
 
 function checkNext(){
@@ -445,25 +436,24 @@ function checkNext(){
   document.getElementById('btnNext').disabled=!(name&&phone&&idDoc&&!idDoc?.sold);
 }
 
-// Step 2
 async function goStep2(){
   const name=document.getElementById('buyerName').value.trim();
   const phone=document.getElementById('buyerPhone').value.trim();
-  if(!name||!phone||!idDoc){
-    showToast('Lengkapi data dulu',true);
-    return;
-  }
-  
-  // Update stepper
+  if(!name||!phone||!idDoc){showToast('Lengkapi data dulu',true);return;}
+
   document.getElementById('s1').classList.remove('active');
   document.getElementById('s1').classList.add('done');
   document.getElementById('sn1').innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
   document.getElementById('sl1').classList.add('done');
   document.getElementById('s2').classList.add('active');
-  document.getElementById('step1').style.display='none';
+
+  // Hide step1 children
+  const step1=document.getElementById('step1');
+  [...step1.children].forEach(el=>el.style.display='none');
+
+  // Show step2
   document.getElementById('step2').style.display='block';
-  
-  // Fill order info
+
   const p=settings.prices||{low:125000,medium:450000,high:850000,legend:1350000};
   const base=p[idDoc.tier]||0;
   const disc=Math.round(base*promoDisc/100);
@@ -473,48 +463,29 @@ async function goStep2(){
   document.getElementById('oiBase').textContent=fmt(base);
   document.getElementById('oiTotal').textContent=fmt(total);
   const dr=document.getElementById('oiDiscRow');
-  if(promoDisc>0){
-    dr.style.display='flex';
-    document.getElementById('oiDisc').textContent=`-${fmt(disc)} (${promoDisc}%)`;
-  }else dr.style.display='none';
-  
+  if(promoDisc>0){dr.style.display='flex';document.getElementById('oiDisc').textContent=`-${fmt(disc)} (${promoDisc}%)`;}
+  else dr.style.display='none';
+
   renderQR(total);
   document.getElementById('scrollarea').scrollTop=0;
 }
 
-// Submit Payment
 async function doSubmit(){
   const name=document.getElementById('buyerName').value.trim();
   const phone=document.getElementById('buyerPhone').value.trim();
-  if(!name||!phone||!idDoc){
-    showToast('Data tidak lengkap',true);
-    return;
-  }
+  if(!name||!phone||!idDoc){showToast('Data tidak lengkap',true);return;}
   const btn=document.getElementById('btnPaid');
   btn.disabled=true;
   btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>Memproses...';
-  
-  const r=await fetch(`${API}/payment`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({idNumber:idDoc.number,method:'qris',buyer:name,phone,promoCode})
-  }).catch(()=>null);
-  
+  const r=await fetch(`${API}/payment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idNumber:idDoc.number,method:'qris',buyer:name,phone,promoCode})}).catch(()=>null);
   if(!r){
     btn.disabled=false;
     btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Saya Sudah Bayar';
-    showToast('Gagal terhubung ke server',true);
-    return;
+    showToast('Gagal terhubung ke server',true);return;
   }
-  
   const d=await r.json();
   if(d.success){
-    // Play success sound
-    try{
-      const sfx=document.getElementById('paidSfx');
-      sfx.currentTime=0;
-      sfx.play().catch(()=>{});
-    }catch(e){}
+    try{const sfx=document.getElementById('paidSfx');sfx.currentTime=0;sfx.play().catch(()=>{});}catch(e){}
     document.getElementById('successMsg').textContent=`Pesanan ID ${idDoc.number} berhasil. Admin akan menghubungi kamu via WhatsApp di ${phone}.`;
     document.getElementById('successOverlay').classList.add('open');
   }else{
@@ -524,52 +495,27 @@ async function doSubmit(){
   }
 }
 
-// Notifikasi badge
 async function loadNotifications(){
   try{
     const r=await fetch(`${API}/notifications?limit=1`);
     if(!r.ok)return;
     const d=await r.json();
     const badge=document.getElementById('notifBadge');
-    if(d.unread>0){
-      badge.textContent=d.unread>99?'99+':String(d.unread);
-      badge.classList.add('show');
-    }else{
-      badge.classList.remove('show');
-    }
+    if(badge){if(d.unread>0){badge.textContent=d.unread>99?'99+':String(d.unread);badge.classList.add('show');}else badge.classList.remove('show');}
   }catch(e){}
 }
 
-// Init
 async function init(){
-  // Load settings
   const r=await fetch(`${API}/settings`).catch(()=>null);
-  if(r&&r.ok){
-    const d=await r.json();
-    settings=d.data||{};
-  }
-  
+  if(r&&r.ok){const d=await r.json();settings=d.data||{};}
   const params=new URLSearchParams(window.location.search);
   const preId=params.get('id');
-  if(preId){
-    await loadId(preId);
-  }else{
-    document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">Tidak ada ID dipilih. <a href="index.html" style="color:#a06bff">Pilih ID dulu</a></span>`;
-  }
-  
-  // Input listeners
-  ['buyerName','buyerPhone'].forEach(id=>{
-    document.getElementById(id).addEventListener('input',checkNext);
-  });
-  
-  // Method radio
+  if(preId){await loadId(preId);}
+  else{document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">Tidak ada ID dipilih. <a href="index.html" style="color:#a06bff">Pilih ID dulu</a></span>`;}
+  ['buyerName','buyerPhone'].forEach(id=>{document.getElementById(id).addEventListener('input',checkNext);});
   document.querySelectorAll('.method-opt').forEach(opt=>{
-    opt.addEventListener('click',()=>{
-      document.querySelectorAll('.method-opt').forEach(o=>o.classList.remove('selected'));
-      opt.classList.add('selected');
-    });
+    opt.addEventListener('click',()=>{document.querySelectorAll('.method-opt').forEach(o=>o.classList.remove('selected'));opt.classList.add('selected');});
   });
-  
   loadNotifications();
   setInterval(loadNotifications,30000);
 }
