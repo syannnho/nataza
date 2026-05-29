@@ -1,4 +1,4 @@
-// api/index.js — lapakID Backend v2.3.0
+// api/index.js — lapakID Backend v2.4.0
 const { MongoClient, ObjectId } = require('mongodb');
 
 const MONGO_URI    = process.env.MONGODB_URI   || 'mongodb+srv://n4taza_db:N44E8WEKlOJLZIHQ@cluster0.pdfnlfb.mongodb.net/?appName=Cluster0';
@@ -301,12 +301,12 @@ module.exports = async function handler(req, res) {
     if (r0 === 'notifications') {
       if (!r1 && M==='GET') {
         const limit = parseInt(qs(req.url).limit)||20;
-        const notifs = await db.collection('notifications').find({type:{$in:['confirmed','info']}}).sort({createdAt:-1}).limit(limit).toArray();
-        const unread = await db.collection('notifications').countDocuments({type:{$in:['confirmed','info']},read:false});
+        const notifs = await db.collection('notifications').find({type:{$in:['confirmed','info','cancelled']}}).sort({createdAt:-1}).limit(limit).toArray();
+        const unread = await db.collection('notifications').countDocuments({type:{$in:['confirmed','info','cancelled']},read:false});
         return ok(res,{data:notifs,unread});
       }
       if (r1==='read' && M==='PUT') {
-        await db.collection('notifications').updateMany({type:{$in:['confirmed','info']},read:false},{$set:{read:true}});
+        await db.collection('notifications').updateMany({type:{$in:['confirmed','info','cancelled']},read:false},{$set:{read:true}});
         return ok(res,{message:'Semua notifikasi ditandai dibaca'});
       }
       if (r1==='broadcast' && M==='POST') {
@@ -414,6 +414,36 @@ module.exports = async function handler(req, res) {
       return created(res,{data:{...payment,_id:ins.insertedId}});
     }
 
+    // ── cancel payment ────────────────────────────────────────────────────
+    if (r0 === 'payments' && r1 && r2 === 'cancel' && M === 'PUT') {
+      const ip = getIP(req);
+      let oid;
+      try { oid = new ObjectId(r1); } catch { return fail(res,400,'ID tidak valid'); }
+      
+      const payment = await db.collection('payments').findOne({ _id: oid });
+      if (!payment) return fail(res,404,'Pembayaran tidak ditemukan');
+      if (payment.ip !== ip && !isAdmin(req)) return fail(res,403,'Unauthorized');
+      if (payment.status !== 'pending') return fail(res,400,'Hanya pesanan dengan status pending yang dapat dibatalkan');
+      
+      // Update status payment menjadi cancelled
+      await db.collection('payments').updateOne({ _id: oid }, { $set: { status: 'cancelled', cancelledAt: new Date() } });
+      
+      // Kembalikan status ID menjadi tidak terjual
+      await db.collection('ids').updateOne({ number: payment.idNumber }, { $set: { sold: false } });
+      
+      // Tambah notifikasi untuk user
+      await db.collection('notifications').insertOne({
+        type: 'cancelled',
+        title: 'Pesanan Dibatalkan',
+        message: `Pesanan ID ${payment.idNumber} telah dibatalkan. Silakan lakukan pemesanan ulang jika masih berminat.`,
+        idNumber: payment.idNumber,
+        read: false,
+        createdAt: new Date()
+      });
+      
+      return ok(res, { message: 'Pesanan berhasil dibatalkan' });
+    }
+
     // ── transactions (cek transaksi berdasarkan IP) ────────────────────────
     if (r0 === 'transactions') {
       if (r1 === 'check' && M === 'GET') {
@@ -438,6 +468,7 @@ module.exports = async function handler(req, res) {
         let oid; try{oid=new ObjectId(r1);}catch{return fail(res,400,'ID tidak valid');}
         const p = await db.collection('payments').findOne({_id:oid});
         if (!p) return fail(res,404,'Pembayaran tidak ditemukan');
+        if (p.status === 'cancelled') return fail(res,400,'Pesanan sudah dibatalkan');
         await db.collection('payments').updateOne({_id:oid},{$set:{status:'confirmed',confirmedAt:new Date()}});
         await db.collection('ids').updateOne({number:p.idNumber},{$set:{sold:true,soldAt:new Date()}});
         const priceStr = (p.finalPrice||0).toLocaleString('id-ID');
