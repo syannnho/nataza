@@ -189,7 +189,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .modal-close{background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:26px;height:26px;border-radius:7px;display:grid;place-items:center;cursor:pointer;color:#a06bff}
 .modal-close svg{width:12px;height:12px}
 
-/* MUSIC VISUALIZER - 3 GIF ANIMASI (Hanya untuk Kicau Mania) */
+/* MUSIC VISUALIZER - 3 GIF ANIMASI (Transparan) */
 .music-visualizer {
   position: fixed;
   bottom: 100px;
@@ -423,7 +423,6 @@ let likedSet=new Set(JSON.parse(localStorage.getItem('lapakid_liked')||'[]'));
 let tierPages={low:1,medium:1,high:1,legend:1};
 let songs=[],currentSong=0;
 let notifOpen=false;
-let isMusicPlaying = false;
 
 // DOM Elements
 const audio = document.getElementById('musicAudio');
@@ -435,6 +434,12 @@ const musicSub = document.getElementById('musicSub');
 const visualizer = document.getElementById('musicVisualizer');
 let autoHideTimer = null;
 
+// Hardcoded Kicau Mania
+const KICAU_MANIA = {
+  title: 'Kicau Mania',
+  src: 'https://files.catbox.moe/5fom9q.mp3'
+};
+
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
 const TCLS={low:'tier-low',medium:'tier-medium',high:'tier-high',legend:'tier-legend'};
@@ -445,9 +450,10 @@ function updateVisualizer() {
     visualizer.classList.remove('show');
     return;
   }
-  const currentTitle = (songs[currentSong].title || '').toLowerCase();
-  const isKicauMania = currentTitle.includes('kicau mania') || currentTitle.includes('kicaumania');
+  const currentSongObj = songs[currentSong];
   const isPlaying = !audio.paused && audio.currentTime > 0;
+  const isKicauMania = currentSongObj.title === 'Kicau Mania' || 
+                        (currentSongObj.title && currentSongObj.title.toLowerCase().includes('kicau mania'));
   
   if (isKicauMania && isPlaying) {
     visualizer.classList.add('show');
@@ -700,8 +706,18 @@ setInterval(checkPendingTransaction,5000);
 
 // ========== MUSIC ==========
 function applyMusic(s){
-  const list=(s&&Array.isArray(s.music)&&s.music.length)?s.music:[];
-  songs=list;
+  // Ambil musik dari database
+  let dbSongs = (s&&Array.isArray(s.music)&&s.music.length)?s.music:[];
+  
+  // Gabungkan dengan Kicau Mania (hardcoded) jika belum ada
+  const hasKicau = dbSongs.some(song => song.title === 'Kicau Mania' || (song.title && song.title.toLowerCase().includes('kicau')));
+  
+  if (!hasKicau) {
+    dbSongs.unshift(KICAU_MANIA);
+  }
+  
+  songs = dbSongs;
+  
   if(songs.length){
     loadSong(0);
     musicBar.style.display='flex';
@@ -726,20 +742,20 @@ function showMusicBar(){
 
 function loadSong(idx){
   currentSong=idx;
-  audio.src=songs[idx].src;
-  musicTitle.textContent=songs[idx].title;
-  musicSub.textContent=`Track ${idx+1} / ${songs.length}`;
-  const ti=musicTitle;
+  audio.src = songs[idx].src;
+  musicTitle.textContent = songs[idx].title;
+  musicSub.textContent = `Track ${idx+1} / ${songs.length}`;
+  const ti = musicTitle;
   ti.classList.remove('marquee');
   setTimeout(()=>{
-    if(ti.scrollWidth>ti.parentElement.clientWidth) ti.classList.add('marquee');
+    if(ti.scrollWidth > ti.parentElement.clientWidth) ti.classList.add('marquee');
   },200);
   updateVisualizer();
 }
 
 function togglePlay(){
   if(audio.paused){
-    audio.play().catch(e=>console.log('Play error:', e));
+    audio.play().catch(e => console.log('Play error:', e));
     musicAlb.classList.add('spin');
     setPlayIcon(true);
   }else{
@@ -760,18 +776,18 @@ function setPlayIcon(p){
 }
 
 function nextSong(){
-  currentSong=(currentSong+1)%songs.length;
+  currentSong = (currentSong+1) % songs.length;
   loadSong(currentSong);
-  audio.play().catch(e=>console.log('Play error:', e));
+  audio.play().catch(e => console.log('Play error:', e));
   musicAlb.classList.add('spin');
   setPlayIcon(true);
   updateVisualizer();
 }
 
 function prevSong(){
-  currentSong=(currentSong-1+songs.length)%songs.length;
+  currentSong = (currentSong-1 + songs.length) % songs.length;
   loadSong(currentSong);
-  audio.play().catch(e=>console.log('Play error:', e));
+  audio.play().catch(e => console.log('Play error:', e));
   musicAlb.classList.add('spin');
   setPlayIcon(true);
   updateVisualizer();
@@ -780,7 +796,6 @@ function prevSong(){
 // Audio event listeners
 audio.addEventListener('ended', () => {
   nextSong();
-  updateVisualizer();
 });
 audio.addEventListener('pause', () => {
   musicAlb.classList.remove('spin');
