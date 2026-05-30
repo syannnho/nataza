@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover"/>
 <title>Transaksi Saya – LAPAK ID</title>
 <link rel="icon" type="image/png" href="https://files.catbox.moe/eeimlh.png"/>
-<meta property="og:title" content="Transaksi Saya – LAPAK ID"/>
-<meta property="og:image" content="https://files.catbox.moe/eeimlh.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -36,8 +34,6 @@ html,body{width:100%;height:100%;background:#0b0b16;color:#fff;font-family:'Exo 
 
 /* SCROLL AREA */
 #scrollarea{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-
-/* WRAPPER */
 .wrap{padding:12px 16px;display:flex;flex-direction:column;gap:12px}
 
 /* Status Card */
@@ -79,18 +75,31 @@ html,body{width:100%;height:100%;background:#0b0b16;color:#fff;font-family:'Exo 
 .empty-state-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;margin-bottom:8px;color:#e8e8f5}
 .empty-state-desc{font-size:.7rem;margin-bottom:16px}
 
-/* BOTTOM NAV */
-#botnav{flex-shrink:0;background:rgba(14,14,26,.97);backdrop-filter:blur(16px);border-top:1px solid #1a1a2e;display:flex;justify-content:space-around;padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:50}
-.bni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;color:#4040a0;cursor:pointer;padding:4px 8px;border-radius:9px;transition:.18s;text-decoration:none}
-.bni:hover{color:#a06bff;background:rgba(123,47,255,.07)}
-.bni.active{color:#a06bff}
-.bni svg{width:19px;height:19px}
+/* NOTIF PANEL */
+.notif-panel{position:fixed;top:54px;right:12px;width:280px;max-height:320px;background:#181826;border:1px solid #232338;border-radius:13px;box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:200;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-6px) scale(.97);transition:.2s}
+.notif-panel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.notif-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1a1a2e}
+.notif-head-title{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700}
+.notif-mark{font-size:.6rem;color:#7b2fff;cursor:pointer;background:none;border:none}
+.notif-list{overflow-y:auto;max-height:260px}
+.notif-item{padding:9px 12px;border-bottom:1px solid #1a1a2e;display:flex;gap:8px;cursor:pointer}
+.notif-item:hover{background:#1e1e30}
+.notif-item.unread{background:rgba(123,47,255,.05)}
+.notif-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(16,185,129,.12);color:#10b981}
+.notif-ico svg{width:12px;height:12px}
+.notif-msg{font-size:.62rem;color:#e8e8f5;line-height:1.4}
+.notif-time{font-size:.54rem;color:#6060a0;margin-top:2px}
+.notif-empty{text-align:center;padding:20px;color:#6060a0;font-size:.7rem}
 
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,187,114,.15);border:1px solid #22bb72;color:#22bb72;font-size:13px;font-weight:700;padding:9px 20px;border-radius:50px;opacity:0;pointer-events:none;transition:.25s;z-index:999}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.warn{background:rgba(239,68,68,.15);border-color:#ef4444;color:#ef4444}
+/* NOTIF DETAIL */
+.nd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.nd-overlay.open{opacity:1;pointer-events:all}
+.nd-box{background:#181826;border:1px solid #232338;border-radius:16px;max-width:340px;width:90%;padding:20px;transform:scale(.94);transition:.22s}
+.nd-overlay.open .nd-box{transform:scale(1)}
+.modal-close{background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:26px;height:26px;border-radius:7px;display:grid;place-items:center;cursor:pointer;color:#a06bff}
+.modal-close svg{width:12px;height:12px}
 
-/* CONFIRM CANCEL OVERLAY */
+/* CANCEL OVERLAY */
 .cancel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
 .cancel-overlay.open{opacity:1;pointer-events:all}
 .cancel-box{background:#181826;border:1px solid #232338;border-radius:20px;max-width:320px;width:90%;padding:24px;text-align:center;transform:scale(.94);transition:.22s}
@@ -105,6 +114,17 @@ html,body{width:100%;height:100%;background:#0b0b16;color:#fff;font-family:'Exo 
 .btn-confirm-cancel:hover{background:#dc2626}
 .btn-keep-order{background:#0e0e1a;border:1px solid #232338;color:#e8e8f5}
 .btn-keep-order:hover{border-color:#7b2fff;color:#a06bff}
+
+/* BOTTOM NAV */
+#botnav{flex-shrink:0;background:rgba(14,14,26,.97);backdrop-filter:blur(16px);border-top:1px solid #1a1a2e;display:flex;justify-content:space-around;padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:50}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;color:#4040a0;cursor:pointer;padding:4px 8px;border-radius:9px;transition:.18s;text-decoration:none}
+.bni:hover{color:#a06bff;background:rgba(123,47,255,.07)}
+.bni.active{color:#a06bff}
+.bni svg{width:19px;height:19px}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,187,114,.15);border:1px solid #22bb72;color:#22bb72;font-size:13px;font-weight:700;padding:9px 20px;border-radius:50px;opacity:0;pointer-events:none;transition:.25s;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.warn{background:rgba(239,68,68,.15);border-color:#ef4444;color:#ef4444}
 </style>
 </head>
 <body>
@@ -143,17 +163,24 @@ html,body{width:100%;height:100%;background:#0b0b16;color:#fff;font-family:'Exo 
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<nav id="botnav">
-  <a class="bni" href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-    Beranda
-  </a>
-  <a class="bni active" href="transaksi.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-    Transaksi
-  </a>
-</nav>
+<!-- NOTIF PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-head">
+    <div class="notif-head-title">Aktivitas</div>
+    <button class="notif-mark" onclick="markAllRead()">Tandai dibaca</button>
+  </div>
+  <div class="notif-list" id="notifList"><div class="notif-empty">Memuat...</div></div>
+</div>
+
+<!-- NOTIF DETAIL -->
+<div class="nd-overlay" id="ndOverlay">
+  <div class="nd-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700">Detail</div>
+      <div class="modal-close" onclick="document.getElementById('ndOverlay').classList.remove('open')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div id="ndContent"></div>
+  </div>
 </div>
 
 <!-- CANCEL CONFIRM OVERLAY -->
@@ -169,11 +196,25 @@ html,body{width:100%;height:100%;background:#0b0b16;color:#fff;font-family:'Exo 
   </div>
 </div>
 
+<!-- BOTTOM NAV -->
+<nav id="botnav">
+  <a class="bni" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Beranda
+  </a>
+  <a class="bni active" href="transaksi.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Transaksi
+  </a>
+</nav>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const API = '/api';
 let currentTransactions = [];
+let notifOpen = false;
 let cancelCallback = null;
 
 function showToast(msg, isError = false) {
@@ -191,8 +232,6 @@ function formatRupiah(num) {
 }
 
 // ========== NOTIFIKASI ==========
-let notifOpen = false;
-
 document.getElementById('notifBtn').addEventListener('click', (e) => {
   e.stopPropagation();
   notifOpen = !notifOpen;
@@ -206,31 +245,6 @@ document.addEventListener('click', (e) => {
     document.getElementById('notifPanel').classList.remove('open');
   }
 });
-
-// NOTIF PANEL HTML
-const notifPanelHTML = `
-<div class="notif-panel" id="notifPanel">
-  <div class="notif-head">
-    <div class="notif-head-title">Aktivitas</div>
-    <button class="notif-mark" onclick="markAllRead()">Tandai dibaca</button>
-  </div>
-  <div class="notif-list" id="notifList"><div class="notif-empty">Memuat...</div></div>
-</div>
-`;
-document.body.insertAdjacentHTML('beforeend', notifPanelHTML);
-
-const notifDetailHTML = `
-<div class="nd-overlay" id="ndOverlay">
-  <div class="nd-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700">Detail</div>
-      <div class="modal-close" onclick="document.getElementById('ndOverlay').classList.remove('open')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-    </div>
-    <div id="ndContent"></div>
-  </div>
-</div>
-`;
-document.body.insertAdjacentHTML('beforeend', notifDetailHTML);
 
 async function loadNotifications() {
   try {
@@ -323,8 +337,8 @@ async function cancelOrder(transactionId, paymentId) {
     
     const data = await res.json();
     if (data.success) {
-      showToast('Pesanan berhasil dibatalkan', false);
-      loadTransactions(); // Refresh daftar transaksi
+      showToast('Pesanan berhasil dibatalkan');
+      loadTransactions();
     } else {
       showToast(data.message || 'Gagal membatalkan pesanan', true);
     }
