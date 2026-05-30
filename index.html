@@ -13,28 +13,54 @@
 html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'Exo 2',sans-serif;overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0b0b16}::-webkit-scrollbar-thumb{background:#7b2fff;border-radius:99px}
 
-#app{width:100%;max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(circle at top right,rgba(123,47,255,.18),transparent 35%),#0b0b16;overflow-x:hidden}
+#app{
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(circle at top right,rgba(123,47,255,.18),transparent 35%),#0b0b16;
+  overflow-x:hidden;
+  /* FIX: padding bottom agar tidak tertutup bottom nav */
+  padding-bottom:calc(60px + env(safe-area-inset-bottom));
+}
 
-/* TOP NAV */
-#topnav{flex-shrink:0;background:rgba(14,14,26,.96);backdrop-filter:blur(16px);border-bottom:1px solid #232338;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:50}
+/* ── TOP NAV ── */
+#topnav{
+  position:sticky;
+  top:0;
+  flex-shrink:0;
+  background:rgba(14,14,26,.96);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid #232338;
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  z-index:100;
+  width:100%;
+}
 .logo{display:flex;align-items:center;gap:0}
-.logo-mark{width:40px;height:40px;border-radius:10px;overflow:hidden}
+.logo-mark{width:40px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0}
 .logo-mark img{width:100%;height:100%;object-fit:cover}
 .nav-r{display:flex;align-items:center;gap:8px}
-.nav-icon{position:relative;background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:34px;height:34px;border-radius:9px;display:grid;place-items:center;cursor:pointer;transition:.2s}
+.nav-icon{position:relative;background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:34px;height:34px;border-radius:9px;display:grid;place-items:center;cursor:pointer;transition:.2s;flex-shrink:0}
 .nav-icon:hover{background:rgba(123,47,255,.2)}
 .nav-icon svg{color:#a06bff;width:16px;height:16px}
 .notif-badge{position:absolute;top:-4px;right:-4px;min-width:15px;height:15px;background:#ef4444;border-radius:99px;border:2px solid #0b0b16;display:none;align-items:center;justify-content:center;font-size:.44rem;font-weight:800;color:#fff;padding:0 2px}
 .notif-badge.show{display:flex}
 
+/* ── SCROLL AREA ── */
 #scrollarea{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 
-/* BANNER */
+/* ── BANNER ── */
 #bannerSec{width:100%;line-height:0;position:relative}
-.banner-wrap{position:relative;overflow:hidden}
-.banner-track{display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1)}
-.banner-slide{flex:0 0 100%}
-.banner-slide img{width:100%;display:block;max-height:180px;object-fit:cover}
+.banner-wrap{position:relative;overflow:hidden;width:100%}
+.banner-track{display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1);width:100%}
+.banner-slide{flex:0 0 100%;width:100%}
+.banner-slide img{width:100%;display:block;max-height:180px;object-fit:cover;object-position:center}
 .banner-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);border:none;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;cursor:pointer;z-index:5;color:#fff;backdrop-filter:blur(4px)}
 .bnp{left:8px}.bnn{right:8px}
 .banner-nav svg{width:13px;height:13px}
@@ -42,61 +68,46 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 .banner-dot{width:5px;height:5px;border-radius:99px;background:#2a2a45;border:none;cursor:pointer;transition:.3s}
 .banner-dot.active{background:#7b2fff;width:16px}
 
-/* FIRE ANIMATION */
+/* ── FIRE ANIMATION ── */
 .sec-head{display:flex;align-items:center;justify-content:space-between;padding:6px 12px 4px}
 .sec-title{display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:#e8e8f5}
-.fire-emoji{
-  display:inline-block;
-  font-size:1.2rem;
-  transform-origin:center bottom;
-  animation: fireShake .9s infinite ease-in-out, firePulse 1.5s infinite ease-in-out, fireGlow 1.2s infinite alternate;
-}
-@keyframes fireShake{
-  0%{transform:rotate(-5deg) translateY(0)}
-  25%{transform:rotate(5deg) translateY(-2px)}
-  50%{transform:rotate(-4deg) translateY(1px)}
-  75%{transform:rotate(4deg) translateY(-2px)}
-  100%{transform:rotate(-5deg) translateY(0)}
-}
-@keyframes firePulse{
-  0%,100%{scale:1;}
-  50%{scale:1.25;}
-}
-@keyframes fireGlow{
-  0%{filter:drop-shadow(0 0 8px rgba(255,180,0,.9)) drop-shadow(0 0 18px rgba(255,120,0,.7));}
-  100%{filter:drop-shadow(0 0 10px rgba(255,70,0,1)) drop-shadow(0 0 24px rgba(255,0,0,.8));}
-}
+.fire-emoji{display:inline-block;font-size:1.2rem;transform-origin:center bottom;animation:fireShake .9s infinite ease-in-out,firePulse 1.5s infinite ease-in-out,fireGlow 1.2s infinite alternate}
+@keyframes fireShake{0%{transform:rotate(-5deg) translateY(0)}25%{transform:rotate(5deg) translateY(-2px)}50%{transform:rotate(-4deg) translateY(1px)}75%{transform:rotate(4deg) translateY(-2px)}100%{transform:rotate(-5deg) translateY(0)}}
+@keyframes firePulse{0%,100%{scale:1}50%{scale:1.25}}
+@keyframes fireGlow{0%{filter:drop-shadow(0 0 8px rgba(255,180,0,.9)) drop-shadow(0 0 18px rgba(255,120,0,.7))}100%{filter:drop-shadow(0 0 10px rgba(255,70,0,1)) drop-shadow(0 0 24px rgba(255,0,0,.8))}}
 .sec-link{font-size:.62rem;color:#7b2fff;font-weight:600;cursor:pointer}
 .pop-scroll{display:flex;gap:8px;padding:0 12px 8px;overflow-x:auto;scrollbar-width:none}
 .pop-scroll::-webkit-scrollbar{display:none}
 
-/* MINI CARD */
-.mini-card{background:#181826;border:1px solid #252540;border-radius:12px;padding:10px;min-width:120px;cursor:pointer;transition:.2s;flex-shrink:0;position:relative}
+/* ── MINI CARD ── */
+.mini-card{background:#181826;border:1px solid #252540;border-radius:12px;padding:10px;min-width:110px;cursor:pointer;transition:.2s;flex-shrink:0;position:relative}
 .mini-card:hover{border-color:rgba(123,47,255,.4);transform:translateY(-2px)}
-.mini-id{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:8px;color:#e8e8f5;word-break:break-all}
+.mini-id{font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:8px;color:#e8e8f5;
+  /* FIX: no wrap untuk mini card */
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
 .mini-like-btn{background:none;border:none;cursor:pointer;color:#5050a0;display:flex;align-items:center;gap:4px;font-size:.62rem;padding:3px 6px;border-radius:15px;transition:.15s;width:fit-content}
 .mini-like-btn:hover{color:#a06bff;background:rgba(123,47,255,.08)}
 .mini-like-btn.liked{color:#7b2fff;background:rgba(123,47,255,.1)}
 .mini-like-btn svg{width:10px;height:10px}
 
-/* SEARCH */
+/* ── SEARCH ── */
 #searchbar{padding:8px 12px 0;flex-shrink:0}
 .search-row{display:flex;gap:7px}
-.search-wrap{flex:1;display:flex;align-items:center;gap:7px;background:#181826;border:1px solid #252540;border-radius:11px;padding:9px 12px;transition:border-color .2s}
+.search-wrap{flex:1;display:flex;align-items:center;gap:7px;background:#181826;border:1px solid #252540;border-radius:11px;padding:9px 12px;transition:border-color .2s;min-width:0}
 .search-wrap:focus-within{border-color:#7b2fff;box-shadow:0 0 0 3px rgba(123,47,255,.1)}
 .search-wrap svg{color:#5050a0;flex-shrink:0;width:14px;height:14px}
-.search-wrap input{flex:1;background:none;border:none;outline:none;color:#e8e8f5;font-family:'Exo 2',sans-serif;font-size:.84rem}
+.search-wrap input{flex:1;background:none;border:none;outline:none;color:#e8e8f5;font-family:'Exo 2',sans-serif;font-size:.84rem;min-width:0;width:100%}
 .search-wrap input::placeholder{color:#4040a0}
-.btn-search{background:#7b2fff;color:#fff;border:none;border-radius:9px;padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 0 10px rgba(123,47,255,.4);transition:.2s}
+.btn-search{background:#7b2fff;color:#fff;border:none;border-radius:9px;padding:9px 14px;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 0 10px rgba(123,47,255,.4);transition:.2s;flex-shrink:0}
 .btn-search:hover{filter:brightness(1.15)}
 
-/* FILTER BAR */
+/* ── FILTER BAR ── */
 #filterBar{display:flex;gap:6px;padding:8px 12px 4px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
 #filterBar::-webkit-scrollbar{display:none}
 .fp{background:#181826;border:1px solid #252540;color:#6060a0;border-radius:8px;padding:5px 12px;font-family:'Exo 2',sans-serif;font-size:.7rem;font-weight:600;white-space:nowrap;cursor:pointer;transition:.2s;flex-shrink:0}
 .fp.act{background:rgba(123,47,255,.15);border-color:rgba(123,47,255,.4);color:#a06bff}
 
-/* SORT ROW */
+/* ── SORT ROW ── */
 #sortrow{padding:5px 12px 4px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;flex-shrink:0}
 .tot-lbl{color:#4040a0}.tot-lbl b{color:#9090cc}
 .sort-sel{background:#181826;border:1px solid #252540;color:#e8e8f5;border-radius:7px;padding:5px 20px 5px 8px;font-family:'Exo 2',sans-serif;font-size:.68rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235050a0' stroke-width='3'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center}
@@ -104,16 +115,30 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 
 .hdiv{height:1px;background:#1a1a2e;margin:4px 12px;flex-shrink:0}
 
-/* TIER BADGE */
-.tier-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:.6rem;font-weight:700;letter-spacing:.3px}
+/* ── TIER BADGE ── */
+.tier-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:.6rem;font-weight:700;letter-spacing:.3px;white-space:nowrap}
 .tier-low{background:rgba(192,192,192,.12);color:#c0c0c0;border:1px solid rgba(192,192,192,.2)}
 .tier-medium{background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.2)}
 .tier-high{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
 .tier-legend{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
 
-/* MAIN CARD */
+/* ── MAIN CARD ── */
 #cardlist{padding:0 10px;display:flex;flex-direction:column;gap:7px;padding-bottom:8px}
-.acard{background:#181826;border:1px solid #232338;border-radius:13px;overflow:hidden;display:flex;flex-wrap:wrap;position:relative;transition:.22s cubic-bezier(.4,0,.2,1);animation:fadeUp .3s ease both;cursor:pointer}
+
+.acard{
+  background:#181826;
+  border:1px solid #232338;
+  border-radius:13px;
+  overflow:hidden;
+  display:flex;
+  position:relative;
+  transition:.22s cubic-bezier(.4,0,.2,1);
+  animation:fadeUp .3s ease both;
+  cursor:pointer;
+  /* FIX: no wrap agar tidak ke bawah */
+  flex-wrap:nowrap;
+  min-width:0;
+}
 .acard:hover{border-color:rgba(123,47,255,.45);transform:translateY(-2px);box-shadow:0 6px 22px rgba(123,47,255,.1)}
 .acard.is-sold{opacity:.6;pointer-events:none}
 .acard.is-new::before{content:'NEW';position:absolute;top:7px;right:7px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:.44rem;font-weight:800;padding:2px 6px;border-radius:4px;letter-spacing:.5px;animation:newPulse 2s ease-in-out infinite;z-index:2}
@@ -121,44 +146,119 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 @keyframes newPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 4px rgba(16,185,129,0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-.cleft{flex:0 0 100px;padding:11px 8px 11px 11px;border-right:1px solid #1e1e30;display:flex;flex-direction:column;gap:7px;justify-content:center}
-.acc-id{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:#e8e8f5;word-break:break-all;line-height:1.2}
+/* ── CARD LEFT: ID tidak wrap ── */
+.cleft{
+  flex:0 0 auto;
+  width:105px;
+  min-width:0;
+  padding:11px 8px 11px 11px;
+  border-right:1px solid #1e1e30;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  justify-content:center;
+}
+.acc-id{
+  font-family:'Rajdhani',sans-serif;
+  font-size:.88rem;
+  font-weight:700;
+  color:#e8e8f5;
+  /* FIX: nomor ID tidak turun ke bawah */
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.2;
+  max-width:100%;
+}
+
 .cright{flex:1;min-width:0;padding:9px 8px 9px 10px;display:flex;flex-direction:column;gap:5px}
 .info-row{display:flex;gap:10px;flex-wrap:wrap}
 .inf{display:flex;flex-direction:column;gap:1px;min-width:0}
-.inf-lbl{font-size:.56rem;color:#4040a0;text-transform:uppercase;letter-spacing:.3px}
+.inf-lbl{font-size:.56rem;color:#4040a0;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 .inf-val{font-size:.75rem;font-weight:600;color:#e8e8f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cbot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;gap:4px;flex-wrap:wrap}
-.card-price{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;color:#a06bff;white-space:nowrap}
-.btn-beli{background:#7b2fff;border:none;border-radius:7px;padding:5px 12px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;box-shadow:0 0 8px rgba(123,47,255,.35);transition:.18s;flex-shrink:0}
+.cbot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;gap:4px;flex-wrap:nowrap}
+.card-price{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:#a06bff;white-space:nowrap}
+.btn-beli{background:#7b2fff;border:none;border-radius:7px;padding:5px 10px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;box-shadow:0 0 8px rgba(123,47,255,.35);transition:.18s;flex-shrink:0;white-space:nowrap}
 .btn-beli:hover{filter:brightness(1.15)}
-.btn-beli:disabled{opacity:0.5;cursor:not-allowed}
+.btn-beli:disabled{opacity:.5;cursor:not-allowed}
 
-.like-btn{background:none;border:none;cursor:pointer;color:#5050a0;display:flex;align-items:center;gap:4px;font-size:.65rem;font-family:'Exo 2',sans-serif;transition:.15s;padding:4px 8px;border-radius:20px;margin-top:4px;width:fit-content}
+.like-btn{background:none;border:none;cursor:pointer;color:#5050a0;display:flex;align-items:center;gap:4px;font-size:.63rem;font-family:'Exo 2',sans-serif;transition:.15s;padding:3px 6px;border-radius:20px;margin-top:4px;width:fit-content;white-space:nowrap}
 .like-btn:hover{color:#a06bff;background:rgba(123,47,255,.1)}
 .like-btn.liked{color:#7b2fff;background:rgba(123,47,255,.1)}
-.like-btn svg{width:12px;height:12px}
+.like-btn svg{width:11px;height:11px;flex-shrink:0}
 
-@media (max-width: 420px){
-  .cleft{flex:0 0 85px;padding:10px 6px 10px 10px}
-  .acc-id{font-size:.8rem}
-  .cright{padding:8px 6px 8px 8px}
-  .inf-val{font-size:.7rem}
-  .card-price{font-size:.85rem}
-  .btn-beli{padding:4px 10px;font-size:.7rem}
-  .like-btn{font-size:.6rem;padding:3px 6px}
+/* ── CARD POP-UP MODAL ANIMATION ── */
+.card-modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(10px);
+  z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s ease;
+  padding:16px;
+}
+.card-modal-overlay.open{opacity:1;pointer-events:all}
+
+.card-modal{
+  background:linear-gradient(145deg,#1a1a2e,#181826);
+  border:1px solid rgba(123,47,255,.4);
+  border-radius:20px;
+  width:100%;max-width:340px;
+  padding:22px;
+  transform:scale(.85) translateY(30px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+  opacity:0;
+  position:relative;
+  box-shadow:0 0 40px rgba(123,47,255,.25), 0 20px 60px rgba(0,0,0,.5);
+}
+.card-modal-overlay.open .card-modal{
+  transform:scale(1) translateY(0);
+  opacity:1;
 }
 
-@media (max-width: 380px){
-  .cleft{flex:0 0 80px}
-  .acc-id{font-size:.75rem}
-  .info-row{gap:6px}
-  .inf-lbl{font-size:.5rem}
-  .inf-val{font-size:.65rem}
-  .card-price{font-size:.8rem}
+.card-modal-close{
+  position:absolute;top:12px;right:12px;
+  background:rgba(123,47,255,.12);border:1px solid rgba(123,47,255,.25);
+  width:28px;height:28px;border-radius:8px;
+  display:grid;place-items:center;cursor:pointer;color:#a06bff;
+  transition:.18s;
 }
+.card-modal-close:hover{background:rgba(123,47,255,.25)}
+.card-modal-close svg{width:13px;height:13px}
 
-/* PAGINATION */
+.cmod-id{
+  font-family:'Rajdhani',sans-serif;
+  font-size:1.6rem;font-weight:700;
+  color:#fff;
+  margin-bottom:4px;
+  letter-spacing:.5px;
+  word-break:break-all;
+}
+.cmod-tier{margin-bottom:16px}
+.cmod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.cmod-inf{background:#111120;border:1px solid #232338;border-radius:10px;padding:10px 12px}
+.cmod-lbl{font-size:.56rem;color:#5050a0;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.cmod-val{font-size:.82rem;font-weight:600;color:#e8e8f5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.cmod-price-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px;gap:10px;flex-wrap:wrap}
+.cmod-price{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:#a06bff}
+.cmod-buy{background:linear-gradient(135deg,#7b2fff,#a06bff);border:none;border-radius:10px;padding:10px 24px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 0 16px rgba(123,47,255,.4);transition:.2s;white-space:nowrap}
+.cmod-buy:hover{filter:brightness(1.2);transform:translateY(-1px)}
+
+.cmod-like-row{margin-top:12px;padding-top:12px;border-top:1px solid #232338;display:flex;align-items:center;justify-content:space-between}
+.cmod-like-btn{background:none;border:1px solid rgba(123,47,255,.2);cursor:pointer;color:#5050a0;display:flex;align-items:center;gap:6px;font-size:.72rem;font-family:'Exo 2',sans-serif;transition:.2s;padding:6px 14px;border-radius:20px;white-space:nowrap}
+.cmod-like-btn:hover{color:#a06bff;background:rgba(123,47,255,.1)}
+.cmod-like-btn.liked{color:#7b2fff;background:rgba(123,47,255,.1);border-color:rgba(123,47,255,.35)}
+.cmod-like-btn svg{width:13px;height:13px;flex-shrink:0}
+.cmod-detail-link{font-size:.65rem;color:#7b2fff;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.cmod-detail-link:hover{color:#a06bff}
+
+/* glow pulse on open */
+@keyframes modalGlow{0%{box-shadow:0 0 40px rgba(123,47,255,.25),0 20px 60px rgba(0,0,0,.5)}50%{box-shadow:0 0 60px rgba(123,47,255,.4),0 20px 60px rgba(0,0,0,.5)}100%{box-shadow:0 0 40px rgba(123,47,255,.25),0 20px 60px rgba(0,0,0,.5)}}
+.card-modal-overlay.open .card-modal{animation:modalGlow 2s ease-in-out infinite}
+
+/* ── PAGINATION ── */
 #pagination{padding:8px 10px 6px;display:flex;justify-content:center;align-items:center;gap:5px;flex-wrap:wrap}
 .pgbtn{min-width:34px;height:34px;border-radius:8px;border:1px solid #232338;background:#181826;color:#e8e8f5;font-family:'Exo 2',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;display:grid;place-items:center;transition:.18s}
 .pgbtn:hover{border-color:#7b2fff;color:#a06bff}
@@ -166,7 +266,7 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 .pgbtn svg{width:12px;height:12px}
 .pg-sep{color:#4040a0;font-size:.75rem}
 
-/* NOTIF PANEL */
+/* ── NOTIF PANEL ── */
 .notif-panel{position:fixed;top:54px;right:12px;width:280px;max-height:320px;background:#181826;border:1px solid #232338;border-radius:13px;box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:200;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(-6px) scale(.97);transition:.2s}
 .notif-panel.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
 .notif-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1a1a2e}
@@ -182,7 +282,7 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 .notif-time{font-size:.54rem;color:#6060a0;margin-top:2px}
 .notif-empty{text-align:center;padding:20px;color:#6060a0;font-size:.7rem}
 
-/* NOTIF DETAIL */
+/* ── NOTIF DETAIL ── */
 .nd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
 .nd-overlay.open{opacity:1;pointer-events:all}
 .nd-box{background:#181826;border:1px solid #232338;border-radius:16px;max-width:340px;width:90%;padding:20px;transform:scale(.94);transition:.22s}
@@ -190,19 +290,19 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 .modal-close{background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);width:26px;height:26px;border-radius:7px;display:grid;place-items:center;cursor:pointer;color:#a06bff}
 .modal-close svg{width:12px;height:12px}
 
-/* MUSIC VISUALIZER */
-.music-visualizer{position:fixed;bottom:100px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:20px;z-index:398;pointer-events:none;opacity:0;transition:opacity 0.3s ease}
+/* ── MUSIC VISUALIZER ── */
+.music-visualizer{position:fixed;bottom:100px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:20px;z-index:398;pointer-events:none;opacity:0;transition:opacity .3s ease}
 .music-visualizer.show{opacity:1}
 .music-visualizer img{width:55px;height:55px;border-radius:50%;object-fit:cover;background:transparent}
-.music-visualizer .gif-left{animation:bounceLeft 0.8s ease-in-out infinite}
-.music-visualizer .gif-center{width:75px;height:75px;animation:bounceCenter 0.6s ease-in-out infinite}
-.music-visualizer .gif-right{animation:bounceRight 0.8s ease-in-out infinite}
+.music-visualizer .gif-left{animation:bounceLeft .8s ease-in-out infinite}
+.music-visualizer .gif-center{width:75px;height:75px;animation:bounceCenter .6s ease-in-out infinite}
+.music-visualizer .gif-right{animation:bounceRight .8s ease-in-out infinite}
 @keyframes bounceLeft{0%,100%{transform:translateX(0) scale(1)}50%{transform:translateX(-10px) scale(1.08)}}
 @keyframes bounceCenter{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 @keyframes bounceRight{0%,100%{transform:translateX(0) scale(1)}50%{transform:translateX(10px) scale(1.08)}}
 
-/* MUSIC BAR */
-.music-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(0);z-index:400;max-width:460px;width:calc(100% - 24px);background:rgba(14,14,26,.92);backdrop-filter:blur(20px);border:1px solid rgba(123,47,255,.25);border-radius:99px;padding:7px 14px 7px 9px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .3s,opacity .3s;cursor:pointer}
+/* ── MUSIC BAR ── */
+.music-bar{position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(0);z-index:400;max-width:460px;width:calc(100% - 24px);background:rgba(14,14,26,.92);backdrop-filter:blur(20px);border:1px solid rgba(123,47,255,.25);border-radius:99px;padding:7px 14px 7px 9px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 24px rgba(0,0,0,.4);transition:transform .3s,opacity .3s;cursor:pointer}
 .music-bar.hidden{transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none}
 .music-alb{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7b2fff,#a06bff);display:grid;place-items:center;flex-shrink:0}
 .music-alb svg{width:15px;height:15px;color:#fff}
@@ -218,18 +318,33 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 .mc:hover{color:#e8e8f5;background:rgba(255,255,255,.07)}
 .mc svg{width:13px;height:13px}
 .mc-play{background:rgba(123,47,255,.8)!important;color:#fff!important;width:29px;height:29px}
-.music-fab{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:399;background:rgba(14,14,26,.88);border:1px solid rgba(123,47,255,.2);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#a06bff;font-size:.62rem;font-weight:600;opacity:0;pointer-events:none;transition:.3s}
+.music-fab{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:399;background:rgba(14,14,26,.88);border:1px solid rgba(123,47,255,.2);border-radius:99px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;color:#a06bff;font-size:.62rem;font-weight:600;opacity:0;pointer-events:none;transition:.3s}
 .music-fab.show{opacity:1;pointer-events:all}
 
-/* BOTTOM NAV */
-#botnav{flex-shrink:0;background:rgba(14,14,26,.97);backdrop-filter:blur(16px);border-top:1px solid #1a1a2e;display:flex;justify-content:space-around;padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:50}
+/* ── BOTTOM NAV ── */
+#botnav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:rgba(14,14,26,.97);
+  backdrop-filter:blur(16px);
+  border-top:1px solid #1a1a2e;
+  display:flex;justify-content:space-around;
+  padding:7px 0 calc(7px + env(safe-area-inset-bottom));
+  z-index:50;
+  max-width:480px;
+  margin:0 auto;
+  /* FIX: agar bottom nav di bawah */
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+}
 .bni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.58rem;color:#4040a0;cursor:pointer;padding:4px 8px;border-radius:9px;transition:.18s;text-decoration:none;position:relative}
 .bni:hover{color:#a06bff;background:rgba(123,47,255,.07)}
 .bni.active{color:#a06bff}
 .bni svg{width:19px;height:19px}
 .trans-badge-icon{position:absolute;top:-5px;right:-8px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center;display:none}
 
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,187,114,.15);border:1px solid #22bb72;color:#22bb72;font-size:13px;font-weight:700;padding:9px 20px;border-radius:50px;opacity:0;pointer-events:none;transition:.25s;z-index:999}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(34,187,114,.15);border:1px solid #22bb72;color:#22bb72;font-size:13px;font-weight:700;padding:9px 20px;border-radius:50px;opacity:0;pointer-events:none;transition:.25s;z-index:999}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.warn{background:rgba(239,68,68,.15);border-color:#ef4444;color:#ef4444}
 .empty{text-align:center;padding:2rem 1rem;color:#6060a0;font-size:.82rem}
@@ -268,6 +383,16 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
       <div class="modal-close" onclick="document.getElementById('ndOverlay').classList.remove('open')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     </div>
     <div id="ndContent"></div>
+  </div>
+</div>
+
+<!-- CARD POPUP MODAL -->
+<div class="card-modal-overlay" id="cardModalOverlay" onclick="closeCardModal(event)">
+  <div class="card-modal" id="cardModal">
+    <div class="card-modal-close" onclick="closeCardModalDirect()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <div id="cardModalContent"></div>
   </div>
 </div>
 
@@ -335,7 +460,7 @@ html,body{width:100%;min-height:100%;background:#0b0b16;color:#fff;font-family:'
 
 </div><!-- /scrollarea -->
 
-<!-- MUSIC VISUALIZER 3 GIF -->
+<!-- MUSIC VISUALIZER -->
 <div class="music-visualizer" id="musicVisualizer">
   <img src="https://files.catbox.moe/a59a9g.gif" alt="gif kiri" class="gif-left">
   <img src="https://files.catbox.moe/a59a9g.gif" alt="gif tengah" class="gif-center">
@@ -386,6 +511,78 @@ let notifOpen=false;
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TNAME={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
 const TCLS={low:'tier-low',medium:'tier-medium',high:'tier-high',legend:'tier-legend'};
+
+// ── CARD MODAL ──────────────────────────────────────
+let currentModalId=null;
+
+function openCardModal(idObj){
+  currentModalId=idObj;
+  const liked=likedSet.has(idObj.number);
+  const lc=idObj.likes||0;
+  const isSold=idObj.sold||false;
+  const price=settings.prices?fmt((idObj.price!=null?idObj.price:settings.prices[idObj.tier])||0):'—';
+
+  document.getElementById('cardModalContent').innerHTML=`
+    <div class="cmod-id">${idObj.number}</div>
+    <div class="cmod-tier"><span class="tier-badge ${TCLS[idObj.tier]}">${TNAME[idObj.tier]}</span></div>
+    <div class="cmod-grid">
+      <div class="cmod-inf">
+        <div class="cmod-lbl">TIER</div>
+        <div class="cmod-val">${TNAME[idObj.tier]}</div>
+      </div>
+      <div class="cmod-inf">
+        <div class="cmod-lbl">STATUS</div>
+        <div class="cmod-val" style="color:${isSold?'#ef4444':'#22bb72'}">${isSold?'Terjual':'Tersedia'}</div>
+      </div>
+    </div>
+    <div class="cmod-price-row">
+      <span class="cmod-price">${price}</span>
+      ${!isSold?`<button class="cmod-buy" onclick="window.location.href='payment.html?id=${encodeURIComponent(idObj.number)}'">Beli Sekarang</button>`:''}
+    </div>
+    <div class="cmod-like-row">
+      <button class="cmod-like-btn${liked?' liked':''}" id="cmodLikeBtn" onclick="doLikeModal('${idObj.number}')">
+        <svg viewBox="0 0 24 24" fill="${liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        ${lc===0?'Suka':lc+' suka'}
+      </button>
+      <span class="cmod-detail-link" onclick="goToDetail('${idObj.number}')">Lihat Detail ›</span>
+    </div>
+  `;
+  document.getElementById('cardModalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeCardModal(e){
+  if(e.target===document.getElementById('cardModalOverlay')) closeCardModalDirect();
+}
+function closeCardModalDirect(){
+  document.getElementById('cardModalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  currentModalId=null;
+}
+
+async function doLikeModal(number){
+  if(likedSet.has(number)){showToast('Sudah menyukai ID ini','warn');return;}
+  const btn=document.getElementById('cmodLikeBtn');
+  if(btn) btn.disabled=true;
+  const r=await fetch(`${API}/like/${number}`,{method:'POST'}).catch(()=>null);
+  if(!r){if(btn)btn.disabled=false;showToast('Gagal, coba lagi','warn');return;}
+  const d=await r.json();
+  if(d.success){
+    likedSet.add(number);localStorage.setItem('lapakid_liked',JSON.stringify([...likedSet]));
+    const idx=allIds.findIndex(i=>i.number===number);if(idx!==-1)allIds[idx].likes=d.likes;
+    if(btn){
+      btn.classList.add('liked');
+      btn.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${d.likes===0?'Suka':d.likes+' suka'}`;
+      btn.disabled=false;
+    }
+    // update list cards
+    document.querySelectorAll(`.like-btn[data-num="${number}"]`).forEach(b=>{b.classList.add('liked');b.innerHTML=`<svg viewBox="0 0 24 24" fill="#7b2fff" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${d.likes} suka`;});
+    showToast('Berhasil menyukai!');
+  }else{if(btn)btn.disabled=false;showToast(d.message||'Gagal like','warn');}
+}
+
+// Close modal on ESC
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCardModalDirect();});
 
 // ── BANNER ──────────────────────────────────────────
 let bannerCur=0,bannerTotal=0,bannerTimer=null;
@@ -497,20 +694,35 @@ function render(){
     html+=`<div style="height:6px"></div>`;
   }
   container.innerHTML=html;
+
+  // Card click → open modal
   container.querySelectorAll('.acard:not(.is-sold)').forEach(card=>{
     card.addEventListener('click',(e)=>{
-      if(e.target.classList.contains('btn-beli') || e.target.closest('.btn-beli')) return;
-      if(e.target.classList.contains('like-btn') || e.target.closest('.like-btn')) return;
-      const num = card.dataset.num;
-      if(num) goToDetail(num);
+      if(e.target.closest('.btn-beli')) return;
+      if(e.target.closest('.like-btn')) return;
+      const num=card.dataset.num;
+      if(num){
+        const idObj=allIds.find(i=>i.number===num);
+        if(idObj) openCardModal(idObj);
+      }
     });
   });
+
   container.querySelectorAll('.like-btn').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();doLike(btn.dataset.num,btn);});});
   container.querySelectorAll('.btn-beli').forEach(btn=>{
     btn.addEventListener('click',e=>{
       e.stopPropagation();
-      const num = btn.dataset.num;
-      if(num) window.location.href = `payment.html?id=${encodeURIComponent(num)}`;
+      const num=btn.dataset.num;
+      if(num) window.location.href=`payment.html?id=${encodeURIComponent(num)}`;
+    });
+  });
+
+  // Pagination
+  container.querySelectorAll('.pgbtn[data-tier]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const tier=btn.dataset.tier;
+      const pg=parseInt(btn.dataset.page);
+      if(!isNaN(pg)&&pg>=1){tierPages[tier]=pg;render();document.getElementById('semua').scrollIntoView({behavior:'smooth'});}
     });
   });
 }
@@ -524,11 +736,8 @@ function buildCard(id,ani=0){
   let cls='acard';
   if(isSold) cls+=' is-sold';
   else if(isNewId) cls+=' is-new';
-  
-  // Jika sold, tombol beli tidak ditampilkan
-  const buyButton = isSold ? '' : `<button class="btn-beli" data-num="${id.number}">Beli</button>`;
-  
-  return `<div class="${cls}" data-num="${id.number}" data-tier="${id.tier}" data-ani="${ani}">
+  const buyButton=isSold?'':`<button class="btn-beli" data-num="${id.number}">Beli</button>`;
+  return `<div class="${cls}" data-num="${id.number}" data-tier="${id.tier}">
     <div class="cleft">
       <div class="acc-id">${id.number}</div>
       <span class="tier-badge ${TCLS[id.tier]}">${TNAME[id.tier]}</span>
@@ -594,21 +803,14 @@ async function doLike(number,btn){
   }else{btn.disabled=false;showToast(d.message||'Gagal like','warn');}
 }
 
-// ── CEK TRANSAKSI PENDING UNTUK BADGE ──────────────────
-async function checkPendingTransaction() {
-  try {
-    const res = await fetch(`${API}/transactions/check`);
-    if (!res.ok) return;
-    const data = await res.json();
-    const badge = document.getElementById('pendingBadge');
-    if (badge) {
-      if (data.hasPending) {
-        badge.style.display = 'block';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
-  } catch (e) {}
+// ── CEK TRANSAKSI PENDING ──────────────────────────
+async function checkPendingTransaction(){
+  try{
+    const res=await fetch(`${API}/transactions/check`);if(!res.ok)return;
+    const data=await res.json();
+    const badge=document.getElementById('pendingBadge');
+    if(badge){badge.style.display=data.hasPending?'block':'none';}
+  }catch(e){}
 }
 
 // ── NOTIF ──────────────────────────────────────────
@@ -659,15 +861,12 @@ function applyMusic(s){
 }
 
 function showMusicBar(){
-  if(!songs.length) return;
+  if(!songs.length)return;
   const bar=document.getElementById('musicBar');
   bar.classList.remove('hidden');
   document.getElementById('musicFab').classList.remove('show');
-  if(autoHideTimer) clearTimeout(autoHideTimer);
-  autoHideTimer=setTimeout(()=>{
-    bar.classList.add('hidden');
-    document.getElementById('musicFab').classList.add('show');
-  },5000);
+  if(autoHideTimer)clearTimeout(autoHideTimer);
+  autoHideTimer=setTimeout(()=>{bar.classList.add('hidden');document.getElementById('musicFab').classList.add('show');},5000);
 }
 
 function loadSong(idx){
@@ -677,49 +876,18 @@ function loadSong(idx){
   document.getElementById('musicSub').textContent=`Track ${idx+1} / ${songs.length}`;
   const ti=document.getElementById('musicTitle');
   ti.classList.remove('marquee');
-  setTimeout(()=>{
-    if(ti.scrollWidth>ti.parentElement.clientWidth) ti.classList.add('marquee');
-  },200);
+  setTimeout(()=>{if(ti.scrollWidth>ti.parentElement.clientWidth)ti.classList.add('marquee');},200);
 }
 
 function togglePlay(){
-  if(audio.paused){
-    audio.play().catch(e=>console.log('Play error:', e));
-    document.getElementById('musicAlb').classList.add('spin');
-    setPlayIcon(true);
-  }else{
-    audio.pause();
-    document.getElementById('musicAlb').classList.remove('spin');
-    setPlayIcon(false);
-  }
+  if(audio.paused){audio.play().catch(e=>console.log('Play error:',e));document.getElementById('musicAlb').classList.add('spin');setPlayIcon(true);}
+  else{audio.pause();document.getElementById('musicAlb').classList.remove('spin');setPlayIcon(false);}
 }
-
-function setPlayIcon(p){
-  document.getElementById('mcPlayIcon').innerHTML=p?'<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>':'<polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>';
-}
-
-function nextSong(){
-  currentSong=(currentSong+1)%songs.length;
-  loadSong(currentSong);
-  audio.play().catch(e=>console.log('Play error:', e));
-  document.getElementById('musicAlb').classList.add('spin');
-  setPlayIcon(true);
-}
-
-function prevSong(){
-  currentSong=(currentSong-1+songs.length)%songs.length;
-  loadSong(currentSong);
-  audio.play().catch(e=>console.log('Play error:', e));
-  document.getElementById('musicAlb').classList.add('spin');
-  setPlayIcon(true);
-}
-
+function setPlayIcon(p){document.getElementById('mcPlayIcon').innerHTML=p?'<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>':'<polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>';}
+function nextSong(){currentSong=(currentSong+1)%songs.length;loadSong(currentSong);audio.play().catch(e=>console.log('Play error:',e));document.getElementById('musicAlb').classList.add('spin');setPlayIcon(true);}
+function prevSong(){currentSong=(currentSong-1+songs.length)%songs.length;loadSong(currentSong);audio.play().catch(e=>console.log('Play error:',e));document.getElementById('musicAlb').classList.add('spin');setPlayIcon(true);}
 audio.addEventListener('ended',nextSong);
-audio.addEventListener('pause',()=>{
-  document.getElementById('musicAlb').classList.remove('spin');
-  setPlayIcon(false);
-});
-
+audio.addEventListener('pause',()=>{document.getElementById('musicAlb').classList.remove('spin');setPlayIcon(false);});
 document.getElementById('mcPlay').addEventListener('click',togglePlay);
 document.getElementById('mcPrev').addEventListener('click',prevSong);
 document.getElementById('mcNext').addEventListener('click',nextSong);
@@ -727,10 +895,8 @@ document.getElementById('mcNext').addEventListener('click',nextSong);
 let toastTimer;
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast '+(type==='warn'?'warn':'')+' show';
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>{t.className='toast '+(type==='warn'?'warn':'');},2500);
+  t.textContent=msg;t.className='toast '+(type==='warn'?'warn':'')+' show';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.className='toast '+(type==='warn'?'warn':'');},2500);
 }
 
 const popupHTML=`
