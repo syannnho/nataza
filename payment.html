@@ -36,8 +36,6 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 
 /* SCROLL AREA */
 #scrollarea{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-
-/* WRAPPER — satu sumber kebenaran untuk jarak antar box */
 .wrap{padding:14px 16px 28px;display:flex;flex-direction:column;gap:12px}
 
 /* STEPPER */
@@ -50,10 +48,10 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .step-line{flex:1;height:2px;background:#232338;margin:0 8px;transition:.3s;max-width:60px}
 .step-line.done{background:#22bb72}
 
-/* ID BANNER - MENGGUNAKAN GAMBAR */
+/* ID BANNER */
 .id-banner{background:#181826;border:1px solid #232338;border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px}
-.id-banner-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.id-banner-ico img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.id-banner-ico{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#7b2fff,#a06bff);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.id-banner-ico svg{width:20px;height:20px;color:#fff}
 .id-banner-num{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.5px}
 .id-banner-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 .tier-pill{font-size:.5rem;font-weight:800;padding:2px 8px;border-radius:99px;border:1px solid;text-transform:uppercase;letter-spacing:.4px}
@@ -63,7 +61,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .tier-legend{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.25)}
 .id-price{font-size:.7rem;font-weight:800;font-family:'Rajdhani',sans-serif;color:#a06bff}
 
-/* FORM CARD — hapus margin-bottom, biarkan gap di .wrap yang ngatur */
+/* FORM CARD */
 .form-card{background:#181826;border:1px solid #232338;border-radius:16px;padding:16px}
 .form-card h3{font-size:.78rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px}
 .form-card h3 svg{width:15px;height:15px;color:#a06bff}
@@ -199,10 +197,10 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 
     <!-- STEP 1 -->
     <div id="step1" style="display:contents">
-      <!-- ID BANNER - MENGGUNAKAN GAMBAR -->
+      <!-- ID BANNER -->
       <div class="id-banner">
         <div class="id-banner-ico">
-          <img src="https://files.catbox.moe/vqzqxe.png" alt="ID Icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="14" y1="3" x2="12" y2="21"/></svg>
         </div>
         <div id="bannerContent"><span style="color:#6060a0;font-size:.72rem">Memuat data ID...</span></div>
       </div>
@@ -305,6 +303,7 @@ const API='/api';
 const DEFAULT_QRIS='00020101021126610014COM.GO-JEK.WWW01189360091438891755300210G8891755300303UMI51440014ID.CO.QRIS.WWW0215ID10243566855930303UMI5204573253033605802ID5918Aestroshop, GREGED6007CIREBON61054518162070703A016304C52D';
 let settings={},idDoc=null,promoDisc=0,promoCode='';
 let qrcodeInstance=null;
+let notifOpen=false;
 
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TCLS={low:'tier-low',medium:'tier-medium',high:'tier-high',legend:'tier-legend'};
@@ -319,6 +318,87 @@ function showToast(msg,isError=false){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+// ========== NOTIFIKASI ==========
+const notifPanelHTML=`
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-head">
+    <div class="notif-head-title">Aktivitas</div>
+    <button class="notif-mark" onclick="markAllRead()">Tandai dibaca</button>
+  </div>
+  <div class="notif-list" id="notifList"><div class="notif-empty">Memuat...</div></div>
+</div>`;
+document.body.insertAdjacentHTML('beforeend',notifPanelHTML);
+
+const notifDetailHTML=`
+<div class="nd-overlay" id="ndOverlay">
+  <div class="nd-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700">Detail</div>
+      <div class="modal-close" onclick="document.getElementById('ndOverlay').classList.remove('open')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div id="ndContent"></div>
+  </div>
+</div>`;
+document.body.insertAdjacentHTML('beforeend',notifDetailHTML);
+
+document.getElementById('notifBtn').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  notifOpen=!notifOpen;
+  document.getElementById('notifPanel').classList.toggle('open',notifOpen);
+  if(notifOpen)loadNotifications();
+});
+document.addEventListener('click',(e)=>{
+  if(notifOpen&&!document.getElementById('notifPanel').contains(e.target)&&e.target!==document.getElementById('notifBtn')){
+    notifOpen=false;
+    document.getElementById('notifPanel').classList.remove('open');
+  }
+});
+
+async function loadNotifications(){
+  try{
+    const r=await fetch(`${API}/notifications?limit=20`);
+    if(!r.ok)return;
+    const d=await r.json();
+    const badge=document.getElementById('notifBadge');
+    if(d.unread>0){badge.textContent=d.unread>99?'99+':String(d.unread);badge.classList.add('show');}
+    else badge.classList.remove('show');
+    const list=document.getElementById('notifList');
+    if(!d.data||!d.data.length){list.innerHTML='<div class="notif-empty">Belum ada aktivitas</div>';return;}
+    list.innerHTML=d.data.map(n=>{
+      const t=new Date(n.createdAt);const diff=Date.now()-t.getTime();
+      const ts=diff<60000?'Baru saja':diff<3600000?Math.floor(diff/60000)+' mnt lalu':diff<86400000?Math.floor(diff/3600000)+' jam lalu':t.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
+      return `<div class="notif-item ${n.read?'':'unread'}" onclick='openNotifDetail(${JSON.stringify(JSON.stringify(n))})'>
+        <div class="notif-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div style="flex:1;min-width:0"><div class="notif-msg">${n.message}</div><div class="notif-time">${ts}</div></div>
+      </div>`;
+    }).join('');
+  }catch(e){}
+}
+
+function openNotifDetail(jsonStr){
+  const n=JSON.parse(jsonStr);
+  document.getElementById('ndContent').innerHTML=`
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;margin-bottom:5px">${n.title||'Aktivitas'}</div>
+      <div style="font-size:.68rem;color:#6060a0;line-height:1.6">${n.message}</div>
+    </div>
+    <div style="font-size:.56rem;color:#6060a0;text-align:center;margin-top:9px">${new Date(n.createdAt).toLocaleString('id-ID')}</div>
+  `;
+  document.getElementById('ndOverlay').classList.add('open');
+}
+
+async function markAllRead(){
+  await fetch(`${API}/notifications/read`,{method:'PUT'}).catch(()=>{});
+  const badge=document.getElementById('notifBadge');
+  badge.classList.remove('show');
+  document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));
+  loadNotifications();
+}
+
+// ========== PAYMENT FUNCTIONS ==========
 function crc16(str){
   let c=0xFFFF;
   for(let i=0;i<str.length;i++){
@@ -447,11 +527,8 @@ async function goStep2(){
   document.getElementById('sl1').classList.add('done');
   document.getElementById('s2').classList.add('active');
 
-  // Hide step1 children
   const step1=document.getElementById('step1');
   [...step1.children].forEach(el=>el.style.display='none');
-
-  // Show step2
   document.getElementById('step2').style.display='block';
 
   const p=settings.prices||{low:125000,medium:450000,high:850000,legend:1350000};
@@ -493,16 +570,6 @@ async function doSubmit(){
     btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Saya Sudah Bayar';
     showToast(d.message||'Gagal memproses pembayaran',true);
   }
-}
-
-async function loadNotifications(){
-  try{
-    const r=await fetch(`${API}/notifications?limit=1`);
-    if(!r.ok)return;
-    const d=await r.json();
-    const badge=document.getElementById('notifBadge');
-    if(badge){if(d.unread>0){badge.textContent=d.unread>99?'99+':String(d.unread);badge.classList.add('show');}else badge.classList.remove('show');}
-  }catch(e){}
 }
 
 async function init(){
