@@ -139,7 +139,7 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .oi-lbl{color:#6060a0}
 .oi-val{font-weight:600;font-family:'Rajdhani',sans-serif}
 
-/* ── DISPATCH BUTTON (SHIP BUTTON) ── */
+/* DISPATCH BUTTON */
 .ship-btn {
   appearance: none;
   border: 0;
@@ -310,7 +310,6 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 .ship-btn .headlight.top    { top: 4px; }
 .ship-btn .headlight.bottom { bottom: 4px; }
 
-/* animated state */
 .ship-btn.go .lbl.idle          { --o: 0; transition-delay: 0s; }
 .ship-btn.go .lbl.done          { --o: 1; transition-delay: 7s; }
 .ship-btn.go .lbl.done svg      { stroke-dashoffset: 0; transition-delay: 7.3s; }
@@ -471,7 +470,6 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
           <div class="oi-row"><div class="oi-lbl">Total</div><div class="oi-val" id="oiTotal">—</div></div>
         </div>
 
-        <!-- DISPATCH BUTTON -->
         <button class="ship-btn" id="shipBtn">
           <span class="lbl idle">Saya Sudah Bayar</span>
           <span class="lbl done">
@@ -516,12 +514,16 @@ html,body{width:100%;height:100%;background:#0e0e1a;color:#e8e8f5;font-family:'E
 <script>
 const API='/api';
 const DEFAULT_QRIS='00020101021126610014COM.GO-JEK.WWW01189360091438891755300210G8891755300303UMI51440014ID.CO.QRIS.WWW0215ID10243566855930303UMI5204573253033605802ID5918Aestroshop, GREGED6007CIREBON61054518162070703A016304C52D';
-let settings={},idDoc=null,promoDisc=0,promoCode='';
+let settings={prices:{low:125000,medium:450000,high:850000,legend:1350000}};
+let idDoc=null;
+let promoDisc=0;
+let promoCode='';
 let qrcodeInstance=null;
 let notifOpen=false;
 
 const fmt=n=>'Rp '+Number(n).toLocaleString('id-ID');
 const TCLS={low:'tier-low',medium:'tier-medium',high:'tier-high',legend:'tier-legend'};
+const TIER_NAMES={low:'Low',medium:'Medium',high:'High',legend:'Legend'};
 
 function showToast(msg,isError=false){
   const t=document.getElementById('toast');
@@ -576,28 +578,43 @@ function downloadQR(){
   a.click();
 }
 
+async function loadSettings(){
+  try{
+    const res=await fetch(`${API}/settings`);
+    if(res.ok){
+      const data=await res.json();
+      if(data.data && data.data.prices) settings.prices=data.data.prices;
+    }
+  }catch(e){console.warn('Settings load error, using defaults',e);}
+}
+
 async function loadId(number){
-  const r=await fetch(`${API}/ids/${encodeURIComponent(number)}`).catch(()=>null);
-  if(!r||!r.ok){
-    document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">ID tidak ditemukan</span>`;
-    return;
-  }
-  const{data}=await r.json();
-  idDoc=data;
-  const prices=settings.prices||{low:125000,medium:450000,high:850000,legend:1350000};
-  const price=prices[data.tier]||0;
-  document.getElementById('bannerContent').innerHTML=`
-    <div><div class="id-banner-num">${data.number}</div>
-    <div class="id-banner-meta">
-      <span class="tier-pill ${TCLS[data.tier]}">${data.tier.toUpperCase()}</span>
-      <span class="id-price">${fmt(price)}</span>
-      ${data.sold?'<span style="font-size:.56rem;color:#ef4444;font-weight:800">SUDAH TERJUAL</span>':''}
-    </div></div>`;
-  updateSummary();
-  checkNext();
-  if(data.sold){
-    document.getElementById('btnNext').disabled=true;
-    document.getElementById('btnNext').textContent='ID Ini Sudah Terjual';
+  try{
+    const r=await fetch(`${API}/ids/${encodeURIComponent(number)}`);
+    if(!r||!r.ok){
+      document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">ID tidak ditemukan</span>`;
+      return;
+    }
+    const data=await r.json();
+    idDoc=data.data;
+    if(!idDoc) throw new Error('No data');
+    const price=settings.prices[idDoc.tier]||0;
+    document.getElementById('bannerContent').innerHTML=`
+      <div><div class="id-banner-num">${idDoc.number}</div>
+      <div class="id-banner-meta">
+        <span class="tier-pill ${TCLS[idDoc.tier]}">${TIER_NAMES[idDoc.tier]}</span>
+        <span class="id-price">${fmt(price)}</span>
+        ${idDoc.sold?'<span style="font-size:.56rem;color:#ef4444;font-weight:800">SUDAH TERJUAL</span>':''}
+      </div></div>`;
+    updateSummary();
+    checkNext();
+    if(idDoc.sold){
+      document.getElementById('btnNext').disabled=true;
+      document.getElementById('btnNext').textContent='ID Ini Sudah Terjual';
+    }
+  }catch(err){
+    console.error(err);
+    document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">Gagal memuat ID</span>`;
   }
 }
 
@@ -605,17 +622,21 @@ async function validatePromo(){
   const code=document.getElementById('promoInput').value.trim().toUpperCase();
   const msgDiv=document.getElementById('promoMsg');
   if(!code){showMsg(msgDiv,'err','Masukkan kode promo');return;}
-  const r=await fetch(`${API}/promo/validate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).catch(()=>null);
-  if(!r){showMsg(msgDiv,'err','Gagal terhubung');return;}
-  const d=await r.json();
-  if(d.success){
-    promoDisc=d.discount;promoCode=d.code;
-    showMsg(msgDiv,'ok',`Diskon ${d.discount}% berhasil diterapkan!`);
-  }else{
-    promoDisc=0;promoCode='';
-    showMsg(msgDiv,'err',d.message||'Kode tidak valid');
-  }
-  updateSummary();
+  try{
+    const r=await fetch(`${API}/promo/validate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+    if(!r){showMsg(msgDiv,'err','Gagal terhubung');return;}
+    const d=await r.json();
+    if(d.success){
+      promoDisc=d.discount;
+      promoCode=d.code;
+      showMsg(msgDiv,'ok',`Diskon ${d.discount}% berhasil diterapkan!`);
+    }else{
+      promoDisc=0;
+      promoCode='';
+      showMsg(msgDiv,'err',d.message||'Kode tidak valid');
+    }
+    updateSummary();
+  }catch(e){showMsg(msgDiv,'err','Gagal terhubung');}
 }
 
 function showMsg(el,type,text){
@@ -626,12 +647,11 @@ function showMsg(el,type,text){
 
 function updateSummary(){
   if(!idDoc)return;
-  const p=settings.prices||{low:125000,medium:450000,high:850000,legend:1350000};
-  const base=p[idDoc.tier]||0;
+  const base=settings.prices[idDoc.tier]||0;
   const disc=Math.round(base*promoDisc/100);
   const total=base-disc;
   document.getElementById('sumId').textContent=idDoc.number;
-  document.getElementById('sumTier').textContent=idDoc.tier.charAt(0).toUpperCase()+idDoc.tier.slice(1);
+  document.getElementById('sumTier').textContent=TIER_NAMES[idDoc.tier];
   document.getElementById('sumBase').textContent=fmt(base);
   document.getElementById('sumTotal').textContent=fmt(total);
   const dr=document.getElementById('sumDiscRow');
@@ -660,12 +680,11 @@ async function goStep2(){
   [...step1.children].forEach(el=>el.style.display='none');
   document.getElementById('step2').style.display='block';
 
-  const p=settings.prices||{low:125000,medium:450000,high:850000,legend:1350000};
-  const base=p[idDoc.tier]||0;
+  const base=settings.prices[idDoc.tier]||0;
   const disc=Math.round(base*promoDisc/100);
   const total=base-disc;
   document.getElementById('oiId').textContent=idDoc.number;
-  document.getElementById('oiTier').textContent=idDoc.tier.charAt(0).toUpperCase()+idDoc.tier.slice(1);
+  document.getElementById('oiTier').textContent=TIER_NAMES[idDoc.tier];
   document.getElementById('oiBase').textContent=fmt(base);
   document.getElementById('oiTotal').textContent=fmt(total);
   const dr=document.getElementById('oiDiscRow');
@@ -676,12 +695,13 @@ async function goStep2(){
   document.getElementById('scrollarea').scrollTop=0;
 }
 
-// ========== SUBMIT WITH DISPATCH BUTTON ==========
+// ========== DISPATCH BUTTON ==========
 const shipBtn = document.getElementById('shipBtn');
 let isProcessing = false;
 
 async function doSubmit() {
   if(isProcessing) return;
+  if(shipBtn.classList.contains('go')) return;
   
   const name = document.getElementById('buyerName').value.trim();
   const phone = document.getElementById('buyerPhone').value.trim();
@@ -690,11 +710,7 @@ async function doSubmit() {
     return;
   }
   
-  if(shipBtn.classList.contains('go')) return;
-  
   isProcessing = true;
-  
-  // Start animation
   shipBtn.classList.add('go');
   
   try{
@@ -702,13 +718,11 @@ async function doSubmit() {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({idNumber:idDoc.number,method:'qris',buyer:name,phone,promoCode})
-    }).catch(()=>null);
+    });
     
-    if(!r){
-      shipBtn.classList.remove('go');
-      isProcessing=false;
-      showToast('Gagal terhubung ke server',true);
-      return;
+    if(!r.ok){
+      const errData=await r.json();
+      throw new Error(errData.message||'Gagal memproses');
     }
     
     const d=await r.json();
@@ -716,7 +730,6 @@ async function doSubmit() {
       try{const sfx=document.getElementById('paidSfx');sfx.currentTime=0;sfx.play().catch(()=>{});}catch(e){}
       document.getElementById('successMsg').textContent=`Pesanan ID ${idDoc.number} berhasil. Admin akan menghubungi kamu via WhatsApp di ${phone}.`;
       document.getElementById('successOverlay').classList.add('open');
-      // Reset button after animation completes
       setTimeout(()=>{
         shipBtn.classList.remove('go');
         isProcessing=false;
@@ -729,7 +742,7 @@ async function doSubmit() {
   }catch(err){
     shipBtn.classList.remove('go');
     isProcessing=false;
-    showToast('Terjadi kesalahan',true);
+    showToast(err.message||'Terjadi kesalahan',true);
   }
 }
 
@@ -815,17 +828,28 @@ async function markAllRead(){
   loadNotifications();
 }
 
+// ========== INIT ==========
 async function init(){
-  const r=await fetch(`${API}/settings`).catch(()=>null);
-  if(r&&r.ok){const d=await r.json();settings=d.data||{};}
+  await loadSettings();
+  
   const params=new URLSearchParams(window.location.search);
   const preId=params.get('id');
-  if(preId){await loadId(preId);}
-  else{document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">Tidak ada ID dipilih. <a href="index.html" style="color:#a06bff">Pilih ID dulu</a></span>`;}
-  ['buyerName','buyerPhone'].forEach(id=>{document.getElementById(id).addEventListener('input',checkNext);});
+  if(preId){
+    await loadId(preId);
+  }else{
+    document.getElementById('bannerContent').innerHTML=`<span style="color:#ef4444;font-size:.72rem">Tidak ada ID dipilih. <a href="index.html" style="color:#a06bff">Pilih ID dulu</a></span>`;
+  }
+  
+  document.getElementById('buyerName').addEventListener('input',checkNext);
+  document.getElementById('buyerPhone').addEventListener('input',checkNext);
+  
   document.querySelectorAll('.method-opt').forEach(opt=>{
-    opt.addEventListener('click',()=>{document.querySelectorAll('.method-opt').forEach(o=>o.classList.remove('selected'));opt.classList.add('selected');});
+    opt.addEventListener('click',()=>{
+      document.querySelectorAll('.method-opt').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
   });
+  
   loadNotifications();
   setInterval(loadNotifications,30000);
 }
